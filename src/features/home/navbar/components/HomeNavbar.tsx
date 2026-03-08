@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { NavItemType } from "@/types/navbar.types";
+import { NavItemType } from "@/types/navbar/navbar.types";
 import { homeNavItems } from "../config/HomeNavItems";
 import HomeNavLink from "./HomeNavLink";
 
@@ -10,7 +10,7 @@ export default function HomeNavbar() {
 
   return (
     <nav
-      className="flex h-full justify-between items-center text-(--color-text-inverse) md:text-2xl"
+      className="flex h-full max-w-390 justify-between items-center text-3xl font-semibold text-(--color-text-inverse) md:text-2xl md:px-5"
       aria-label="Navegación principal"
     >
       {homeNavItems.map((item) => {
@@ -25,16 +25,9 @@ export default function HomeNavbar() {
           );
         }
 
-        // if (item.type === NavItemType.DROPDOWN) {
-        //   return (
-        //     <NavDropdown
-        //       key={item.label}
-        //       label={item.label}
-        //       items={item.items}
-        //       currentPath={pathName}
-        //     />
-        //   );
-        // }
+        if (item.type === NavItemType.DROPDOWN) {
+          return <></>;
+        }
 
         if (item.type === NavItemType.LOGIN) {
           return <div key={item.label}>Login</div>;

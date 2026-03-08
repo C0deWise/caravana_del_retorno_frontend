@@ -4,6 +4,13 @@ export const metadata = {
   title: "Caravana del Retorno - Inicio",
   description:
     "¡Bienvenidos a la página web oficial de la Caravana del Retorno, Florencia, Cauca, Popayán!",
+  icons: {
+    icon: "/home/Caravana-Del-Retorno-Icon.svg",
+  },
+  openGraph: {
+    images: ["/home/Caravana-Del-Retorno-Text.svg"],
+    type: "website",
+  },
 };
 
 export default function HomeLayout({
