@@ -1,6 +1,6 @@
-import HeaderIcon from "@/ui/components/HeaderIcon";
-import HeaderText from "@/ui/components/HeaderText";
-import HeaderCurve from "@/ui/components/HeaderCurve";
+import HeaderIcon from "@/ui/header/HeaderIcon";
+import HeaderText from "@/ui/header/HeaderText";
+import HeaderCurve from "@/ui/header/HeaderCurve";
 import HomeNavbar from "../../navbar/components/HomeNavbar";
 
 export default function HomeHeaderContent() {
