@@ -1,1 +1,0 @@
-export { useCreateColonia } from './useCreateColonia';

@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Select from 'react-select';
-import { useCreateColonia } from '../hooks';
+import { useCreateColonia } from '../hooks/useCreateColonia';
 import type { ColoniaData } from '../types/colonia.types';
 import { getAllCountries, getDepartments, getCitiesByDepartmentName } from '@/shared/constants/countries';
 import type { City } from '@/shared/constants/countries';
