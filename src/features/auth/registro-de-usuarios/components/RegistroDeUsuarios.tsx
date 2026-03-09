@@ -8,7 +8,7 @@ import LocationModal, { LocationData } from './LocationModal';
 export default function AuthRegistroDeUsuarios() {
     const { registerUser, loading, error, success } = useRegisterUser();
     const { validate: validateDocument, validating, validationError } = useDocumentValidation();
-    
+
     const [formData, setFormData] = useState<RegistrationData>({
         us_codigo: '',
         us_tipo_doc: 'CC',
@@ -18,9 +18,9 @@ export default function AuthRegistroDeUsuarios() {
         us_apellido: '',
         us_genero: '',
         us_fecha_nacimiento: '',
-        us_pais: 'Colombia',
+        us_pais: '',
         us_departamento: '',
-        us_ciudad: 'Bogotá',
+        us_ciudad: '',
         email: '',
         confirmEmail: '',
         password: '',
@@ -34,7 +34,7 @@ export default function AuthRegistroDeUsuarios() {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-        
+
         // Limpiar error del campo cuando el usuario empieza a escribir
         if (fieldErrors[name]) {
             setFieldErrors(prev => {
@@ -52,12 +52,12 @@ export default function AuthRegistroDeUsuarios() {
 
     const validateField = (fieldName: string) => {
         const value = formData[fieldName as keyof RegistrationData];
-        
+
         if (!value || (typeof value === 'string' && value.trim() === '')) {
             setFieldErrors(prev => ({ ...prev, [fieldName]: 'Este campo es obligatorio' }));
             return false;
         }
-        
+
         return true;
     };
 
@@ -87,36 +87,36 @@ export default function AuthRegistroDeUsuarios() {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        
+
         // Validar todos los campos
         if (!validateAllFields()) {
             return;
         }
-        
+
         // Validar emails coincidan
         if (formData.email !== formData.confirmEmail) {
-            setFieldErrors(prev => ({ 
-                ...prev, 
-                confirmEmail: 'Los correos electrónicos no coinciden' 
+            setFieldErrors(prev => ({
+                ...prev,
+                confirmEmail: 'Los correos electrónicos no coinciden'
             }));
             return;
         }
-        
+
         // Validar contraseñas coincidan
         if (formData.password !== formData.confirmPassword) {
-            setFieldErrors(prev => ({ 
-                ...prev, 
-                confirmPassword: 'Las contraseñas no coinciden' 
+            setFieldErrors(prev => ({
+                ...prev,
+                confirmPassword: 'Las contraseñas no coinciden'
             }));
             return;
         }
-        
+
         // Validar documento antes de enviar
         const documentoValido = await validateDocument(formData.us_tipo_doc, formData.us_documento);
         if (!documentoValido) {
             return;
         }
-        
+
         await registerUser(formData);
     };
 
@@ -128,7 +128,7 @@ export default function AuthRegistroDeUsuarios() {
             us_ciudad: locationData.municipio
         }));
         setIsLocationModalOpen(false);
-        
+
         // Limpiar errores de ubicación si existen
         if (fieldErrors.us_ciudad) {
             setFieldErrors(prev => {
@@ -148,8 +148,17 @@ export default function AuthRegistroDeUsuarios() {
     };
 
     const getLocationDisplay = () => {
-        if (formData.us_departamento && formData.us_ciudad) {
-            return `${formData.us_pais}, ${formData.us_departamento}, ${formData.us_ciudad}`;
+        if (formData.us_pais === 'Colombia') {
+            if (formData.us_departamento && formData.us_ciudad) {
+                return `${formData.us_pais}, ${formData.us_departamento}, ${formData.us_ciudad}`;
+            } else if (formData.us_departamento) {
+                return `${formData.us_pais}, ${formData.us_departamento}`;
+            }
+        }
+
+        // Si solo hay país o cualquier otro caso
+        if (formData.us_pais) {
+            return formData.us_pais;
         }
         return 'Seleccionar ubicación';
     };
@@ -169,7 +178,7 @@ export default function AuthRegistroDeUsuarios() {
                             <h2 className="section-title">
                                 Datos personales
                             </h2>
-                            
+
                             <div className="space-y-6">
                                 {/* Nombres y Apellidos */}
                                 <div className="grid grid-cols-2 gap-4">
@@ -294,9 +303,22 @@ export default function AuthRegistroDeUsuarios() {
                                         <button
                                             type="button"
                                             onClick={handleLocationModalOpen}
-                                            className={`input-base text-left ${fieldErrors.us_ciudad ? 'input-error' : ''}`}
+                                            className={`input-base text-left flex items-center justify-between ${fieldErrors.us_ciudad ? 'input-error' : ''}`}
                                         >
-                                            {getLocationDisplay()}
+                                            <span>{getLocationDisplay()}</span>
+                                            <svg 
+                                                className="w-5 h-5 text-gray-400" 
+                                                fill="none" 
+                                                stroke="currentColor" 
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path 
+                                                    strokeLinecap="round" 
+                                                    strokeLinejoin="round" 
+                                                    strokeWidth={2} 
+                                                    d="M19 9l-7 7-7-7" 
+                                                />
+                                            </svg>
                                         </button>
                                         {fieldErrors.us_ciudad && (
                                             <p className="validation-message validation-error">{fieldErrors.us_ciudad}</p>
@@ -318,7 +340,7 @@ export default function AuthRegistroDeUsuarios() {
                             <h2 className="section-title">
                                 Datos de inicio de sesion
                             </h2>
-                            
+
                             <div className="space-y-6">
                                 {/* Correo Electrónico */}
                                 <div className="grid grid-cols-2 gap-4">
