@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react';
-import { useCreateRetorno } from '../hooks';
+import { useCreateRetorno } from '../hooks/useCreateRetorno';
+import Breadcrumb from '../../breadcrumb/Breadcrumb';
 
 export default function CrearRetorno() {
     const { createRetorno, loading, error, success } = useCreateRetorno();
@@ -92,18 +93,7 @@ export default function CrearRetorno() {
     return (
         <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#E5E5E5' }}>
             {/* Header con breadcrumb y usuario */}
-            <div className="bg-white border-b border-gray-200 px-6 py-4">
-                <div className="flex justify-between items-center">
-                    <div className="text-sm text-gray-600">
-                        <span>Inicio &gt; </span>
-                        <span className="font-semibold">Creacion de retornos</span>
-                    </div>
-                    <div className="text-right">
-                        <div className="text-xs text-gray-500">Usuario</div>
-                        <div className="text-sm font-semibold">Administrador</div>
-                    </div>
-                </div>
-            </div>
+            <Breadcrumb />
 
             {/* Contenido principal */}
             <div className="flex-1 flex justify-center items-center p-4">
