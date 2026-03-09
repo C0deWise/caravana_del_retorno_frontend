@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, FormEvent } from 'react';
-import { useRegisterUser, useDocumentValidation } from '../hooks';
+import { useRegisterUser } from '../hooks/useUserRegistrarion';
+import { useDocumentValidation } from '../hooks/useDocumentValidation';
 import type { RegistrationData } from '../types/registro.types';
 import LocationModal, { LocationData } from './LocationModal';
 
