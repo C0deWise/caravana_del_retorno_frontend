@@ -1,4 +1,5 @@
 import HomeHeader from "@/features/home/header/components/HomeHeader";
+import HomeFooter from "@/features/home/footer/components/HomeFooter";
 
 export const metadata = {
   title: "Caravana del Retorno - Inicio",
@@ -22,6 +23,7 @@ export default function HomeLayout({
     <>
       <HomeHeader />
       <main className="grow w-full flex flex-col">{children}</main>
+      <HomeFooter />
     </>
   );
 }
