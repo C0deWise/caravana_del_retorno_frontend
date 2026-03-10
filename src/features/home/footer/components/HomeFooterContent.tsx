@@ -1,52 +1,70 @@
 import FooterCurve from "@/ui/footer/FooterCurve";
-import Separator from "@/ui/general/Separator";
+import VerticalSeparator from "@/ui/general/VerticalSeparator";
+import HeaderText from "@/ui/header/HeaderText";
+import FooterFacebook from "@/ui/footer/FooterFacebook";
+import FooterInstagram from "@/ui/footer/FooterInstagram";
 import HomeMap from "../../mapa/components/HomeMap";
 import { ArrowLeftCircleIcon } from "@heroicons/react/24/outline";
 import { PhotoIcon } from "@heroicons/react/24/outline";
 
 export default function HomeFooterContent() {
   return (
-    <div className="bg-primary md:h-100 relative">
+    <div className="bg-primary md:h-90 relative">
       <FooterCurve />
-      <div className="w-full h-full flex">
+      <div className="w-full h-11/12 flex">
         <div className="flex-none md:w-auto aspect-square md:pl-10 md:py-5">
           <HomeMap />
         </div>
-        <div className="md:w-fit md:h-auto justify-center">
-          <div className="flex flex-col pl-10 space-y-6 mr-9">
-            <div className="flex w-fit items-center mt-10 space-x-10">
-              <ArrowLeftCircleIcon className="text-text-inverse md:w-16 md:h-16" />
-              <span className="text-text-inverse font-semibold text-4xl">
+        <div className="md:w-full md:flex-1 md:h-full justify-center">
+          <div className="flex flex-col md:pl-10 md:mr-8 md:h-full md:py-5">
+            <div className="flex w-fit items-center space-x-10">
+              <ArrowLeftCircleIcon className="text-text-inverse md:w-16 md:h-16 flex-none" />
+              <span className="text-text-inverse font-semibold text-4xl text-shadow-lg">
                 ¡Encuentranos en el mapa!
               </span>
             </div>
-            <span className="self-stretch h-1 rounded-4xl bg-bg"></span>
-            <div className="flex flex-col w-1/2">
-              <span className="text-text-inverse font-semibold text-xl md:py-4">
+            <span className="self-stretch h-1 rounded-full bg-bg flex-none mt-4"></span>
+            <div className="flex flex-col flex-1 min-h-0 mt-2 overflow-hidden">
+              <span className="text-text-inverse font-semibold text-xl text-shadow-lg md:pb-4 flex-none">
                 Con el apoyo de:
               </span>
-              <div className="flex md:w-fit md:h-40 md:space-x-6">
-                <div className="bg-bg/15 rounded-xl relative aspect-square">
-                  <PhotoIcon className="w-20 h-20 text-text-inverse absolute inset-0 m-auto" />
+              <div className="flex md:w-full flex-1 min-h-0 gap-4 md:gap-6 relative justify-between items-center pb-2">
+                <div className="flex-1 flex justify-center items-center min-w-0 h-full">
+                  <div className="bg-bg/15 rounded-xl aspect-square w-full max-h-full flex items-center justify-center">
+                    <PhotoIcon className="w-1/2 h-1/2 text-text-inverse" />
+                  </div>
                 </div>
-                <div className="bg-bg/15 rounded-xl relative aspect-square">
-                  <PhotoIcon className="w-20 h-20 text-text-inverse absolute inset-0 m-auto" />
+                <div className="flex-1 flex justify-center items-center min-w-0 h-full">
+                  <div className="bg-bg/15 rounded-xl aspect-square w-full max-h-full flex items-center justify-center">
+                    <PhotoIcon className="w-1/2 h-1/2 text-text-inverse" />
+                  </div>
                 </div>
-                <div className="bg-bg/15 rounded-xl relative aspect-square">
-                  <PhotoIcon className="w-20 h-20 text-text-inverse absolute inset-0 m-auto" />
+                <div className="flex-1 flex justify-center items-center min-w-0 h-full">
+                  <div className="bg-bg/15 rounded-xl aspect-square w-full max-h-full flex items-center justify-center">
+                    <PhotoIcon className="w-1/2 h-1/2 text-text-inverse" />
+                  </div>
                 </div>
-                <div className="bg-bg/15 rounded-xl relative aspect-square">
-                  <PhotoIcon className="w-20 h-20 text-text-inverse absolute inset-0 m-auto" />
+                <div className="flex-1 flex justify-center items-center min-w-0 h-full">
+                  <div className="bg-bg/15 rounded-xl aspect-square w-full max-h-full flex items-center justify-center">
+                    <PhotoIcon className="w-1/2 h-1/2 text-text-inverse" />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <span className="w-10 h-100  border-2 border-accent-yellow">
-          <Separator className="rotate-90" />
+        <span className="self-stretch w-7 rounded-full overflow-clip md:mr-2 md:mb-5 md:mt-2">
+          <VerticalSeparator />
         </span>
-        <div className="flex flex-col border border-accent-red">colmunb</div>
+        <div className="flex flex-col md:mr-7 md:pb-4 justify-between items-center">
+          <HeaderText />
+          <FooterFacebook className="h-20" />
+          <FooterInstagram className="h-20" />
+        </div>
       </div>
+      <span className="absolute bottom-2 right-2 text-text-inverse text-sm font-light">
+        © {new Date().getFullYear()} All rights reserved | Caravana del retorno, Florencia, Cauca
+      </span>
     </div>
   );
 }
