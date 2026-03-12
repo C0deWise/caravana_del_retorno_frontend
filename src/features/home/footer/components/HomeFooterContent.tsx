@@ -3,7 +3,7 @@ import VerticalSeparator from "@/ui/general/VerticalSeparator";
 import HeaderText from "@/ui/header/HeaderText";
 import FooterFacebook from "@/ui/footer/FooterFacebook";
 import FooterInstagram from "@/ui/footer/FooterInstagram";
-import HomeMap from "../../mapa/components/HomeMap";
+import HomeMap from "./HomeMap";
 import { ArrowLeftCircleIcon } from "@heroicons/react/24/outline";
 import { PhotoIcon } from "@heroicons/react/24/outline";
 

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import HomeHeader from "@/features/home/header/components/HomeHeader";
+import HomeFooter from "@/features/home/footer/components/HomeFooter";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -9,10 +11,11 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
+    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   ),
-  title: "Caravana del Retorno",
-  description: "Pagina web de la caravana del retorno",
+  title: "Caravana del Retorno - Inicio",
+  description:
+    "¡Bienvenidos a la página web oficial de la Caravana del Retorno, Florencia, Cauca, Colombia!",
   icons: {
     icon: "/home/Caravana-Del-Retorno-Icon.svg",
   },
@@ -29,7 +32,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className={inter.variable}>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <HomeHeader />
+        <main>{children}</main>
+        <HomeFooter />
+      </body>
     </html>
   );
 }

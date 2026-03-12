@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { NavItemType } from "@/types/navbar/navbar.types";
+import { NavItemType } from "@/types/navbar.types";
 import { homeNavItems } from "../config/HomeNavItems";
 import HomeNavLink from "./HomeNavLink";
 
