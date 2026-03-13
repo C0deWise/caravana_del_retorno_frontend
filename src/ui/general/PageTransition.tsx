@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Spinner from "@/ui/general/Spinner";
 
-const MIN_LOADING_TIME = 250;
+const MIN_LOADING_TIME = 300;
 
 export default function PageTransition({
   children,
