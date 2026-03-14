@@ -53,6 +53,22 @@ export const userService = {
     },
 
     /**
+     * @brief Edita la información de un campo de un usuario específico.
+     * @param us_codigo Código del usuario a editar
+     * @param data Atributo del usuario a editar
+     * @returns Retorna un response con la información del usuario o un error si la operación falla.
+     */
+    patchUser : async (us_codigo: string, data: Partial<UserData>): Promise<UserResponse> => {
+        try {
+            const response = await apiService.put<UserResponse>(`/users/${us_codigo}`, data);
+            return response;
+        } catch (error) {
+            console.error('Error en patchUser:', error);
+            throw error;
+        }
+    },
+
+    /**
      * @brief Eliminar la información de un usuario específico.
      * @param us_codigo Código del usuario a obtener información
      * @returns Retorna un response con la información del usuario o un error si la operación falla.
