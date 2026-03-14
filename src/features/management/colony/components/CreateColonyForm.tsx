@@ -18,19 +18,19 @@ export default function CrearColonia() {
     const [cities, setCities] = useState<City[]>([]);
     
     const [coloniaData, setColoniaData] = useState<ColoniaData>({
-        co_pais: 'Colombia',
-        co_departamento: '',
-        co_ciudad: '',
+        pais: 'Colombia',
+        departamento: '',
+        ciudad: '',
     });
 
     // Obtener países y departamentos
     const countries = useMemo(() => getAllCountries(), []);
     const departments = useMemo(() => {
-        if (coloniaData.co_pais === 'Colombia') {
+        if (coloniaData.pais === 'Colombia') {
             return getDepartments();
         }
         return [];
-    }, [coloniaData.co_pais]);
+    }, [coloniaData.pais]);
 
     // Convertir a formato de react-select
     const countryOptions = useMemo(() => 
@@ -51,9 +51,9 @@ export default function CrearColonia() {
     const handlePaisChange = (option: SelectOption | null) => {
         const pais = option?.value || '';
         setColoniaData({
-            co_pais: pais,
-            co_departamento: '',
-            co_ciudad: '',
+            pais: pais,
+            departamento: '',
+            ciudad: '',
         });
         setCities([]);
     };
@@ -62,8 +62,8 @@ export default function CrearColonia() {
         const departamento = option?.value || '';
         setColoniaData(prev => ({
             ...prev,
-            co_departamento: departamento,
-            co_ciudad: '',
+            departamento: departamento,
+            ciudad: '',
         }));
 
         if (departamento) {
@@ -76,20 +76,20 @@ export default function CrearColonia() {
 
     const handleMunicipioChange = (option: SelectOption | null) => {
         const municipio = option?.value || '';
-        setColoniaData(prev => ({ ...prev, co_ciudad: municipio }));
+        setColoniaData(prev => ({ ...prev, ciudad: municipio }));
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         
         // Validar campos según el país seleccionado
-        if (!coloniaData.co_pais) {
+        if (!coloniaData.pais) {
             return; // El campo país es requerido siempre
         }
         
         // Si es Colombia, validar departamento y municipio
-        if (coloniaData.co_pais === 'Colombia') {
-            if (!coloniaData.co_departamento || !coloniaData.co_ciudad) {
+        if (coloniaData.pais === 'Colombia') {
+            if (!coloniaData.departamento || !coloniaData.ciudad) {
                 return; // Campos requeridos para Colombia
             }
         }
@@ -132,7 +132,7 @@ export default function CrearColonia() {
                 </h1>
                 
                 <h2 className="section-title">
-                    {coloniaData.co_pais === 'Colombia' 
+                    {coloniaData.pais === 'Colombia' 
                         ? 'Seleccione la ubicación de la colonia'
                         : 'Seleccione el país de la colonia'}
                 </h2>
@@ -158,7 +158,7 @@ export default function CrearColonia() {
                         </label>
                         <Select
                             options={countryOptions}
-                            value={countryOptions.find(opt => opt.value === coloniaData.co_pais)}
+                            value={countryOptions.find(opt => opt.value === coloniaData.pais)}
                             onChange={handlePaisChange}
                             placeholder="Seleccione un país"
                             isSearchable={true}
@@ -170,14 +170,14 @@ export default function CrearColonia() {
                     </div>
 
                     {/* Departamento - Solo para Colombia */}
-                    {coloniaData.co_pais === 'Colombia' && (
+                    {coloniaData.pais === 'Colombia' && (
                         <div>
                             <label className="label-base">
                                 Departamento
                             </label>
                             <Select
                                 options={departmentOptions}
-                                value={departmentOptions.find(opt => opt.value === coloniaData.co_departamento) || null}
+                                value={departmentOptions.find(opt => opt.value === coloniaData.departamento) || null}
                                 onChange={handleDepartamentoChange}
                                 placeholder="Seleccione un departamento"
                                 isSearchable={true}
@@ -190,20 +190,20 @@ export default function CrearColonia() {
                     )}
 
                     {/* Municipio - Solo para Colombia */}
-                    {coloniaData.co_pais === 'Colombia' && (
+                    {coloniaData.pais === 'Colombia' && (
                         <div>
                             <label className="label-base">
                                 Municipio
                             </label>
                             <Select
                                 options={cityOptions}
-                                value={cityOptions.find(opt => opt.value === coloniaData.co_ciudad) || null}
+                                value={cityOptions.find(opt => opt.value === coloniaData.ciudad) || null}
                                 onChange={handleMunicipioChange}
-                                placeholder={coloniaData.co_departamento ? 'Seleccione un municipio' : 'Seleccione primero un departamento'}
+                                placeholder={coloniaData.departamento ? 'Seleccione un municipio' : 'Seleccione primero un departamento'}
                                 isSearchable={true}
                                 isClearable={true}
                                 openMenuOnFocus={true}
-                                isDisabled={!coloniaData.co_departamento || cities.length === 0}
+                                isDisabled={!coloniaData.departamento || cities.length === 0}
                                 styles={customStyles}
                                 noOptionsMessage={() => 'No se encontraron municipios'}
                             />
@@ -216,8 +216,8 @@ export default function CrearColonia() {
                             type="submit"
                             disabled={
                                 loading || 
-                                !coloniaData.co_pais || 
-                                (coloniaData.co_pais === 'Colombia' && (!coloniaData.co_departamento || !coloniaData.co_ciudad))
+                                !coloniaData.pais || 
+                                (coloniaData.pais === 'Colombia' && (!coloniaData.departamento || !coloniaData.ciudad))
                             }
                             className="w-full py-3 rounded-lg font-semibold transition-opacity disabled:opacity-50"
                             style={{ 
@@ -242,17 +242,17 @@ export default function CrearColonia() {
                         <ul className="mb-6 space-y-2" style={{ color: 'var(--color-text)' }}>
                             <li className="flex items-center">
                                 <span className="mr-2">•</span>
-                                <span><strong>País:</strong> {coloniaData.co_pais}</span>
+                                <span><strong>País:</strong> {coloniaData.pais}</span>
                             </li>
-                            {coloniaData.co_pais === 'Colombia' && (
+                            {coloniaData.pais === 'Colombia' && (
                                 <>
                                     <li className="flex items-center">
                                         <span className="mr-2">•</span>
-                                        <span><strong>Departamento:</strong> {coloniaData.co_departamento}</span>
+                                        <span><strong>Departamento:</strong> {coloniaData.departamento}</span>
                                     </li>
                                     <li className="flex items-center">
                                         <span className="mr-2">•</span>
-                                        <span><strong>Municipio:</strong> {coloniaData.co_ciudad}</span>
+                                        <span><strong>Municipio:</strong> {coloniaData.ciudad}</span>
                                     </li>
                                 </>
                             )}

@@ -1,4 +1,4 @@
-import CrearColonia from "@/features/gestion/colonia/components/CrearColonia";
+import CrearColonia from "@/features/management/colony/components/CreateColonyForm";
 
 export default function RegistroPage() {
     return <CrearColonia />;

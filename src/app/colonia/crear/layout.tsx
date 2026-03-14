@@ -1,9 +1,9 @@
 import HomeHeader from "@/features/home/header/components/HomeHeader";
 
 export const metadata = {
-    title: "Caravana del Retorno - Registro",
+    title: "Caravana del Retorno - Crear colonia",
     description:
-        "¡Registrate en la caravana del retorno y forma parte de nuestra comunidad! Crea tu cuenta para acceder a todas las funcionalidades y beneficios que ofrecemos. Únete a nosotros hoy mismo y comienza tu viaje con la Caravana del Retorno.",
+        "Página para crear una nueva colonia en la Caravana del Retorno. Administra y organiza tus colonias de manera eficiente.",
     icons: {
         icon: "/home/Caravana-Del-Retorno-Icon.svg",
     },

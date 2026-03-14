@@ -24,7 +24,7 @@ export const useCreateColonia = (): UseCreateColoniaReturn => {
 
         try {
             // Validar que los campos no estén vacíos
-            if (!data.co_pais || !data.co_departamento || !data.co_ciudad) {
+            if (!data.pais || !data.departamento || !data.ciudad) {
                 setError('Todos los campos son obligatorios');
                 return null;
             }
