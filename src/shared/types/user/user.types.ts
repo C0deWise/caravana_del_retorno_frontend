@@ -7,6 +7,7 @@ export interface UserData {
     nombre: string;
     apellido: string;
     genero: string;
+    rol: string;
     fecha_nacimiento: string;
     pais: string;
     departamento: string;
