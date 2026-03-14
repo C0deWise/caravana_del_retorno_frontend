@@ -1,14 +1,14 @@
 export interface ColoniaData {
-    co_pais: string;
-    co_departamento: string;
-    co_ciudad: string;
+    pais: string;
+    departamento: string | null;
+    ciudad: string | null;
 }
 
 export interface ColoniaItem {
-    co_codigo?: string;
-    co_pais: string;
-    co_departamento: string;
-    co_ciudad: string;
+    codigo?: string;
+    pais: string;
+    departamento: string | null;
+    ciudad: string | null;
 }
 
 export interface ColoniaResponse<TData = unknown> {
