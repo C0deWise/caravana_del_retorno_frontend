@@ -23,20 +23,21 @@ export const useCreateColonia = (): UseCreateColoniaReturn => {
         setSuccess(false);
 
         try {
-            // Validar que los campos no estén vacíos
-            if (!data.pais || !data.departamento || !data.ciudad) {
-                setError('Todos los campos son obligatorios');
+            const isColombia = data.pais === 'Colombia';
+
+            if (!data.pais || (isColombia && !data.departamento) || (isColombia && !data.ciudad)) {
+                setError('Todos los campos son obligatorios para Colombia');
                 return null;
             }
 
             const response = await coloniaService.createColonia(data);
-            
+
             if (response.success) {
                 setSuccess(true);
             } else {
                 setError(response.message || 'Error al crear la colonia');
             }
-            
+
             return response;
 
         } catch (error) {
