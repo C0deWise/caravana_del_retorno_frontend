@@ -21,7 +21,7 @@ export const useInscribirUsuarioColonia = (): UseInscribirUsuarioColoniaReturn =
 
         try {
             // Validar que los campos no estén vacíos
-            if (!data.us_codigo || !data.us_tipo_doc || !data.us_documento || !data.us_celular || !data.co_codigo || !data.us_nombre || !data.us_apellido || !data.us_genero || !data.us_fecha_nacimiento || !data.us_pais) {
+            if (!data.codigo || !data.tipo_doc || !data.documento || !data.celular || !data.colonia || !data.nombre || !data.apellido || !data.genero || !data.fecha_nacimiento || !data.pais) {
                 setError('Todos los campos son obligatorios');
                 return null;
             } 

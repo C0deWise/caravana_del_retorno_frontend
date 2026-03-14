@@ -1,4 +1,4 @@
-import InscripcionColoniaForm from "@/features/gestion/colonia/components/InscripcionColoniaForm";
+import InscripcionColoniaForm from "@/features/gestion/colonia/components/ColonyRegistrationForm";
 
 export default function InscribirColoniaPage() {
     return (
