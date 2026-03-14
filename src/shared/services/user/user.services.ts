@@ -1,5 +1,5 @@
-import { apiService } from "./api.services";
-import type { UserData, UserResponse } from "../types/user.types";
+import { apiService } from "../api.services";
+import { UserData, UserResponse } from "../../types/user/user.types";
 
 /**
  * Servicio para manejar las operaciones de gestión de usuarios.
@@ -22,7 +22,7 @@ export const userService = {
     },
 
     /**
-     * 
+     * @brief Obtiene la información de un usuario específico.
      * @param us_codigo Código del usuario a obtener
      * @returns Retorna un response con la información del usuario solicitado o un error si la operación falla.
      */
@@ -37,7 +37,7 @@ export const userService = {
     },
 
     /**
-     * 
+     * @brief Actualiza la información de un usuario específico.
      * @param us_codigo Código del usuario a obtener información
      * @param data Información de usuario a actualizar
      * @returns Retorna un response con la información del usuario o un error si la operación falla.
@@ -52,6 +52,11 @@ export const userService = {
         }
     },
 
+    /**
+     * @brief Eliminar la información de un usuario específico.
+     * @param us_codigo Código del usuario a obtener información
+     * @returns Retorna un response con la información del usuario o un error si la operación falla.
+     */
     deleteUser : async (us_codigo: string): Promise<UserResponse> => {
         try {
             const response = await apiService.delete<UserResponse>(`/users/${us_codigo}`);
