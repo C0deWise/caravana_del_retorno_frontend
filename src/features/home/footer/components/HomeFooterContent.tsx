@@ -5,7 +5,7 @@ import FooterFacebook from "@/ui/footer/FooterFacebook";
 import FooterInstagram from "@/ui/footer/FooterInstagram";
 import HomeMap from "../../mapa/components/HomeMap";
 import { ArrowLeftCircleIcon } from "@heroicons/react/24/outline";
-import { PhotoIcon } from "@heroicons/react/24/outline";
+import HomeFooterImagePlaceholder from "./HomeFooterImagePlaceholder";
 
 export default function HomeFooterContent() {
   return (
@@ -29,26 +29,10 @@ export default function HomeFooterContent() {
                 Con el apoyo de:
               </span>
               <div className="flex md:w-full flex-1 min-h-0 gap-4 md:gap-6 relative justify-between items-center">
-                <div className="flex-1 flex justify-center items-center min-w-0 h-full">
-                  <div className="bg-bg/15 rounded-xl aspect-square w-full max-h-full flex items-center justify-center">
-                    <PhotoIcon className="w-1/2 h-1/2 text-text-inverse" />
-                  </div>
-                </div>
-                <div className="flex-1 flex justify-center items-center min-w-0 h-full">
-                  <div className="bg-bg/15 rounded-xl aspect-square w-full max-h-full flex items-center justify-center">
-                    <PhotoIcon className="w-1/2 h-1/2 text-text-inverse" />
-                  </div>
-                </div>
-                <div className="flex-1 flex justify-center items-center min-w-0 h-full">
-                  <div className="bg-bg/15 rounded-xl aspect-square w-full max-h-full flex items-center justify-center">
-                    <PhotoIcon className="w-1/2 h-1/2 text-text-inverse" />
-                  </div>
-                </div>
-                <div className="flex-1 flex justify-center items-center min-w-0 h-full">
-                  <div className="bg-bg/15 rounded-xl aspect-square w-full max-h-full flex items-center justify-center">
-                    <PhotoIcon className="w-1/2 h-1/2 text-text-inverse" />
-                  </div>
-                </div>
+                <HomeFooterImagePlaceholder />
+                <HomeFooterImagePlaceholder />
+                <HomeFooterImagePlaceholder />
+                <HomeFooterImagePlaceholder />
               </div>
             </div>
           </div>
