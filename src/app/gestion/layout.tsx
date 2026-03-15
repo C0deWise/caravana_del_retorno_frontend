@@ -5,12 +5,6 @@ import Sidebar from "@/features/gestion/sidebar/components/Sidebar";
 import PageTransition from "@/ui/general/PageTransition";
 import { usePathname } from "next/navigation";
 
-// export const metadata = {
-//   title: "Caravana del Retorno - Gestión",
-//   description:
-//     "¡Bienvenidos a la página de gestión de la Caravana del Retorno, Florencia, Cauca, Colombia!",
-// };
-
 export default function GestionLayout({
   children,
 }: {

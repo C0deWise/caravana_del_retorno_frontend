@@ -51,7 +51,7 @@ export default function PageTransition({
     <div className="relative min-h-100">
       {" "}
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-primary/10 backdrop-blur-sm z-10 rounded-lg">
+        <div className="absolute inset-0 flex items-center justify-center bg-white/20 backdrop-blur-sm z-10 rounded-lg">
           <Spinner size="lg" />
         </div>
       )}

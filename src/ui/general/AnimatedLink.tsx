@@ -25,7 +25,7 @@ export default function AnimatedLink({
         {label}
       </span>
       <span
-        className={`h-0.5 bg-secondary transition-all duration-300 ${underlineClassName ?? ""}`}
+        className={`h-0.5 bg-secondary rounded-full transition-all duration-300 ${underlineClassName ?? ""}`}
       />
     </Link>
   );

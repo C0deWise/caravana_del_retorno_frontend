@@ -29,3 +29,15 @@ body {
   background: var(--color-bg);
   font-family: var(--font-sans);
 }
+
+.sidebar-collapsed {
+  width: 5.5rem;
+  min-width: 5.5rem;
+  max-width: 5.5rem;
+}
+
+.sidebar-expanded {
+  width: auto;
+  min-width: 20rem; /* 320px */
+  max-width: 30rem; /* 384px */
+}

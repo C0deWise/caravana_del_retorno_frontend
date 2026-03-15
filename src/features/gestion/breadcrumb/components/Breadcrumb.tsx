@@ -8,7 +8,7 @@ export default function Breadcrumb() {
   const items = useBreadcrumb();
 
   return (
-    <nav className="flex items-center gap-1 text-xl bg-bg-separator rounded-xl px-6 py-3">
+    <nav className="flex items-center shadow-lg gap-1 text-xl bg-bg-separator rounded-xl px-6 py-3">
       <AnimatedLink
         href="/"
         label="Inicio"
