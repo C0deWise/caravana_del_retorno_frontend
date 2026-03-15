@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import HomeHeader from "@/features/home/header/components/HomeHeader";
+import HomeFooter from "@/features/home/footer/components/HomeFooter";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -8,8 +10,19 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Caravana del Retorno",
-  description: "Pagina web de la caravana del retorno",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  ),
+  title: "Caravana del Retorno - Inicio",
+  description:
+    "¡Bienvenidos a la página web oficial de la Caravana del Retorno, Florencia, Cauca, Colombia!",
+  icons: {
+    icon: "/home/Caravana-Del-Retorno-Icon.svg",
+  },
+  openGraph: {
+    images: ["/home/Caravana-Del-Retorno-Text.svg"],
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -18,9 +31,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
-      <body className={`${inter.variable} antialiased`}>
-        {children}
+    <html lang="es" className={inter.variable}>
+      <body className="antialiased">
+        <HomeHeader />
+        <main>{children}</main>
+        <HomeFooter />
       </body>
     </html>
   );

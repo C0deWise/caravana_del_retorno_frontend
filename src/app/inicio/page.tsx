@@ -1,5 +1,7 @@
-import HomeLayout from "@/features/home/layout/components/HomeLayout";
-
 export default function Inicio() {
-    return <HomeLayout />;
+  return (
+    <div className="flex justify-center items-center h-190 m-10 border-4 border-accent-red">
+      Inicio Component
+    </div>
+  );
 }
