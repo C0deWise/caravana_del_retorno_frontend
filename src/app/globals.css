@@ -31,9 +31,9 @@ body {
 }
 
 .sidebar-collapsed {
-  width: 5.5rem;
-  min-width: 5.5rem;
-  max-width: 5.5rem;
+  width: 5.3rem;
+  min-width: 5.3rem;
+  max-width: 5.3rem;
 }
 
 .sidebar-expanded {

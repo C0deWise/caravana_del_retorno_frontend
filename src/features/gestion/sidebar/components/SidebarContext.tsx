@@ -15,7 +15,12 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
 
-  const toggleCollapse = () => setIsCollapsed(!isCollapsed);
+  const toggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+    if (!isCollapsed) {
+      setOpenMenus({});
+    }
+  };
   const toggleMenu = (href: string) =>
     setOpenMenus((prev) => ({ ...prev, [href]: !prev[href] }));
 

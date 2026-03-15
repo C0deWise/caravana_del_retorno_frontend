@@ -10,26 +10,6 @@ export const menuConfig: MenuItem[] = [
         label: "Crear Colonia",
         href: "/gestion/colonia/crear",
       },
-      {
-        label: "Establecer lider de Colonia",
-        href: "/gestion/colonia/establecer-lider",
-        icon: "home",
-        subitems: [
-          {
-            label: "establecer vice",
-            href: "/vice",
-            icon: "home",
-            subitems: [
-              { label: "test 1", href: "/test1" },
-              { label: "test 2", href: "/test2" },
-            ],
-          },
-          {
-            label: "establecer secretario",
-            href: "/secretario",
-          },
-        ],
-      },
     ],
   },
   {

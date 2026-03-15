@@ -24,10 +24,12 @@ export default function SidebarMenuItem({
 
   const isOpen = openMenus[item.href];
   const isParent = !!item.subitems?.length;
-  const anyChildActive =
-    item.subitems?.some((sub) => isActive(sub.href) || openMenus[sub.href]) ||
-    isActive(item.href);
 
+  const hasActiveChild = (items?: MenuItem[]): boolean => {
+    if (!items) return false;
+    return items.some((sub) => isActive(sub.href) || hasActiveChild(sub.subitems));
+  };
+  const anyDescendantActive = hasActiveChild(item.subitems);
   const handleChevronClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
@@ -35,58 +37,56 @@ export default function SidebarMenuItem({
   };
 
   const handleContainerClick = () => {
-    if (!isParent || !anyChildActive) {
-      router.push(item.href);
-    }
+    router.push(item.href);
   };
 
-  const baseStyles = `rounded-lg transition-all flex items-center w-full relative z-10 cursor-pointer group`;
-  const activeStyles =
-    anyChildActive || isOpen
-      ? "bg-gray-100 text-secondary shadow-md"
-      : "hover:bg-gray-100 hover:text-secondary hover:shadow-md";
+  const baseStyles = `rounded-lg transition-all flex items-center w-full relative z-10 cursor-pointer group hover:bg-gray-100 hover:text-secondary hover:shadow-md`;
+  const activeStyles = anyDescendantActive || (isActive(item.href) && isParent)
+    ? "bg-gray-100 shadow-md text-primary"
+    : (isOpen && isParent)
+      ? "bg-gray-100 shadow-md"
+      : "";
 
   return (
     <>
-      {/* Contenedor PRINCIPAL clickable */}
+      {/* Main Container */}
       <div
         className={`flex items-center gap-3 w-full ${baseStyles} ${activeStyles}`}
         onClick={handleContainerClick}
       >
-        {/* Icono + Label */}
-        <div className="px-4 flex items-center gap-3 flex-1 min-w-0 relative z-20">
+        {/* Icon + Label */}
+        <div className={`px-4 flex items-center gap-3 flex-1 min-w-0 relative z-20 ${isActive(item.href) ? "text-secondary" : ""}`}>
           {item.icon && (
             <span className="w-5 h-5 flex items-center justify-center shrink-0 text-lg relative z-20">
               {iconMap[item.icon]}
             </span>
           )}
           <span
-            className={`truncate font-medium text-lg transition-all relative z-20 ${
-              isCollapsed && level === 0
-                ? "opacity-0 w-0 scale-x-50 -translate-x-2"
-                : "opacity-100"
-            }`}
+            className={`truncate font-medium text-lg transition-all relative z-20 ${isCollapsed && level === 0
+              ? "opacity-0 w-0 scale-x-50 -translate-x-2"
+              : "opacity-100"
+              }`}
           >
             {item.label}
           </span>
         </div>
 
-        {/* Chevron por encima */}
+        {/* Chevron */}
         {isParent && (
           <ChevronDownIcon
             className={`
-              w-10 h-10 transition-all duration-300 shrink-0 cursor-pointer relative z-30
+              w-10 h-10 text-primary transition-all duration-300 shrink-0 cursor-pointer relative z-30
               ${isCollapsed && level === 0 ? "opacity-0 scale-0" : "opacity-100 scale-100"}
               ${isOpen ? "rotate-180" : ""}
-              hover:scale-110 hover:bg-gray-200 p-1 rounded ml-auto
-              ${anyChildActive || isOpen ? "text-secondary" : ""}
+              hover:scale-140 hover:bg-gray-200 p-1 rounded-full ml-auto
+              ${isOpen ? "text-secondary" : ""}
             `}
             onClick={handleChevronClick}
           />
         )}
       </div>
 
-      {/* Submenú */}
+      {/* Submenu */}
       {isParent && (
         <div
           className={`
