@@ -1,9 +1,9 @@
+import HomeFooterContent from "./HomeFooterContent";
+
 export default function HomeFooter() {
-    return (
-        <div className="flex flex-row min-h-screen justify-center items-center">
-            <h1 className="text-3xl font-semibold p-4">
-                HomeFooter Component
-            </h1>
-        </div>
-    )
+  return (
+    <footer className="w-full bottom-0 z-50 drop-shadow-[0_-8px_16px_rgba(0,0,0,0.25)] overflow-x-clip">
+      <HomeFooterContent />
+    </footer>
+  );
 }

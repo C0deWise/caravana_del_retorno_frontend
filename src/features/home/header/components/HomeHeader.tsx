@@ -1,9 +1,9 @@
+import HeaderContent from "./HomeHeaderContent";
+
 export default function HomeHeader() {
-    return (
-        <div className="flex flex-row min-h-screen justify-center items-center">
-            <h1 className="text-3xl font-semibold p-4">
-                HomeHeader Component
-            </h1>
-        </div>
-    )
+  return (
+    <header className="w-full sticky top-0 z-50 drop-shadow-2xl overflow-x-clip">
+      <HeaderContent />
+    </header>
+  );
 }
