@@ -30,6 +30,147 @@ body {
   font-family: var(--font-sans);
 }
 
+/* ===== ESTILOS COMPARTIDOS DE FORMULARIOS ===== */
+@layer components {
+  /* Inputs de texto estándar */
+  .input-base {
+    @apply w-full px-4 py-3 rounded-lg transition-colors;
+    background-color: var(--color-bg-card);
+    border: 1px solid transparent;
+  }
+
+  .input-base:focus {
+    outline: none;
+    background-color: var(--color-bg);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(2, 64, 89, 0.1);
+  }
+
+  .input-base::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  /* Input con error */
+  .input-error {
+    background-color: #FEE;
+    border: 2px solid var(--color-danger) !important;
+  }
+
+  .input-error:focus {
+    outline: none;
+    background-color: #FFF;
+    border: 2px solid var(--color-danger) !important;
+    box-shadow: 0 0 0 3px rgba(150, 13, 13, 0.15);
+  }
+
+  /* Select estándar */
+  .select-base {
+    @apply px-3 py-3 rounded-lg transition-colors;
+    background-color: var(--color-bg-card);
+    border: 1px solid transparent;
+  }
+
+  .select-base:focus {
+    outline: none;
+    background-color: var(--color-bg);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(2, 64, 89, 0.1);
+  }
+
+  /* Labels de formulario */
+  .label-base {
+    @apply block text-sm font-medium mb-2;
+    color: var(--color-text);
+  }
+
+  .label-primary {
+    @apply block text-sm font-medium mb-2;
+    color: var(--color-primary);
+  }
+
+  /* Títulos de sección */
+  .section-title {
+    @apply text-2xl font-bold mb-6;
+    color: var(--color-primary);
+  }
+
+  .page-title {
+    @apply text-3xl font-bold mb-12;
+    color: var(--color-primary);
+  }
+
+  /* Botones */
+  .btn-primary {
+    @apply px-12 py-3 text-lg font-semibold rounded-lg transition-colors shadow-lg;
+    background-color: var(--color-primary);
+    color: var(--color-text-inverse);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background-color: #013548;
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Alertas */
+  .alert-error {
+    @apply mt-6 p-4 rounded border-l-4;
+    background-color: #FEE;
+    border-color: var(--color-danger);
+  }
+
+  .alert-error-text {
+    @apply text-sm;
+    color: var(--color-danger);
+  }
+
+  .alert-success {
+    @apply mt-6 p-4 rounded border-l-4;
+    background-color: #E8F5E9;
+    border-color: var(--color-success);
+  }
+
+  .alert-success-text {
+    @apply text-sm;
+    color: var(--color-accent-green);
+  }
+
+  /* Barra de colores colombiana */
+  .colombia-bar {
+    @apply hidden lg:flex flex-col w-2 rounded-full overflow-hidden;
+  }
+
+  .colombia-bar-blue {
+    @apply flex-1;
+    background-color: var(--color-primary);
+  }
+
+  .colombia-bar-yellow {
+    @apply flex-1;
+    background-color: var(--color-accent-yellow);
+  }
+
+  .colombia-bar-red {
+    @apply flex-1;
+    background-color: var(--color-accent-red);
+  }
+
+  /* Mensajes de validación */
+  .validation-message {
+    @apply text-xs mt-1;
+  }
+
+  .validation-error {
+    color: var(--color-danger);
+  }
+
+  .validation-info {
+    color: var(--color-text-muted);
+  }
+}
 /* Clases para formularios */
 .input-base {
   width: 100%;
