@@ -5,6 +5,7 @@ import Sidebar from "@/features/management/layout/sidebar/components/Sidebar";
 import PageTransition from "@/ui/general/PageTransition";
 import ErrorBoundary from "@/ui/general/ErrorBoundary";
 import { usePathname } from "next/navigation";
+import { AuthProvider } from "@/features/auth/context/AuthContext";
 
 export default function GestionLayout({
   children,
@@ -29,7 +30,7 @@ export default function GestionLayout({
                 </div>
               }
             >
-              {children}
+              <AuthProvider>{children}</AuthProvider>
             </ErrorBoundary>
           </PageTransition>
         </div>
