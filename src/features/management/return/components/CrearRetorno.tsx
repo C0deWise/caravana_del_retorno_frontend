@@ -115,8 +115,7 @@ export default function CrearRetorno() {
 
   return (
     <div
-      className="flex flex-col min-h-screen"
-      style={{ backgroundColor: "#E5E5E5" }}
+      className="flex flex-col min-h-screen" style={{ backgroundColor: "var(--color-bg)" }}
     >
       {/* Contenido principal */}
       <div className="flex-1 flex justify-center items-center p-4">
@@ -125,7 +124,7 @@ export default function CrearRetorno() {
             className="text-2xl font-bold text-center mb-2"
             style={{ color: "#1E3A8A" }}
           >
-            Creacion de un retorno
+            Creación de un retorno
           </h1>
 
           <h2 className="text-lg text-center mb-6" style={{ color: "#1E3A8A" }}>
@@ -235,7 +234,7 @@ export default function CrearRetorno() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
             <h3 className="text-xl font-bold text-center mb-4">
-              ¿Confirmas la creacion del retorno?
+              ¿Confirmas la creación del retorno?
             </h3>
             <div className="text-center mb-6">
               <p className="text-lg font-semibold">
