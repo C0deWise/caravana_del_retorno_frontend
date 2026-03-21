@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useMemo } from 'react';
-import Select from 'react-select';
+import Select, { type StylesConfig } from 'react-select';
 import { useCreateColonia } from '../hooks/useCreateColony';
 import type { ColoniaData } from '../types/colonia.types';
-import { getAllCountries, getDepartments, getCitiesByDepartmentName } from '@/shared/constants/countries';
+import { getDepartments, getCitiesByDepartmentName } from '@/shared/constants/countries';
 import type { City } from '@/shared/constants/countries';
+import CountrySelect from '@/shared/components/CountrySelect';
 
 type SelectOption = {
     value: string;
@@ -23,20 +24,13 @@ export default function CrearColonia() {
         ciudad: '',
     });
 
-    // Obtener países y departamentos
-    const countries = useMemo(() => getAllCountries(), []);
+    // Obtener departamentos
     const departments = useMemo(() => {
         if (coloniaData.pais === 'Colombia') {
             return getDepartments();
         }
         return [];
     }, [coloniaData.pais]);
-
-    // Convertir a formato de react-select
-    const countryOptions = useMemo(() => 
-        countries.map(country => ({ value: country.name, label: country.name })),
-        [countries]
-    );
 
     const departmentOptions = useMemo(() => 
         departments.map(dept => ({ value: dept.name, label: dept.name })),
@@ -48,8 +42,7 @@ export default function CrearColonia() {
         [cities]
     );
 
-    const handlePaisChange = (option: SelectOption | null) => {
-        const pais = option?.value || '';
+    const handlePaisChange = (pais: string) => {
         setColoniaData({
             pais: pais,
             departamento: '',
@@ -107,7 +100,7 @@ export default function CrearColonia() {
     };
 
     // Estilos personalizados para react-select
-    const customStyles = {
+    const customStyles: StylesConfig<SelectOption, false> = {
         control: (base: Record<string, unknown>) => ({
             ...base,
             borderColor: '#d1d5db',
@@ -152,22 +145,13 @@ export default function CrearColonia() {
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {/* País */}
-                    <div>
-                        <label className="label-base">
-                            País
-                        </label>
-                        <Select
-                            options={countryOptions}
-                            value={countryOptions.find(opt => opt.value === coloniaData.pais)}
-                            onChange={handlePaisChange}
-                            placeholder="Seleccione un país"
-                            isSearchable={true}
-                            isClearable={true}
-                            openMenuOnFocus={true}
-                            styles={customStyles}
-                            noOptionsMessage={() => 'No se encontraron países'}
-                        />
-                    </div>
+                    <CountrySelect
+                        value={coloniaData.pais}
+                        onChange={handlePaisChange}
+                        instanceId="create-colony-country-select"
+                        inputId="create-colony-country-select-input"
+                        styles={customStyles}
+                    />
 
                     {/* Departamento - Solo para Colombia */}
                     {coloniaData.pais === 'Colombia' && (
@@ -176,6 +160,8 @@ export default function CrearColonia() {
                                 Departamento
                             </label>
                             <Select
+                                instanceId="create-colony-department-select"
+                                inputId="create-colony-department-select-input"
                                 options={departmentOptions}
                                 value={departmentOptions.find(opt => opt.value === coloniaData.departamento) || null}
                                 onChange={handleDepartamentoChange}
@@ -196,6 +182,8 @@ export default function CrearColonia() {
                                 Municipio
                             </label>
                             <Select
+                                instanceId="create-colony-city-select"
+                                inputId="create-colony-city-select-input"
                                 options={cityOptions}
                                 value={cityOptions.find(opt => opt.value === coloniaData.ciudad) || null}
                                 onChange={handleMunicipioChange}

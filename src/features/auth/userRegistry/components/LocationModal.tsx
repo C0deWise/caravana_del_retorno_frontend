@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react';
-import Select from 'react-select';
-import { getDepartments, getCitiesByDepartmentName, getAllCountries } from '@/shared/constants/countries';
-import type { City, Country } from '@/shared/constants/countries';
+import { useState, useMemo } from 'react';
+import Select, { type StylesConfig } from 'react-select';
+import { getDepartments, getCitiesByDepartmentName } from '@/shared/constants/countries';
+import type { City } from '@/shared/constants/countries';
+import CountrySelect from '@/shared/components/CountrySelect';
 
 interface LocationModalProps {
-    isOpen: boolean;
     onClose: () => void;
     onSave: (location: LocationData) => void;
     initialData?: LocationData;
@@ -23,15 +23,21 @@ type SelectOption = {
     label: string;
 };
 
-export default function LocationModal({ isOpen, onClose, onSave, initialData }: LocationModalProps) {
+const EMPTY_LOCATION_DATA: LocationData = {
+    pais: '',
+    departamento: '',
+    municipio: '',
+};
+
+export default function LocationModal({ onClose, onSave, initialData }: LocationModalProps) {
 
     // Estados
-    const countries = useState<Country[]>(() => getAllCountries())[0];
-    const [cities, setCities] = useState<City[]>([]);
-    const [locationData, setLocationData] = useState<LocationData>({
-        pais: '',
-        departamento: '',
-        municipio: '',
+    const [locationData, setLocationData] = useState<LocationData>(() => initialData ?? EMPTY_LOCATION_DATA);
+    const [cities, setCities] = useState<City[]>(() => {
+        if (initialData?.departamento) {
+            return getCitiesByDepartmentName(initialData.departamento);
+        }
+        return [];
     });
 
     // Cargar departamentos solo si el país es Colombia
@@ -43,57 +49,24 @@ export default function LocationModal({ isOpen, onClose, onSave, initialData }: 
         return [];
     }, [locationData.pais]);
 
-    // Restablecer datos cuando se abre el modal
-    // Nota: setState en useEffect es necesario aquí para sincronizar el estado del modal
-    // con las props (isOpen, initialData) que vienen del componente padre
-    useEffect(() => {
-        if (isOpen) {
-            // Si hay datos iniciales, cargarlos y obtener ciudades
-            if (initialData) {
-                setLocationData(initialData);
-                
-                if (initialData.departamento) {
-                    const cities = getCitiesByDepartmentName(initialData.departamento);
-                    setCities(cities);
-                }
-            } else {
-                // Resetear el estado si no hay datos iniciales
-                setLocationData({
-                    pais: '',
-                    departamento: '',
-                    municipio: '',
-                });
-                setCities([]);
-            }
-        }
-    }, [isOpen, initialData]);
-
-    // Convertir datos a formato de react-select
-    const countryOptions = useMemo(() => 
-        countries.map(country => ({ value: country.name, label: country.name })),
-        [countries]
-    );
-
-    const departmentOptions = useMemo(() => 
+    const departmentOptions = useMemo(() =>
         departments.map(dept => ({ value: dept.name, label: dept.name })),
         [departments]
     );
 
-    const cityOptions = useMemo(() => 
+    const cityOptions = useMemo(() =>
         cities.map(city => ({ value: city.name, label: city.name })),
         [cities]
     );
 
-    const handlePaisChange = (option: SelectOption | null) => {
-        const pais = option?.value || '';
-        
+    const handlePaisChange = (pais: string) => {
         // Actualizar país y resetear departamento y municipio
         setLocationData({
             pais,
             departamento: '',
             municipio: '',
         });
-        
+
         // Limpiar ciudades cuando cambia el país
         if (pais !== 'Colombia') {
             setCities([]);
@@ -102,7 +75,7 @@ export default function LocationModal({ isOpen, onClose, onSave, initialData }: 
 
     const handleDepartamentoChange = (option: SelectOption | null) => {
         const departamento = option?.value || '';
-        
+
         // Actualizar departamento y resetear municipio
         setLocationData(prev => ({
             ...prev,
@@ -129,10 +102,8 @@ export default function LocationModal({ isOpen, onClose, onSave, initialData }: 
         onClose();
     };
 
-    if (!isOpen) return null;
-
     // Estilos personalizados para react-select
-    const customStyles = {
+    const customStyles: StylesConfig<SelectOption, false> = {
         control: (base: Record<string, unknown>) => ({
             ...base,
             borderColor: '#d1d5db',
@@ -158,61 +129,60 @@ export default function LocationModal({ isOpen, onClose, onSave, initialData }: 
 
                 <div className="space-y-4">
                     {/* País */}
-                    <div>
-                        <label className="label-base">
-                            País
-                        </label>
-                        <Select
-                            options={countryOptions}
-                            value={countryOptions.find(opt => opt.value === locationData.pais)}
-                            onChange={handlePaisChange}
-                            placeholder="Seleccione un país"
-                            isSearchable={true}
-                            isClearable={true}
-                            openMenuOnFocus={true}
-                            styles={customStyles}
-                            noOptionsMessage={() => 'No se encontraron países'}
-                        />
-                    </div>
+                    <CountrySelect
+                        value={locationData.pais}
+                        onChange={handlePaisChange}
+                        instanceId="location-modal-country-select"
+                        inputId="location-modal-country-select-input"
+                        styles={customStyles}
+                    />
 
-                    {/* Departamento */}
-                    <div>
-                        <label className="label-base">
-                            Departamento
-                        </label>
-                        <Select
-                            options={departmentOptions}
-                            value={departmentOptions.find(opt => opt.value === locationData.departamento) || null}
-                            onChange={handleDepartamentoChange}
-                            placeholder="Seleccione un departamento"
-                            isSearchable={true}
-                            isClearable={true}
-                            openMenuOnFocus={true}
-                            isDisabled={locationData.pais !== 'Colombia'}
-                            styles={customStyles}
-                            noOptionsMessage={() => 'No se encontraron departamentos'}
-                        />
-                    </div>
+                    {/* Departamento - Solo para Colombia */}
+                    {locationData.pais === 'Colombia' && (
+                        <div>
+                            <label className="label-base">
+                                Departamento
+                            </label>
+                            <Select
+                                instanceId="create-colony-department-select"
+                                inputId="create-colony-department-select-input"
+                                options={departmentOptions}
+                                value={departmentOptions.find(opt => opt.value === locationData.departamento) || null}
+                                onChange={handleDepartamentoChange}
+                                placeholder="Seleccione un departamento"
+                                isSearchable={true}
+                                isClearable={true}
+                                openMenuOnFocus={true}
+                                styles={customStyles}
+                                noOptionsMessage={() => 'No se encontraron departamentos'}
+                            />
+                        </div>
+                    )}
 
-                    {/* Municipio */}
-                    <div>
-                        <label className="label-base">
-                            Municipio
-                        </label>
-                        <Select
-                            options={cityOptions}
-                            value={cityOptions.find(opt => opt.value === locationData.municipio) || null}
-                            onChange={handleMunicipioChange}
-                            placeholder={locationData.departamento ? 'Seleccione un municipio' : 'Seleccione primero un departamento'}
-                            isSearchable={true}
-                            isClearable={true}
-                            openMenuOnFocus={true}
-                            isDisabled={!locationData.departamento || cities.length === 0}
-                            styles={customStyles}
-                            noOptionsMessage={() => 'No se encontraron municipios'}
-                        />
-                    </div>
+                    {/* Municipio - Solo para Colombia */}
+                    {locationData.pais === 'Colombia' && (
+                        <div>
+                            <label className="label-base">
+                                Municipio
+                            </label>
+                            <Select
+                                instanceId="create-colony-city-select"
+                                inputId="create-colony-city-select-input"
+                                options={cityOptions}
+                                value={cityOptions.find(opt => opt.value === locationData.municipio) || null}
+                                onChange={handleMunicipioChange}
+                                placeholder={locationData.departamento ? 'Seleccione un municipio' : 'Seleccione primero un departamento'}
+                                isSearchable={true}
+                                isClearable={true}
+                                openMenuOnFocus={true}
+                                isDisabled={!locationData.departamento || cities.length === 0}
+                                styles={customStyles}
+                                noOptionsMessage={() => 'No se encontraron municipios'}
+                            />
+                        </div>
+                    )}
                 </div>
+
 
                 {/* Botones */}
                 <div className="mt-6 flex justify-end gap-3">
