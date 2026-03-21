@@ -108,7 +108,7 @@ export default function CrearColonia() {
             padding: '0.25rem',
             fontSize: '1rem',
             '&:hover': {
-                borderColor: '#9ca3af',
+                borderColor: "(var(--color-bg-border))",
             },
         }),
         menu: (base: Record<string, unknown>) => ({

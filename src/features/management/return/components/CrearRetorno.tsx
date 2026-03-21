@@ -133,14 +133,14 @@ export default function CrearRetorno() {
 
           {/* Mensajes de estado */}
           {error && (
-            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-              <p className="text-sm">{error}</p>
+            <div className="alert-error">
+              <p className="alert-error-text">{error}</p>
             </div>
           )}
 
           {success && (
-            <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
-              <p className="text-sm">Retorno creado exitosamente</p>
+            <div className="alert-success">
+              <p className="alert-success-text">Colonia creada exitosamente</p>
             </div>
           )}
 
@@ -192,14 +192,13 @@ export default function CrearRetorno() {
                     <button
                       type="button"
                       onClick={() => handleDateClick(day)}
-                      className={`w-full aspect-square flex items-center justify-center rounded text-sm transition-colors ${
-                        selectedDate &&
-                        day.getDate() === selectedDate.getDate() &&
-                        day.getMonth() === selectedDate.getMonth() &&
-                        day.getFullYear() === selectedDate.getFullYear()
-                          ? "bg-black text-white"
+                      className={`w-full aspect-square flex items-center justify-center rounded text-sm transition-colors ${selectedDate &&
+                          day.getDate() === selectedDate.getDate() &&
+                          day.getMonth() === selectedDate.getMonth() &&
+                          day.getFullYear() === selectedDate.getFullYear()
+                          ? "bg-primary text-white"
                           : "hover:bg-gray-200"
-                      }`}
+                        }`}
                     >
                       {day.getDate()}
                     </button>
