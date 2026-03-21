@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState } from "react";
 import { useRegisterUser } from "../hooks/useUserRegistration";
 import { useDocumentValidation } from "../hooks/useDocumentValidation";
 import type { RegistrationData } from "../types/registro.types";
@@ -15,17 +15,17 @@ export default function AuthRegistroDeUsuarios() {
   } = useDocumentValidation();
 
   const [formData, setFormData] = useState<RegistrationData>({
-    us_codigo: "",
-    us_tipo_doc: "CC",
-    us_documento: "",
-    us_celular: "",
-    us_nombre: "",
-    us_apellido: "",
-    us_genero: "",
-    us_fecha_nacimiento: "",
-    us_pais: "",
-    us_departamento: "",
-    us_ciudad: "",
+    codigo: "",
+    tipo_doc: "CC",
+    documento: "",
+    celular: "",
+    nombre: "",
+    apellido: "",
+    genero: "",
+    fecha_nacimiento: "",
+    pais: "",
+    departamento: "",
+    ciudad: "",
     email: "",
     confirmEmail: "",
     password: "",
@@ -33,7 +33,6 @@ export default function AuthRegistroDeUsuarios() {
   });
 
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 
   const handleChange = (
@@ -53,7 +52,6 @@ export default function AuthRegistroDeUsuarios() {
   };
 
   const handleBlur = (fieldName: string) => {
-    setTouched((prev) => ({ ...prev, [fieldName]: true }));
     validateField(fieldName);
   };
 
@@ -71,15 +69,15 @@ export default function AuthRegistroDeUsuarios() {
     return true;
   };
 
-  const validateAllFields = () => {
+  const validateAllFields = (data: RegistrationData) => {
     const errors: Record<string, string> = {};
     const requiredFields = [
-      "us_nombre",
-      "us_apellido",
-      "us_documento",
-      "us_fecha_nacimiento",
-      "us_celular",
-      "us_ciudad",
+      "nombre",
+      "apellido",
+      "documento",
+      "fecha_nacimiento",
+      "celular",
+      "ciudad",
       "email",
       "confirmEmail",
       "password",
@@ -87,7 +85,7 @@ export default function AuthRegistroDeUsuarios() {
     ];
 
     requiredFields.forEach((field) => {
-      const value = formData[field as keyof RegistrationData];
+      const value = data[field as keyof RegistrationData];
       if (!value || (typeof value === "string" && value.trim() === "")) {
         errors[field] = "Este campo es obligatorio";
       }
@@ -98,21 +96,48 @@ export default function AuthRegistroDeUsuarios() {
   };
 
   const handleDocumentBlur = async () => {
-    if (formData.us_documento && formData.us_tipo_doc) {
-      await validateDocument(formData.us_tipo_doc, formData.us_documento);
+    if (formData.documento && formData.tipo_doc) {
+      await validateDocument(formData.tipo_doc, formData.documento);
     }
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const buildRegistrationDataFromForm = (
+    submittedFormData: FormData,
+  ): RegistrationData => {
+    const getValue = (field: keyof RegistrationData) => {
+      const value = submittedFormData.get(field);
+      return typeof value === "string" ? value : "";
+    };
+
+    return {
+      codigo: getValue("codigo"),
+      tipo_doc: getValue("tipo_doc"),
+      documento: getValue("documento"),
+      celular: getValue("celular"),
+      nombre: getValue("nombre"),
+      apellido: getValue("apellido"),
+      genero: getValue("genero"),
+      fecha_nacimiento: getValue("fecha_nacimiento"),
+      pais: getValue("pais"),
+      departamento: getValue("departamento"),
+      ciudad: getValue("ciudad"),
+      email: getValue("email"),
+      confirmEmail: getValue("confirmEmail"),
+      password: getValue("password"),
+      confirmPassword: getValue("confirmPassword"),
+    };
+  };
+
+  const handleFormAction = async (submittedFormData: FormData) => {
+    const submissionData = buildRegistrationDataFromForm(submittedFormData);
 
     // Validar todos los campos
-    if (!validateAllFields()) {
+    if (!validateAllFields(submissionData)) {
       return;
     }
 
     // Validar emails coincidan
-    if (formData.email !== formData.confirmEmail) {
+    if (submissionData.email !== submissionData.confirmEmail) {
       setFieldErrors((prev) => ({
         ...prev,
         confirmEmail: "Los correos electrónicos no coinciden",
@@ -121,7 +146,7 @@ export default function AuthRegistroDeUsuarios() {
     }
 
     // Validar contraseñas coincidan
-    if (formData.password !== formData.confirmPassword) {
+    if (submissionData.password !== submissionData.confirmPassword) {
       setFieldErrors((prev) => ({
         ...prev,
         confirmPassword: "Las contraseñas no coinciden",
@@ -131,30 +156,30 @@ export default function AuthRegistroDeUsuarios() {
 
     // Validar documento antes de enviar
     const documentoValido = await validateDocument(
-      formData.us_tipo_doc,
-      formData.us_documento,
+      submissionData.tipo_doc,
+      submissionData.documento,
     );
     if (!documentoValido) {
       return;
     }
 
-    await registerUser(formData);
+    await registerUser(submissionData);
   };
 
   const handleLocationSave = (locationData: LocationData) => {
     setFormData((prev) => ({
       ...prev,
-      us_pais: locationData.pais,
-      us_departamento: locationData.departamento,
-      us_ciudad: locationData.municipio,
+      pais: locationData.pais,
+      departamento: locationData.departamento,
+      ciudad: locationData.municipio,
     }));
     setIsLocationModalOpen(false);
 
     // Limpiar errores de ubicación si existen
-    if (fieldErrors.us_ciudad) {
+    if (fieldErrors.ciudad) {
       setFieldErrors((prev) => {
         const newErrors = { ...prev };
-        delete newErrors.us_ciudad;
+        delete newErrors.ciudad;
         return newErrors;
       });
     }
@@ -169,17 +194,17 @@ export default function AuthRegistroDeUsuarios() {
   };
 
   const getLocationDisplay = () => {
-    if (formData.us_pais === "Colombia") {
-      if (formData.us_departamento && formData.us_ciudad) {
-        return `${formData.us_pais}, ${formData.us_departamento}, ${formData.us_ciudad}`;
-      } else if (formData.us_departamento) {
-        return `${formData.us_pais}, ${formData.us_departamento}`;
+    if (formData.pais === "Colombia") {
+      if (formData.departamento && formData.ciudad) {
+        return `${formData.pais}, ${formData.departamento}, ${formData.ciudad}`;
+      } else if (formData.departamento) {
+        return `${formData.pais}, ${formData.departamento}`;
       }
     }
 
     // Si solo hay país o cualquier otro caso
-    if (formData.us_pais) {
-      return formData.us_pais;
+    if (formData.pais) {
+      return formData.pais;
     }
     return "Seleccionar ubicación";
   };
@@ -190,7 +215,7 @@ export default function AuthRegistroDeUsuarios() {
         {/* Título */}
         <h1 className="page-title">Registro de usuario</h1>
 
-        <form onSubmit={handleSubmit}>
+        <form action={handleFormAction}>
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-8">
             {/* Columna Izquierda - Datos Personales */}
             <div>
@@ -203,16 +228,16 @@ export default function AuthRegistroDeUsuarios() {
                     <label className="label-base">Nombres</label>
                     <input
                       type="text"
-                      name="us_nombre"
-                      value={formData.us_nombre}
+                      name="nombre"
+                      value={formData.nombre}
                       onChange={handleChange}
-                      onBlur={() => handleBlur("us_nombre")}
+                      onBlur={() => handleBlur("nombre")}
                       placeholder="Jhon"
-                      className={`input-base ${fieldErrors.us_nombre ? "input-error" : ""}`}
+                      className={`input-base ${fieldErrors.nombre ? "input-error" : ""}`}
                     />
-                    {fieldErrors.us_nombre && (
+                    {fieldErrors.nombre && (
                       <p className="validation-message validation-error">
-                        {fieldErrors.us_nombre}
+                        {fieldErrors.nombre}
                       </p>
                     )}
                   </div>
@@ -220,16 +245,16 @@ export default function AuthRegistroDeUsuarios() {
                     <label className="label-base">Apellidos</label>
                     <input
                       type="text"
-                      name="us_apellido"
-                      value={formData.us_apellido}
+                      name="apellido"
+                      value={formData.apellido}
                       onChange={handleChange}
-                      onBlur={() => handleBlur("us_apellido")}
+                      onBlur={() => handleBlur("apellido")}
                       placeholder="Doe"
-                      className={`input-base ${fieldErrors.us_apellido ? "input-error" : ""}`}
+                      className={`input-base ${fieldErrors.apellido ? "input-error" : ""}`}
                     />
-                    {fieldErrors.us_apellido && (
+                    {fieldErrors.apellido && (
                       <p className="validation-message validation-error">
-                        {fieldErrors.us_apellido}
+                        {fieldErrors.apellido}
                       </p>
                     )}
                   </div>
@@ -241,8 +266,8 @@ export default function AuthRegistroDeUsuarios() {
                     <label className="label-base">Identificación</label>
                     <div className="flex gap-2">
                       <select
-                        name="us_tipo_doc"
-                        value={formData.us_tipo_doc}
+                        name="tipo_doc"
+                        value={formData.tipo_doc}
                         onChange={handleChange}
                         className="select-base"
                       >
@@ -252,15 +277,15 @@ export default function AuthRegistroDeUsuarios() {
                       </select>
                       <input
                         type="text"
-                        name="us_documento"
-                        value={formData.us_documento}
+                        name="documento"
+                        value={formData.documento}
                         onChange={handleChange}
                         onBlur={() => {
-                          handleBlur("us_documento");
+                          handleBlur("documento");
                           handleDocumentBlur();
                         }}
                         placeholder="1234567890"
-                        className={`input-base flex-1 ${fieldErrors.us_documento ? "input-error" : ""}`}
+                        className={`input-base flex-1 ${fieldErrors.documento ? "input-error" : ""}`}
                       />
                     </div>
                     {validating && (
@@ -268,14 +293,14 @@ export default function AuthRegistroDeUsuarios() {
                         Validando...
                       </p>
                     )}
-                    {validationError && !fieldErrors.us_documento && (
+                    {validationError && !fieldErrors.documento && (
                       <p className="validation-message validation-error">
                         {validationError}
                       </p>
                     )}
-                    {fieldErrors.us_documento && (
+                    {fieldErrors.documento && (
                       <p className="validation-message validation-error">
-                        {fieldErrors.us_documento}
+                        {fieldErrors.documento}
                       </p>
                     )}
                   </div>
@@ -283,16 +308,16 @@ export default function AuthRegistroDeUsuarios() {
                     <label className="label-base">Fecha de nacimiento</label>
                     <input
                       type="date"
-                      name="us_fecha_nacimiento"
-                      value={formData.us_fecha_nacimiento}
+                      name="fecha_nacimiento"
+                      value={formData.fecha_nacimiento}
                       onChange={handleChange}
-                      onBlur={() => handleBlur("us_fecha_nacimiento")}
+                      onBlur={() => handleBlur("fecha_nacimiento")}
                       placeholder="04/08/1999"
-                      className={`input-base ${fieldErrors.us_fecha_nacimiento ? "input-error" : ""}`}
+                      className={`input-base ${fieldErrors.fecha_nacimiento ? "input-error" : ""}`}
                     />
-                    {fieldErrors.us_fecha_nacimiento && (
+                    {fieldErrors.fecha_nacimiento && (
                       <p className="validation-message validation-error">
-                        {fieldErrors.us_fecha_nacimiento}
+                        {fieldErrors.fecha_nacimiento}
                       </p>
                     )}
                   </div>
@@ -304,16 +329,16 @@ export default function AuthRegistroDeUsuarios() {
                     <label className="label-base">Teléfono</label>
                     <input
                       type="tel"
-                      name="us_celular"
-                      value={formData.us_celular}
+                      name="celular"
+                      value={formData.celular}
                       onChange={handleChange}
-                      onBlur={() => handleBlur("us_celular")}
+                      onBlur={() => handleBlur("celular")}
                       placeholder="1234567890"
-                      className={`input-base ${fieldErrors.us_celular ? "input-error" : ""}`}
+                      className={`input-base ${fieldErrors.celular ? "input-error" : ""}`}
                     />
-                    {fieldErrors.us_celular && (
+                    {fieldErrors.celular && (
                       <p className="validation-message validation-error">
-                        {fieldErrors.us_celular}
+                        {fieldErrors.celular}
                       </p>
                     )}
                   </div>
@@ -322,7 +347,7 @@ export default function AuthRegistroDeUsuarios() {
                     <button
                       type="button"
                       onClick={handleLocationModalOpen}
-                      className={`input-base text-left flex items-center justify-between ${fieldErrors.us_ciudad ? "input-error" : ""}`}
+                      className={`input-base text-left flex items-center justify-between ${fieldErrors.ciudad ? "input-error" : ""}`}
                     >
                       <span>{getLocationDisplay()}</span>
                       <svg
@@ -339,9 +364,9 @@ export default function AuthRegistroDeUsuarios() {
                         />
                       </svg>
                     </button>
-                    {fieldErrors.us_ciudad && (
+                    {fieldErrors.ciudad && (
                       <p className="validation-message validation-error">
-                        {fieldErrors.us_ciudad}
+                        {fieldErrors.ciudad}
                       </p>
                     )}
                   </div>
@@ -444,6 +469,14 @@ export default function AuthRegistroDeUsuarios() {
             </div>
           </div>
 
+          <input type="hidden" name="pais" value={formData.pais} />
+          <input
+            type="hidden"
+            name="departamento"
+            value={formData.departamento}
+          />
+          <input type="hidden" name="ciudad" value={formData.ciudad} />
+
           {/* Mensajes de Error y Éxito */}
           {error && (
             <div className="alert-error">
@@ -472,16 +505,17 @@ export default function AuthRegistroDeUsuarios() {
         </form>
 
         {/* Modal de ubicación */}
-        <LocationModal
-          isOpen={isLocationModalOpen}
-          onClose={handleLocationModalClose}
-          onSave={handleLocationSave}
-          initialData={{
-            pais: formData.us_pais,
-            departamento: formData.us_departamento || "",
-            municipio: formData.us_ciudad,
-          }}
-        />
+        {isLocationModalOpen && (
+          <LocationModal
+            onClose={handleLocationModalClose}
+            onSave={handleLocationSave}
+            initialData={{
+              pais: formData.pais,
+              departamento: formData.departamento || "",
+              municipio: formData.ciudad,
+            }}
+          />
+        )}
       </div>
     </div>
   );
