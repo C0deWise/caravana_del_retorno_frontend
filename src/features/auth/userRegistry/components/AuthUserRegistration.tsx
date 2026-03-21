@@ -6,7 +6,7 @@ import { useDocumentValidation } from "../hooks/useDocumentValidation";
 import type { RegistrationData } from "../types/registro.types";
 import LocationModal, { LocationData } from "./LocationModal";
 
-export default function AuthRegistroDeUsuarios() {
+export default function AuthUserRegistration() {
   const { registerUser, loading, error, success } = useRegisterUser();
   const {
     validate: validateDocument,
