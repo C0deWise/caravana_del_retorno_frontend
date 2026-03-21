@@ -43,6 +43,11 @@ export default function AuthUserRegistration() {
   const [hasSubmitAttempted, setHasSubmitAttempted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const todayLocalDate = new Date(
+    Date.now() - new Date().getTimezoneOffset() * 60000,
+  )
+    .toISOString()
+    .split("T")[0];
 
   const sanitizeDocumentInput = (
     documentType: string,
@@ -310,6 +315,7 @@ export default function AuthUserRegistration() {
                       type="date"
                       name="fecha_nacimiento"
                       value={formData.fecha_nacimiento}
+                      max={todayLocalDate}
                       onChange={handleChange}
                       onBlur={() => handleBlur("fecha_nacimiento")}
                       placeholder="04/08/1999"

@@ -24,6 +24,12 @@ const REQUIRED_FIELDS: Array<keyof RegistrationData> = [
 
 export const getTrimmedValue = (value: string | undefined): string => (value ?? '').trim();
 
+const getTodayLocalDate = (): string => {
+  const now = new Date();
+  const timezoneOffsetMs = now.getTimezoneOffset() * 60_000;
+  return new Date(now.getTime() - timezoneOffsetMs).toISOString().split('T')[0];
+};
+
 export const validateDocumentByType = (
   documentType: string,
   documentNumber: string,
@@ -78,6 +84,13 @@ export const validateRegistrationField = (
 
   if (fieldName === 'password' && value && value.length < 8) {
     return 'La contraseña debe tener al menos 8 caracteres';
+  }
+
+  if (fieldName === 'fecha_nacimiento' && value) {
+    const today = getTodayLocalDate();
+    if (value > today) {
+      return 'La fecha de nacimiento no puede ser superior a la fecha de hoy';
+    }
   }
 
   if (
