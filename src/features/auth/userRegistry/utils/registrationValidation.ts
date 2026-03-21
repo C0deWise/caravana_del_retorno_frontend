@@ -3,6 +3,7 @@ import type { RegistrationData } from '../types/registro.types';
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DIGITS_ONLY_REGEX = /^\d+$/;
 const PASSPORT_REGEX = /^[A-Za-z0-9]+$/;
+const NAME_REGEX = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s'-]+$/;
 
 const DOCUMENT_RULES: Record<string, { min: number; max: number; allowsLetters: boolean }> = {
   CC: { min: 6, max: 10, allowsLetters: false },
@@ -72,6 +73,16 @@ export const validateRegistrationField = (
 
   if (fieldName === 'documento') {
     return validateDocumentByType(data.tipo_doc, data.documento);
+  }
+
+  if ((fieldName === 'nombre' || fieldName === 'apellido') && value) {
+    if (value.length < 3) {
+      return 'Debe tener al menos 3 caracteres';
+    }
+
+    if (!NAME_REGEX.test(value)) {
+      return 'Solo se permiten letras';
+    }
   }
 
   if (fieldName === 'email' && value && !EMAIL_REGEX.test(value)) {

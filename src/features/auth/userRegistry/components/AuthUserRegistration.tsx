@@ -233,6 +233,9 @@ export default function AuthUserRegistration() {
                       type="text"
                       name="nombre"
                       value={formData.nombre}
+                      minLength={3}
+                      pattern="[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s'-]{3,}"
+                      title="Debe tener al menos 3 caracteres y solo letras"
                       onChange={handleChange}
                       onBlur={() => handleBlur("nombre")}
                       placeholder="Jhon"
@@ -250,6 +253,9 @@ export default function AuthUserRegistration() {
                       type="text"
                       name="apellido"
                       value={formData.apellido}
+                      minLength={3}
+                      pattern="[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s'-]{3,}"
+                      title="Debe tener al menos 3 caracteres y solo letras"
                       onChange={handleChange}
                       onBlur={() => handleBlur("apellido")}
                       placeholder="Doe"
