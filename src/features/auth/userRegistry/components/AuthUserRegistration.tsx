@@ -6,11 +6,16 @@ import { useRegisterUser } from "../hooks/useUserRegistration";
 import { useDocumentValidation } from "../hooks/useDocumentValidation";
 import type { RegistrationData } from "../types/registro.types";
 import {
-  validateDocumentByType,
   validateRegistrationData,
   validateRegistrationField,
 } from "../utils/registrationValidation";
 import LocationModal, { LocationData } from "./LocationModal";
+
+const TODAY_LOCAL_DATE = (() => {
+  const now = new Date();
+  const timezoneOffsetMs = now.getTimezoneOffset() * 60000;
+  return new Date(now.getTime() - timezoneOffsetMs).toISOString().split("T")[0];
+})();
 
 export default function AuthUserRegistration() {
   const { registerUser, loading, error, success } = useRegisterUser();
@@ -43,11 +48,6 @@ export default function AuthUserRegistration() {
   const [hasSubmitAttempted, setHasSubmitAttempted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const todayLocalDate = new Date(
-    Date.now() - new Date().getTimezoneOffset() * 60000,
-  )
-    .toISOString()
-    .split("T")[0];
 
   const sanitizeDocumentInput = (
     documentType: string,
@@ -315,7 +315,7 @@ export default function AuthUserRegistration() {
                       type="date"
                       name="fecha_nacimiento"
                       value={formData.fecha_nacimiento}
-                      max={todayLocalDate}
+                      max={TODAY_LOCAL_DATE}
                       onChange={handleChange}
                       onBlur={() => handleBlur("fecha_nacimiento")}
                       placeholder="04/08/1999"
