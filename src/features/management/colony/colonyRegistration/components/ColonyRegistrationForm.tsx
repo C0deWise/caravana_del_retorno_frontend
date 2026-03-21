@@ -55,15 +55,20 @@ export default function InscripcionColoniaForm() {
 	};
 
 	return (
-		<div className="flex min-h-screen w-full items-center justify-center bg-bg px-4 py-6">
-			<div className="mx-auto w-full max-w-xl rounded-xl border border-bg-border bg-bg-card p-6 shadow-sm sm:p-8">
-				<h2 className="text-4xl font-bold text-primary">Registro de colonia</h2>
+		<div className="flex flex-col min-h-screen w-full items-center px-4 py-6" style={{ backgroundColor: 'var(--color-bg)' }}>
+			<div className="rounded-lg shadow-xl w-full max-w-lg p-8" style={{ backgroundColor: 'var(--color-bg)' }}>
+				<h1 className="page-title">
+					Registro de colonia
+				</h1>
+
+				<h2 className="section-title">
+					Selecciona la colonia a la que deseas unirte
+				</h2>
 
 				<div className="mt-10">
-					<label htmlFor="buscar-colonia" className="mb-3 block text-2xl font-semibold text-primary">
+					<label className="label-base">
 						Buscar colonia
 					</label>
-
 					<div className="relative">
 						<Search className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted" size={20} />
 						<input
@@ -117,14 +122,20 @@ export default function InscripcionColoniaForm() {
 						</div>
 					)}
 
-					<button
-						type="button"
-						onClick={() => seleccionada && setMostrarConfirmacion(true)}
-						disabled={!seleccionada}
-						className="mt-8 w-full rounded-lg bg-secondary py-3 text-xl font-semibold text-text-inverse disabled:cursor-not-allowed disabled:opacity-60"
-					>
-						Inscribir
-					</button>
+					<div className="mt-4">
+						<button
+							type="button"
+							onClick={() => seleccionada && setMostrarConfirmacion(true)}
+							disabled={!seleccionada}
+							className="w-full py-3 rounded-lg font-semibold transition-opacity disabled:opacity-50"
+							style={{
+								backgroundColor: 'var(--color-secondary)',
+								color: 'var(--color-text-inverse)',
+							}}
+						>
+							{loading ? 'Inscribiendo...' : 'Inscribir'}
+						</button>
+					</div>
 				</div>
 			</div>
 
