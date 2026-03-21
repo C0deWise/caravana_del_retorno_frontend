@@ -121,7 +121,7 @@ export default function CrearColonia() {
         <div className="flex flex-col min-h-screen items-center p-4" style={{ backgroundColor: 'var(--color-bg)' }}>
             <div className="rounded-lg shadow-xl w-full max-w-lg p-8" style={{ backgroundColor: 'var(--color-bg)' }}>
                 <h1 className="page-title">
-                    Registro de colonia
+                    Creación de colonia
                 </h1>
                 
                 <h2 className="section-title">
