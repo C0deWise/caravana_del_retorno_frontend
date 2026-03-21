@@ -5,6 +5,7 @@ import type {
     RegistrationData,
     RegistrationResponse
 } from '../types/registro.types';
+import { validateRegistrationData } from '../utils/registrationValidation';
 
 interface UseRegisterUserReturn {
     registerUser: (data: RegistrationData) => Promise<RegistrationResponse | null>;
@@ -25,7 +26,13 @@ export const useRegisterUser = (): UseRegisterUserReturn => {
         setSuccess(false);
 
         try {
-            // TODO: Implement client-side validation here before making the API call
+            const validationErrors = validateRegistrationData(data);
+            if (Object.keys(validationErrors).length > 0) {
+                const firstError = Object.values(validationErrors)[0] ?? 'Datos de registro inválidos';
+                setError(firstError);
+                return null;
+            }
+
             const response = await registrationService.userRegistration(data);
             
             if (response.success) {

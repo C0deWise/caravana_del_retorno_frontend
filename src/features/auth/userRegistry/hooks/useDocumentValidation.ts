@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { registrationService } from '../services/registro.service';
+import { validateDocumentByType } from '../utils/registrationValidation';
 
 interface UseDocumentValidationReturn {
     validate: (documentType: string, documentNumber: string) => Promise<boolean>;
@@ -15,8 +16,9 @@ export const useDocumentValidation = (): UseDocumentValidationReturn => {
     const [validationError, setValidationError] = useState<string | null>(null);
 
     const validate = useCallback(async (documentType: string, documentNumber: string): Promise<boolean> => {
-        if (!documentNumber || documentNumber.length < 5) {
-            setValidationError('Documento inválido');
+        const documentError = validateDocumentByType(documentType, documentNumber);
+        if (documentError) {
+            setValidationError(documentError);
             return false;
         }
 
