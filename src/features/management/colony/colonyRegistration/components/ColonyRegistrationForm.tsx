@@ -30,9 +30,9 @@ export default function InscripcionColoniaForm() {
 		const termino = normalizarTexto(busqueda.trim());
 		if (!termino) return colonias;
 		return colonias.filter((colonia) => {
-			const etiqueta = colonia.co_departamento
-				? `${colonia.co_pais} ${colonia.co_departamento} ${colonia.co_ciudad}`
-				: colonia.co_pais;
+			const etiqueta = colonia.departamento
+				? `${colonia.pais} ${colonia.departamento} ${colonia.ciudad}`
+				: colonia.pais;
 			return normalizarTexto(etiqueta).includes(termino);
 		});
 	}, [busqueda, colonias]);
@@ -42,9 +42,9 @@ export default function InscripcionColoniaForm() {
 	const seleccionarColonia = (colonia: ColoniaItem) => {
 		setSeleccionada(colonia);
 		setBusqueda(
-			colonia.co_departamento
-				? `${colonia.co_pais} - ${colonia.co_departamento} - ${colonia.co_ciudad}`
-				: colonia.co_pais
+			colonia.departamento
+				? `${colonia.pais} - ${colonia.departamento} - ${colonia.ciudad}`
+				: colonia.pais
 		);
 		setMostrarLista(false);
 	};
@@ -91,15 +91,15 @@ export default function InscripcionColoniaForm() {
 									</li>
 								)}
 								{!loading && coloniasFiltradas.map((colonia, index) => (
-									<li key={colonia.co_codigo ?? `${colonia.co_pais}-${colonia.co_departamento}-${colonia.co_ciudad}-${index}`}>
+									<li key={colonia.codigo ?? `${colonia.pais}-${colonia.departamento}-${colonia.ciudad}-${index}`}>
 										<button
 											type="button"
 											onClick={() => seleccionarColonia(colonia)}
 											className="w-full px-4 py-3 text-left text-base text-text hover:bg-bg-separator"
 										>
-											{colonia.co_departamento
-												? `${colonia.co_pais} - ${colonia.co_departamento} - ${colonia.co_ciudad}`
-												: colonia.co_pais}
+											{colonia.departamento
+												? `${colonia.pais} - ${colonia.departamento} - ${colonia.ciudad}`
+												: colonia.pais}
 										</button>
 									</li>
 								))}
@@ -135,9 +135,9 @@ export default function InscripcionColoniaForm() {
 				details={
 					seleccionada
 						? [
-							seleccionada.co_pais,
-							seleccionada.co_departamento,
-							seleccionada.co_ciudad,
+							seleccionada.pais,
+							seleccionada.departamento,
+							seleccionada.ciudad,
 						].filter((v): v is string => v !== null)
 						: []
 				}
