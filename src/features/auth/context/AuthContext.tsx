@@ -1,25 +1,44 @@
 import { createContext, useContext, ReactNode, useState } from "react";
-
-type Role = "usuario" | "lider_colonia" | "admin" | null;
+import { AuthUser } from "../types/user";
 
 interface AuthContextType {
-  userRole: Role;
+  user: AuthUser | null;
   isAuthenticated: boolean;
-  login: (role: Role) => void;
+  login: (user: AuthUser) => void;
+  updateUser: (partial: Partial<AuthUser>) => void;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [userRole, setUserRole] = useState<Role>("admin"); // Cambiar aqui para probar con los MOCKs
+// TODO: eliminar cuando el back esté listo
+const MOCK_USER: AuthUser = {
+  id: 1,
+  documentNumber: "CC10000000",
+  documentType: "CC",
+  firstName: "Mock",
+  lastName: "User",
+  gender: "M",
+  birthDate: "1990-01-01",
+  phone: "+573001000000",
+  role: "usuario",
+  colonyId: 1,
+};
 
-  const login = (role: Role) => setUserRole(role);
-  const logout = () => setUserRole(null);
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<AuthUser | null>(MOCK_USER); // TODO: null cuando haya back
+
+  const login = (newUser: AuthUser) => setUser(newUser);
+
+  const updateUser = (partial: Partial<AuthUser>) => {
+    setUser((prev) => (prev ? { ...prev, ...partial } : null));
+  };
+
+  const logout = () => setUser(null);
 
   return (
     <AuthContext.Provider
-      value={{ userRole, isAuthenticated: !!userRole, login, logout }}
+      value={{ user, isAuthenticated: !!user, login, updateUser, logout }}
     >
       {children}
     </AuthContext.Provider>

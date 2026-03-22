@@ -1,20 +1,50 @@
 "use client";
 import { useAuth } from "../context/AuthContext";
+import { LoggedUserRole } from "../types/roles";
+import { Draggable } from "@/utils/Draggable/components/Draggable";
 
-export function RoleSwitcher() {
-  const { userRole, login } = useAuth();
+const ROLES: {
+  role: LoggedUserRole | undefined;
+  label: string;
+  color: string;
+}[] = [
+  {
+    role: undefined,
+    label: "Guest",
+    color: "bg-yellow-500 hover:bg-yellow-400",
+  },
+  { role: "usuario", label: "User", color: "bg-green-500 hover:bg-green-400" },
+  {
+    role: "lider_colonia",
+    label: "Líder",
+    color: "bg-blue-500 hover:bg-blue-400",
+  },
+  { role: "admin", label: "Admin", color: "bg-red-500 hover:bg-red-400" },
+];
+
+export default function RoleSwitcher() {
+  const { user, updateUser } = useAuth();
+
   return (
-    <div className="fixed top-4 right-4 z-50 p-2 bg-gray-800 text-white rounded">
-      Role: {userRole || "guest"} |
-      <button onClick={() => login("usuario")} className="ml-2">
-        User
-      </button>
-      <button onClick={() => login("lider_colonia")} className="ml-2">
-        Leader
-      </button>
-      <button onClick={() => login("admin")} className="ml-2">
-        Admin
-      </button>
-    </div>
+    <Draggable
+      initialPosition={{ top: "110px", right: "15px" }}
+      className="z-50"
+    >
+      <div className="flex items-center gap-1.5 bg-gray-300 rounded-md px-2 py-1.5 shadow-sm border border-gray-400">
+        <span className="text-[10px] font-medium text-Black tracking-wide">
+          Rol:
+        </span>
+        {ROLES.map(({ role, label, color }) => (
+          <button
+            key={role ?? "guest"}
+            onClick={() => updateUser({ role })}
+            disabled={user?.role === role}
+            className={`px-2 py-0.5 rounded-lg text-[10px] font-semibold text-white transition-all ${color} disabled:opacity-30 disabled:cursor-not-allowed active:scale-95`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    </Draggable>
   );
 }

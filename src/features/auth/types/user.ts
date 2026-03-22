@@ -1,4 +1,6 @@
-export interface Member {
+import { LoggedUserRole } from "./roles";
+
+export interface AuthUser {
   id: number;
   documentNumber: string;
   documentType: string;
@@ -7,6 +9,6 @@ export interface Member {
   gender: "M" | "F" | "O";
   birthDate: string;
   phone: string;
-  role: "usuario" | "lider_colonia" | "admin";
-  colonyId: number;
+  role: LoggedUserRole;
+  colonyId: number | null;
 }

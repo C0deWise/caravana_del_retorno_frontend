@@ -1,6 +1,5 @@
+import type { LoggedUserRole } from "@/features/auth/types/roles";
 import { Member } from "../types/member";
-
-export type LoggedUserRole = "usuario" | "lider_colonia" | "admin";
 
 export const getVisibleMemberData = (
   member: Member,
