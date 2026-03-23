@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useId } from "react";
 import { useAssignLeaderToColony } from "../hooks/UseAssignLeaderToColony";
 import { UserData } from "../../../../shared/types/user/user.types";
 import { ConfirmModal } from "@/shared/components/confirmModal";
@@ -46,6 +46,7 @@ type SearchType = 'codigo' | 'nombre';
 
 export default function AssignLeaderToColonyForm() {
     const { assignLeader, loading, error, success } = useAssignLeaderToColony();
+    const listboxId = useId();
 
     const [searchType, setSearchType] = useState<SearchType>('codigo');
     const [inputValue, setInputValue] = useState('');
@@ -261,7 +262,7 @@ export default function AssignLeaderToColonyForm() {
                                 }}
                             >
                                 {/* Ícono de búsqueda */}
-                                <div className="pl-3 pr-2 flex-shrink-0" style={{ color: 'var(--color-text-muted)' }}>
+                                <div className="pl-3 pr-2 shrink-0" style={{ color: 'var(--color-text-muted)' }}>
                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                                         <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.5" />
                                         <path d="M10.5 10.5L13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -283,7 +284,13 @@ export default function AssignLeaderToColonyForm() {
                                     autoComplete="off"
                                     role="combobox"
                                     aria-expanded={isDropdownOpen}
+                                    aria-controls={listboxId}
                                     aria-haspopup="listbox"
+                                    aria-activedescendant={
+                                        highlightedIndex >= 0
+                                            ? `${listboxId}-option-${highlightedIndex}`
+                                            : undefined
+                                    }
                                 />
 
                                 {/* Botón para limpiar */}
@@ -297,8 +304,7 @@ export default function AssignLeaderToColonyForm() {
                                             setIsDropdownOpen(false);
                                             inputRef.current?.focus();
                                         }}
-                                        className="pr-3 flex-shrink-0 transition-opacity hover:opacity-60"
-                                        style={{ color: 'var(--color-text-muted)' }}
+                                        className="pr-3 shrink-0 transition-opacity hover:opacity-60 text-text-muted"
                                         aria-label="Limpiar búsqueda"
                                     >
                                         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -312,6 +318,7 @@ export default function AssignLeaderToColonyForm() {
                             {isDropdownOpen && (
                                 <div
                                     ref={dropdownRef}
+                                    id={listboxId}
                                     role="listbox"
                                     className="absolute z-50 w-full mt-1 rounded-lg border shadow-lg overflow-hidden"
                                     style={{
@@ -341,6 +348,7 @@ export default function AssignLeaderToColonyForm() {
                                             return (
                                                 <button
                                                     key={user.codigo}
+                                                    id={`${listboxId}-option-${idx}`}
                                                     type="button"
                                                     role="option"
                                                     aria-selected={selectedUser?.codigo === user.codigo}
@@ -386,7 +394,7 @@ export default function AssignLeaderToColonyForm() {
                                 }}
                             >
                                 <span
-                                    className="w-2 h-2 rounded-full flex-shrink-0"
+                                    className="w-2 h-2 rounded-full shrink-0"
                                     style={{ backgroundColor: 'var(--color-accent-green)' }}
                                 />
                                 {selectedUser.nombre} {selectedUser.apellido}
