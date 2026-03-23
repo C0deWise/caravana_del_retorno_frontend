@@ -451,7 +451,6 @@ export default function AssignLeaderToColonyForm() {
                 details={[
                     `${selectedUser?.nombre} ${selectedUser?.apellido}`,
                     selectedUser?.colonia ?? '',
-                    selectedUser?.ciudad ?? '',
                 ]}
                 onConfirm={handleModalConfirm}
                 onCancel={() => setShowConfirmModal(false)}
