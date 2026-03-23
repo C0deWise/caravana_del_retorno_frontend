@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { userService } from "../../../../shared/services/user/user.services";
-import { UserData, UserResponse } from "../../../../shared/types/user/user.types";
+import { userService } from "../../../../../shared/services/user/user.services";
+import { UserData, UserResponse } from "../../../../../shared/types/user/user.types";
 
 interface UseAssignLeaderToColonyReturn {
     assignLeader: (userData: UserData) => Promise<UserResponse | null>;

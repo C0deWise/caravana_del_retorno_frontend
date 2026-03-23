@@ -2,10 +2,12 @@
 
 import { useState, useRef, useEffect, useId } from "react";
 import { useAssignLeaderToColony } from "../hooks/UseAssignLeaderToColony";
-import { UserData } from "../../../../shared/types/user/user.types";
+import { UserData } from "../../../../../shared/types/user/user.types";
 import { ConfirmModal } from "@/shared/components/confirmModal";
 
 const USE_MOCK = true;
+const NAME_ALLOWED_CHAR_REGEX = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s'-]$/;
+const IDENTIFICATION_ALLOWED_CHAR_REGEX = /^[A-Za-z0-9]$/;
 
 const MOCK_USERS: UserData[] = [
     {
@@ -13,7 +15,7 @@ const MOCK_USERS: UserData[] = [
         tipo_doc: 'CC',
         documento: '1010101010',
         celular: '3000000001',
-        colonia: 'Centro',
+        colonia: 'Colombia, Antioquia, Medellín',
         nombre: 'Ana',
         apellido: 'Pérez',
         genero: 'F',
@@ -29,7 +31,7 @@ const MOCK_USERS: UserData[] = [
         tipo_doc: 'CC',
         documento: '2020202020',
         celular: '3000000002',
-        colonia: 'Norte',
+        colonia: 'Colombia, Cundinamarca, Bogotá',
         nombre: 'Carlos',
         apellido: 'Gómez',
         genero: 'M',
@@ -42,13 +44,13 @@ const MOCK_USERS: UserData[] = [
     },
 ];
 
-type SearchType = 'codigo' | 'nombre';
+type SearchType = 'documento' | 'nombre';
 
 export default function AssignLeaderToColonyForm() {
     const { assignLeader, loading, error, success } = useAssignLeaderToColony();
     const listboxId = useId();
 
-    const [searchType, setSearchType] = useState<SearchType>('codigo');
+    const [searchType, setSearchType] = useState<SearchType>('documento');
     const [inputValue, setInputValue] = useState('');
     const [filteredUsers, setFilteredUsers] = useState<UserData[]>([]);
     const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
@@ -77,8 +79,8 @@ export default function AssignLeaderToColonyForm() {
 
         if (USE_MOCK) {
             return MOCK_USERS.filter((u) =>
-                type === 'codigo'
-                    ? u.codigo.toLowerCase().includes(normalized)
+                type === 'documento'
+                    ? u.documento.toLowerCase().includes(normalized)
                     : `${u.nombre} ${u.apellido}`.toLowerCase().includes(normalized)
             );
         }
@@ -89,13 +91,18 @@ export default function AssignLeaderToColonyForm() {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
-        setInputValue(value);
+        const normalizedValue =
+            searchType === 'nombre'
+                ? value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñÜü\s'-]/g, '')
+                : value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+
+        setInputValue(normalizedValue);
         setSelectedUser(null);
         setHighlightedIndex(-1);
 
-        const results = filterUsers(value, searchType);
+        const results = filterUsers(normalizedValue, searchType);
         setFilteredUsers(results);
-        setIsDropdownOpen(results.length > 0 && value.trim().length > 0);
+        setIsDropdownOpen(results.length > 0 && normalizedValue.trim().length > 0);
     };
 
     const handleSearchTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -111,8 +118,8 @@ export default function AssignLeaderToColonyForm() {
     const handleSelectUser = (user: UserData) => {
         setSelectedUser(user);
         setInputValue(
-            searchType === 'codigo'
-                ? user.codigo
+            searchType === 'documento'
+                ? user.documento
                 : `${user.nombre} ${user.apellido}`
         );
         setIsDropdownOpen(false);
@@ -121,6 +128,24 @@ export default function AssignLeaderToColonyForm() {
 
     // Navegación con teclado
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (
+            searchType === 'nombre' &&
+            e.key.length === 1 &&
+            !NAME_ALLOWED_CHAR_REGEX.test(e.key)
+        ) {
+            e.preventDefault();
+            return;
+        }
+
+        if (
+            searchType === 'documento' &&
+            e.key.length === 1 &&
+            !IDENTIFICATION_ALLOWED_CHAR_REGEX.test(e.key)
+        ) {
+            e.preventDefault();
+            return;
+        }
+
         if (!isDropdownOpen) return;
 
         if (e.key === 'ArrowDown') {
@@ -172,37 +197,36 @@ export default function AssignLeaderToColonyForm() {
     };
 
     const placeholder =
-        searchType === 'codigo'
-            ? 'Ej: USR001'
+        searchType === 'documento'
+            ? 'Ej: 1234567890'
             : 'Ej: Ana Pérez';
 
     return (
         <div
-            className="flex min-h-screen items-center justify-center p-4"
+            className="flex flex-col min-h-screen w-full items-center px-4 py-6"
             style={{ backgroundColor: 'var(--color-bg)' }}
         >
             <div
-                className="w-full max-w-2xl rounded-xl p-8 md:p-10 shadow-sm"
-                style={{ backgroundColor: 'var(--color-bg-card)' }}
+                className="rounded-lg shadow-xl w-full max-w-lg p-8"
+                style={{ backgroundColor: 'var(--color-bg)' }}
             >
-                <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--color-primary)' }}>
+                <h1 className="page-title">
                     Asignar Líder a Colonia
                 </h1>
-                <p className="text-sm mb-8" style={{ color: 'var(--color-text-muted)' }}>
-                    Busca y selecciona el usuario que deseas asignar como líder.
-                </p>
+
+                <h2 className="section-title">
+                    Busca y selecciona el usuario que deseas asignar como líder
+                </h2>
 
                 {/* Alertas */}
                 {error && (
-                    <div className="mb-4 rounded-lg p-3" style={{ backgroundColor: 'var(--color-danger)' }}>
-                        <p className="text-sm" style={{ color: 'var(--color-text-inverse)' }}>{error}</p>
+                    <div className="alert-error">
+                        <p className="alert-error-text">{error}</p>
                     </div>
                 )}
                 {success && (
-                    <div className="mb-4 rounded-lg p-3" style={{ backgroundColor: 'var(--color-success)' }}>
-                        <p className="text-sm" style={{ color: 'var(--color-text-inverse)' }}>
-                            Líder asignado exitosamente
-                        </p>
+                    <div className="alert-success">
+                        <p className="alert-success-text">Líder asignado exitosamente</p>
                     </div>
                 )}
 
@@ -229,7 +253,7 @@ export default function AssignLeaderToColonyForm() {
                                 onFocus={(e) => (e.currentTarget.style.borderColor = 'var(--color-primary)')}
                                 onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--color-bg-border)')}
                             >
-                                <option value="codigo">Número de documento</option>
+                                <option value="documento">Número de documento</option>
                                 <option value="nombre">Nombre</option>
                             </select>
                             {/* Ícono chevron personalizado */}
@@ -250,7 +274,7 @@ export default function AssignLeaderToColonyForm() {
                             className="block text-sm font-semibold mb-1.5"
                             style={{ color: 'var(--color-primary)' }}
                         >
-                            {searchType === 'codigo' ? 'Código de usuario' : 'Nombre del usuario'}
+                            {searchType === 'documento' ? 'Número de documento' : 'Nombre del usuario'}
                         </label>
 
                         <div ref={containerRef} className="relative">
@@ -337,13 +361,13 @@ export default function AssignLeaderToColonyForm() {
                                         filteredUsers.map((user, idx) => {
                                             const isHighlighted = idx === highlightedIndex;
                                             const label =
-                                                searchType === 'codigo'
-                                                    ? user.codigo
+                                                searchType === 'documento'
+                                                    ? user.documento
                                                     : `${user.nombre} ${user.apellido}`;
                                             const sublabel =
-                                                searchType === 'codigo'
+                                                searchType === 'documento'
                                                     ? `${user.nombre} ${user.apellido}`
-                                                    : user.codigo;
+                                                    : user.documento;
 
                                             return (
                                                 <button
