@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import type { ColoniaItem, ColoniaResponse } from '../types/colonia.types';
-import { coloniaService } from '../services/colonia.service';
+// import { coloniaService } from '../services/colonia.service';
 
 // ─── Toggle: cambia a false para usar el servicio real ───────────────────────
 const USE_MOCK = true;

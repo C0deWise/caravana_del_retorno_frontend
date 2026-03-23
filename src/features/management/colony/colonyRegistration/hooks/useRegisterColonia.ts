@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { userService } from '../../../../shared/services/user/user.services';
-import type { UserData, UserResponse } from '../../../../shared/types/user/user.types';
+import { userService } from '../../../../../shared/services/user/user.services';
+import type { UserData, UserResponse } from '../../../../../shared/types/user/user.types';
 
 interface UseInscribirUsuarioColoniaReturn {
     inscribirUsuarioColonia: (data: UserData) => Promise<UserResponse | null>;
