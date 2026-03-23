@@ -1,7 +1,9 @@
+import type { ReactNode } from 'react';
+
 interface ConfirmModalProps {
     isOpen: boolean;
     title: string;
-    details?: string[];
+    details?: ReactNode[];
     onConfirm: () => void;
     onCancel: () => void;
     confirmLabel?: string;

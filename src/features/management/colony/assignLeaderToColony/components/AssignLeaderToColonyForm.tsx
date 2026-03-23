@@ -449,8 +449,14 @@ export default function AssignLeaderToColonyForm() {
                 isOpen={showConfirmModal}
                 title="¿Confirmas la asignación del líder?"
                 details={[
-                    `${selectedUser?.nombre} ${selectedUser?.apellido}`,
-                    selectedUser?.colonia ?? '',
+                    <>
+                        <span className="font-bold text-lg">Líder:</span>{' '}
+                        {selectedUser?.nombre} {selectedUser?.apellido}
+                    </>,
+                    <>
+                        <span className="font-bold text-lg">Colonia:</span>{' '}
+                        {selectedUser?.colonia ?? ''}
+                    </>
                 ]}
                 onConfirm={handleModalConfirm}
                 onCancel={() => setShowConfirmModal(false)}
