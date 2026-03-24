@@ -1,7 +1,7 @@
-import { AuthUser } from "@/features/auth/types/user";
+import { UserData } from "@/types/user.types";
 
 export type Member = Pick<
-  AuthUser,
+  UserData,
   | "id"
   | "documentNumber"
   | "documentType"

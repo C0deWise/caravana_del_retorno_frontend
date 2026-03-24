@@ -41,7 +41,7 @@ export default function ListColonyMembers({
     return (
       <div className="w-full h-full flex items-center justify-center p-8">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-text mb-4">Acceso negado</h1>
+          <h1 className="text-2xl font-bold text-text mb-4">Acceso Denegado</h1>
           <p className="text-text-muted">
             Por favor inicia sesión para ver los miembros de tu colonia.
           </p>

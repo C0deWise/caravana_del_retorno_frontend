@@ -1,12 +1,12 @@
 // TODO: ELiminar cuando este el back
 
-import { Colony } from "../types/colony";
-import { Member } from "../types/member";
+import { ColonyData } from "@/types/colony.types";
+import { Member } from "../types/member.types";
 
-export const mockColonies: Colony[] = [
-  { id: 1, city: "Bogotá", department: "Cundinamarca", country: "Colombia" },
-  { id: 2, city: "Cali", department: "Valle del Cauca", country: "Colombia" },
-  { id: 3, city: "", department: "", country: "España" },
+export const mockColonies: ColonyData[] = [
+  { id: "1", city: "Bogotá", department: "Cundinamarca", country: "Colombia" },
+  { id: "2", city: "Cali", department: "Valle del Cauca", country: "Colombia" },
+  { id: "3", city: "", department: "", country: "España" },
 ];
 
 const firstNames = [

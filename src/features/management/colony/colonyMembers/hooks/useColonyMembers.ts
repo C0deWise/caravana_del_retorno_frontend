@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { useAuth } from "@/features/auth/context/AuthContext";
-import type { Member } from "../types/member";
+import type { Member } from "../types/member.types";
 import { mockColonies, mockAllMembers } from "./mocks";
 
 export function useColonyMembers(targetColonyId: number): {

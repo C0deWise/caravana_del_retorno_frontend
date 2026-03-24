@@ -1,18 +1,18 @@
 import { createContext, useContext, ReactNode, useState } from "react";
-import { AuthUser } from "../types/user";
+import { User } from "../../../types/user.types";
 
 interface AuthContextType {
-  user: AuthUser | null;
+  user: User | null;
   isAuthenticated: boolean;
-  login: (user: AuthUser) => void;
-  updateUser: (partial: Partial<AuthUser>) => void;
+  login: (user: User) => void;
+  updateUser: (partial: Partial<User>) => void;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 // TODO: eliminar cuando el back esté listo
-const MOCK_USER: AuthUser = {
+const MOCK_USER: User = {
   id: 1,
   documentNumber: "CC10000000",
   documentType: "CC",
@@ -26,11 +26,11 @@ const MOCK_USER: AuthUser = {
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(MOCK_USER); // TODO: null cuando haya back
+  const [user, setUser] = useState<User | null>(MOCK_USER); // TODO: null cuando haya back
 
-  const login = (newUser: AuthUser) => setUser(newUser);
+  const login = (newUser: User) => setUser(newUser);
 
-  const updateUser = (partial: Partial<AuthUser>) => {
+  const updateUser = (partial: Partial<User>) => {
     setUser((prev) => (prev ? { ...prev, ...partial } : null));
   };
 

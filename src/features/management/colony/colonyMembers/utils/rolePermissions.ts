@@ -1,5 +1,5 @@
 import type { LoggedUserRole } from "@/features/auth/types/roles";
-import { Member } from "../types/member";
+import { Member } from "../types/member.types";
 
 export const getVisibleMemberData = (
   member: Member,

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { userService } from '../../../../shared/services/user/user.services';
-import type { UserData, UserResponse } from '../../../../shared/types/user/user.types';
+import { userService } from '@/shared/services/user/user.services';
+import type { UserData, UserResponse } from '@/types/user.types';
 
 interface UseInscribirUsuarioColoniaReturn {
     inscribirUsuarioColonia: (data: UserData) => Promise<UserResponse | null>;
@@ -21,13 +21,13 @@ export const useInscribirUsuarioColonia = (): UseInscribirUsuarioColoniaReturn =
 
         try {
             // Validar que los campos no estén vacíos
-            if (!data.codigo || !data.tipo_doc || !data.documento || !data.celular || !data.colonia || !data.nombre || !data.apellido || !data.genero || !data.fecha_nacimiento || !data.pais) {
+            if (!data.id || !data.documentType || !data.documentNumber || !data.phone || !data.colonyId || !data.firstName || !data.lastName || !data.gender || !data.birthDate || !data.country) {
                 setError('Todos los campos son obligatorios');
                 return null;
-            } 
+            }
 
             const response = await userService.createUser(data);
-            
+
             if (response.success) {
                 setSuccess(true);
             } else {

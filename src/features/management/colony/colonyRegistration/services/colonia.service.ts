@@ -1,9 +1,9 @@
 import { apiService } from '@/shared/services/api.services';
 import type {
-    ColoniaData,
-    ColoniaItem,
-    ColoniaResponse
-} from '../types/colonia.types';
+    ColonyData,
+    ColonyData,
+    ColonyResponse
+} from '@/types/colony.types';
 
 /**
  * Servicio para manejar las operaciones de gestión de colonias.
@@ -11,9 +11,9 @@ import type {
  */
 export const coloniaService = {
 
-    createColonia: async (data: ColoniaData): Promise<ColoniaResponse<ColoniaItem>> => {
+    createColonia: async (data: ColonyData): Promise<ColonyResponse<ColonyData>> => {
         try {
-            const response = await apiService.post<ColoniaResponse<ColoniaItem>>('/colonias', data);
+            const response = await apiService.post<ColonyResponse<ColonyData>>('/colonias', data);
             return response;
         } catch (error) {
             console.error('Error en createColonia:', error);
@@ -21,9 +21,9 @@ export const coloniaService = {
         }
     },
 
-    getColonias: async (): Promise<ColoniaResponse<ColoniaItem[]>> => {
+    getColonias: async (): Promise<ColonyResponse<ColonyData[]>> => {
         try {
-            const response = await apiService.get<ColoniaResponse<ColoniaItem[]>>('/colonias');
+            const response = await apiService.get<ColonyResponse<ColonyData[]>>('/colonias');
             return response;
         } catch (error) {
             console.error('Error en getColonias:', error);
