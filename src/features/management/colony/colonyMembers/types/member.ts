@@ -10,6 +10,7 @@ export type Member = Pick<
   | "gender"
   | "birthDate"
   | "phone"
+  | "email"
   | "role"
   | "colonyId"
 >;

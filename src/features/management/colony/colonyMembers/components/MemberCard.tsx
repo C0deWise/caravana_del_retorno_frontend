@@ -4,10 +4,12 @@ import {
   CakeIcon,
   IdentificationIcon,
   UserIcon,
+  EnvelopeIcon,
 } from "@heroicons/react/24/solid";
 import { Member } from "../types/member";
 import { LoggedUserRole } from "@/features/auth/types/roles";
 import { getVisibleMemberData } from "../utils/rolePermissions";
+import calculateAge from "../utils/calculateAge";
 
 interface MemberCardProps {
   member: Member;
@@ -62,15 +64,32 @@ export function MemberCard({ member, userRole, index }: MemberCardProps) {
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-4 text-sm text-text-muted">
-          <div className="flex items-center space-x-2">
-            <PhoneIcon className="w-5 h-5 text-text-muted shrink-0" />
-            <span>{visibleData.phone || "—"}</span>
+          <div
+            className={`group flex items-center space-x-2 ${visibleData.email ? 'cursor-pointer' : ''}`}
+            onClick={() => visibleData.email && navigator.clipboard.writeText(visibleData.email)}
+            title={visibleData.email ? "Copiar correo" : undefined}
+          >
+            <EnvelopeIcon className={`w-5 h-5 shrink-0 transition-colors ${visibleData.email ? 'text-text-muted group-hover:text-primary' : 'text-text-muted'}`} />
+            <span className={`transition-colors ${visibleData.email ? 'group-hover:text-primary' : ''}`}>
+              {visibleData.email || "—"}
+            </span>
           </div>
 
           {userRole !== "usuario" && (
             <div className="flex items-center space-x-2">
+              <PhoneIcon className="w-5 h-5 text-text-muted shrink-0" />
+              <span>{visibleData.phone || "—"}</span>
+            </div>
+          )}
+
+          {userRole !== "usuario" && (
+            <div className="flex items-center space-x-2">
               <CakeIcon className="w-5 h-5 text-text-muted shrink-0" />
-              <span>{visibleData.birthDate || "—"}</span>
+              <span>
+                {visibleData.birthDate
+                  ? `${calculateAge(visibleData.birthDate)} años`
+                  : "—"}
+              </span>
             </div>
           )}
 

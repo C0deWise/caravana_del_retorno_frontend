@@ -72,7 +72,7 @@ export default function ListColonyMembers({
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto">
+      <main className="max-w-7xl mx-auto">
         <MemberList members={members} userRole={user?.role as LoggedUserRole} />
       </main>
 

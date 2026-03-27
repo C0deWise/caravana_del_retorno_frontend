@@ -9,6 +9,7 @@ export interface AuthUser {
   gender: "M" | "F" | "O";
   birthDate: string;
   phone: string;
+  email: string;
   role: LoggedUserRole;
   colonyId: number | null;
 }

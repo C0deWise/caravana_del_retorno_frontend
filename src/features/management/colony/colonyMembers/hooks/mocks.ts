@@ -64,6 +64,7 @@ export const mockAllMembers: Member[] = Array.from({ length: 200 }, (_, i) => {
 
   const firstName = `${firstNames[i % firstNames.length]} ${secondNames[i % secondNames.length]}`;
   const lastName = `${lastNames[i % lastNames.length]} ${lastNames[(i + 5) % lastNames.length]}`;
+  const email = `${firstNames[i % firstNames.length].toLowerCase()}.${lastNames[i % lastNames.length].toLowerCase()}${i}@example.com`;
 
   return {
     id: i + 1,
@@ -71,6 +72,7 @@ export const mockAllMembers: Member[] = Array.from({ length: 200 }, (_, i) => {
     documentType: "CC",
     firstName,
     lastName,
+    email,
     gender: (i % 3 === 0 ? "M" : i % 3 === 1 ? "F" : "O") as Member["gender"],
     birthDate: `${1950 + (i % 56)}-${String((i % 12) + 1).padStart(2, "0")}-${String((i % 28) + 1).padStart(2, "0")}`,
     phone: `(+57) 3${String(10 + i).padStart(2, "0")} ${String(200 + i).padStart(3, "0")} ${String(300 + i).padStart(4, "0")}`,

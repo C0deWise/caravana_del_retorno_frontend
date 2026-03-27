@@ -11,7 +11,7 @@ export const getVisibleMemberData = (
         firstName: `${member.firstName.split(" ")[0]}...`,
         lastName: `${member.lastName.split(" ")[0]}...`,
         role: member.role,
-        phone: member.phone,
+        email: member.email,
       };
     case "lider_colonia":
     case "admin":
