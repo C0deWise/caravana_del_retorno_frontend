@@ -9,7 +9,7 @@ export default function SidebarContainer() {
 
   return (
     <aside
-      className={`bg-bg-separator shadow-xl rounded-xl h-full flex flex-col transition-all duration-300 ease-in-out ${
+      className={`bg-bg-separator shadow-xl rounded-xl h-full flex flex-col overflow-hidden transition-all duration-300 ease-in-out ${
         isCollapsed ? "sidebar-collapsed" : "sidebar-expanded"
       }`}
     >
