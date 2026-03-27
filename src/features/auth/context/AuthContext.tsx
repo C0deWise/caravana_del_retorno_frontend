@@ -21,6 +21,7 @@ const MOCK_USER: AuthUser = {
   gender: "M",
   birthDate: "1990-01-01",
   phone: "+573001000000",
+  email: "example@email.com",
   role: "usuario",
   colonyId: 1,
 };
