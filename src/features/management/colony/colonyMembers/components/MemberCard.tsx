@@ -5,7 +5,7 @@ import {
   IdentificationIcon,
   UserIcon,
 } from "@heroicons/react/24/solid";
-import { Member } from "../types/member.types";
+import { Member } from "../types/member";
 import { LoggedUserRole } from "@/features/auth/types/roles";
 import { getVisibleMemberData } from "../utils/rolePermissions";
 

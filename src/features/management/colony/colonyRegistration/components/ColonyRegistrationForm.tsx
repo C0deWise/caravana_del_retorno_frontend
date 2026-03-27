@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useListColonia } from '../hooks/useListColonia';
-import type { ColonyData } from '@/types/colony.types';
+import type { ColoniaItem } from '../types/colonia.types';
 import { ConfirmModal } from '@/shared/components/confirmModal';
 import { Search } from 'lucide-react';
 
@@ -11,9 +11,9 @@ const normalizarTexto = (valor: string): string =>
 
 export default function InscripcionColoniaForm() {
 	const { listColonia, loading, error } = useListColonia();
-	const [colonias, setColonias] = useState<ColonyData[]>([]);
+	const [colonias, setColonias] = useState<ColoniaItem[]>([]);
 	const [busqueda, setBusqueda] = useState('');
-	const [seleccionada, setSeleccionada] = useState<ColonyData | null>(null);
+	const [seleccionada, setSeleccionada] = useState<ColoniaItem | null>(null);
 	const [mostrarLista, setMostrarLista] = useState(false);
 	const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
 	const [mostrarMensajeEspera, setMostrarMensajeEspera] = useState(false);
@@ -30,21 +30,21 @@ export default function InscripcionColoniaForm() {
 		const termino = normalizarTexto(busqueda.trim());
 		if (!termino) return colonias;
 		return colonias.filter((colonia) => {
-			const etiqueta = colonia.department
-				? `${colonia.country} ${colonia.department} ${colonia.city}`
-				: colonia.country;
+			const etiqueta = colonia.co_departamento
+				? `${colonia.co_pais} ${colonia.co_departamento} ${colonia.co_ciudad}`
+				: colonia.co_pais;
 			return normalizarTexto(etiqueta).includes(termino);
 		});
 	}, [busqueda, colonias]);
 
 	const sinColoniasDisponibles = !loading && !error && colonias.length === 0;
 
-	const seleccionarColonia = (colonia: ColonyData) => {
+	const seleccionarColonia = (colonia: ColoniaItem) => {
 		setSeleccionada(colonia);
 		setBusqueda(
-			colonia.department
-				? `${colonia.country} - ${colonia.department} - ${colonia.city}`
-				: colonia.country
+			colonia.co_departamento
+				? `${colonia.co_pais} - ${colonia.co_departamento} - ${colonia.co_ciudad}`
+				: colonia.co_pais
 		);
 		setMostrarLista(false);
 	};
@@ -91,15 +91,15 @@ export default function InscripcionColoniaForm() {
 									</li>
 								)}
 								{!loading && coloniasFiltradas.map((colonia, index) => (
-									<li key={colonia.id ?? `${colonia.country}-${colonia.department}-${colonia.city}-${index}`}>
+									<li key={colonia.co_codigo ?? `${colonia.co_pais}-${colonia.co_departamento}-${colonia.co_ciudad}-${index}`}>
 										<button
 											type="button"
 											onClick={() => seleccionarColonia(colonia)}
 											className="w-full px-4 py-3 text-left text-base text-text hover:bg-bg-separator"
 										>
-											{colonia.department
-												? `${colonia.country} - ${colonia.department} - ${colonia.city}`
-												: colonia.country}
+											{colonia.co_departamento
+												? `${colonia.co_pais} - ${colonia.co_departamento} - ${colonia.co_ciudad}`
+												: colonia.co_pais}
 										</button>
 									</li>
 								))}
@@ -135,9 +135,9 @@ export default function InscripcionColoniaForm() {
 				details={
 					seleccionada
 						? [
-							seleccionada.country,
-							seleccionada.department,
-							seleccionada.city,
+							seleccionada.co_pais,
+							seleccionada.co_departamento,
+							seleccionada.co_ciudad,
 						].filter((v): v is string => v !== null)
 						: []
 				}
