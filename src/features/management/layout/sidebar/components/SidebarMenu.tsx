@@ -8,7 +8,7 @@ export default function SidebarMenu() {
   const { isCollapsed } = useSidebarContext();
 
   return (
-    <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+    <nav className="flex-1 p-4 space-y-2 overflow-hidden">
       {menuConfig.map((item) => (
         <SidebarMenuItem
           key={item.href}
