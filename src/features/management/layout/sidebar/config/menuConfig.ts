@@ -1,4 +1,4 @@
-import { MenuItem } from "@/types/menu";
+import { MenuItem } from "@/features/management/layout/sidebar/types/menu.types";
 
 export const menuConfig: MenuItem[] = [
   {

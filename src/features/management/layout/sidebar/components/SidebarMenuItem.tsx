@@ -3,7 +3,7 @@
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { iconMap } from "../utils/icons";
 import { useSidebarContext } from "./SidebarContext";
-import { MenuItem } from "@/types/menu";
+import { MenuItem } from "@/features/management/layout/sidebar/types/menu.types";
 import { useActivePath } from "../hooks/useActivePath";
 import { useRouter } from "next/navigation";
 

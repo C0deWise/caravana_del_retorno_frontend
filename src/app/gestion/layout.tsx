@@ -2,7 +2,7 @@
 
 import Breadcrumb from "@/features/management/layout/breadcrumb/components/Breadcrumb";
 import Sidebar from "@/features/management/layout/sidebar/components/Sidebar";
-import PageTransition from "@/ui/general/PageTransition";
+import PageTransition from "@/ui/animations/PageTransition";
 import ErrorBoundary from "@/ui/general/ErrorBoundary";
 import { usePathname } from "next/navigation";
 import { AuthProvider } from "@/features/auth/context/AuthContext";

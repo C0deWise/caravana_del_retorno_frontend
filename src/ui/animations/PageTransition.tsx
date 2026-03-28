@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Spinner from "@/ui/general/Spinner";
+import Spinner from "@/ui/animations/Spinner";
 
 const MIN_LOADING_TIME = 300;
 

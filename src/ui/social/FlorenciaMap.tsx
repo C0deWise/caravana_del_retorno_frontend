@@ -1,4 +1,4 @@
-export default function HomeMap() {
+export default function FlorenciaMap() {
   return (
     <div className="w-full h-full rounded-xl overflow-hidden">
       <iframe

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
-import Spinner from "@/ui/general/Spinner";
+import Spinner from "@/ui/animations/Spinner";
 import { useColonyMembers } from "../hooks/useColonyMembers";
 import { useAuth } from "@/features/auth/context/AuthContext";
 import { MemberList } from "./MemberList";

@@ -1,9 +1,9 @@
-import FooterCurve from "@/ui/footer/FooterCurve";
-import VerticalSeparator from "@/ui/general/VerticalSeparator";
-import HeaderText from "@/ui/header/HeaderText";
-import FooterFacebook from "@/ui/footer/FooterFacebook";
-import FooterInstagram from "@/ui/footer/FooterInstagram";
-import HomeMap from "./HomeMap";
+import FooterCurve from "../ui/FooterCurve";
+import FlorenciaMap from "@/ui/social/FlorenciaMap";
+import VerticalSeparator from "@/ui/decorators/VerticalSeparator";
+import Facebook from "@/ui/social/Facebook";
+import Instagram from "@/ui/social/Instagram";
+import MainText from "@/ui/general/MainText";
 import { ArrowLeftCircleIcon } from "@heroicons/react/24/outline";
 import { PhotoIcon } from "@heroicons/react/24/outline";
 
@@ -13,7 +13,7 @@ export default function HomeFooterContent() {
       <FooterCurve />
       <div className="w-full h-11/12 flex">
         <div className="flex-none md:w-auto aspect-square md:pl-10 md:py-5">
-          <HomeMap />
+          <FlorenciaMap />
         </div>
         <div className="md:w-fit md:h-full justify-center">
           <div className="flex flex-col md:pl-10 md:pr-10 md:h-full md:py-5 md:w-300">
@@ -57,9 +57,9 @@ export default function HomeFooterContent() {
           <VerticalSeparator />
         </span>
         <div className="flex flex-1 flex-col md:mr-7 md:pb-4 justify-between items-center">
-          <HeaderText />
-          <FooterFacebook className="h-20" />
-          <FooterInstagram className="h-20" />
+          <MainText size={200} />
+          <Facebook size={20} />
+          <Instagram size={20} />
         </div>
       </div>
       <span className="absolute bottom-2 right-2 text-text-inverse text-sm font-light">

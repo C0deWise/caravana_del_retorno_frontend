@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Spinner from "@/ui/general/Spinner";
+import Spinner from "@/ui/animations/Spinner";
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);

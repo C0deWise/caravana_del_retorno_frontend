@@ -1,6 +1,6 @@
 "use client";
 
-import AnimatedLink from "@/ui/general/AnimatedLink";
+import AnimatedLink from "@/ui/animations/AnimatedLink";
 
 interface HomeNavLinkProps {
   href: string;
