@@ -6,28 +6,40 @@
 
   /* Colores principales */
   --color-primary: #024059;
-  --color-secondary: #F28F38;
-  --color-accent-red: #EC1E25;
-  --color-accent-green: #038C4A;
-  --color-accent-yellow: #EABE03;
-  --color-danger: #960D0D;
-  --color-success: #38C878;
+  --color-secondary: #f28f38;
+  --color-accent-red: #ec1e25;
+  --color-accent-green: #038c4a;
+  --color-accent-yellow: #eabe03;
+  --color-danger: #960d0d;
+  --color-success: #38c878;
 
   /* Fondos */
-  --color-bg: #FFFFFF;
-  --color-bg-card: #F7F7F7;
-  --color-bg-border: #E0E0E0;
-  --color-bg-separator: #EDEDED;
+  --color-bg: #ffffff;
+  --color-bg-card: #f7f7f7;
+  --color-bg-border: #e0e0e0;
+  --color-bg-separator: #ededed;
 
   /* Textos */
   --color-text: #343434;
   --color-text-muted: #707070;
-  --color-text-inverse: #FFFFFF;
+  --color-text-inverse: #ffffff;
 }
 
 body {
   background: var(--color-bg);
   font-family: var(--font-sans);
+}
+
+.sidebar-collapsed {
+  width: 5.3rem;
+  min-width: 5.3rem;
+  max-width: 5.3rem;
+}
+
+.sidebar-expanded {
+  width: auto;
+  min-width: 20rem; /* 320px */
+  max-width: 30rem; /* 384px */
 }
 
 /* ===== ESTILOS COMPARTIDOS DE FORMULARIOS ===== */
@@ -52,13 +64,13 @@ body {
 
   /* Input con error */
   .input-error {
-    background-color: #FEE;
+    background-color: #fee;
     border: 2px solid var(--color-danger) !important;
   }
 
   .input-error:focus {
     outline: none;
-    background-color: #FFF;
+    background-color: #fff;
     border: 2px solid var(--color-danger) !important;
     box-shadow: 0 0 0 3px rgba(150, 13, 13, 0.15);
   }
@@ -118,7 +130,7 @@ body {
   /* Alertas */
   .alert-error {
     @apply mt-6 p-4 rounded border-l-4;
-    background-color: #FEE;
+    background-color: #fee;
     border-color: var(--color-danger);
   }
 
@@ -129,7 +141,7 @@ body {
 
   .alert-success {
     @apply mt-6 p-4 rounded border-l-4;
-    background-color: #E8F5E9;
+    background-color: #e8f5e9;
     border-color: var(--color-success);
   }
 
@@ -180,10 +192,6 @@ body {
   background-color: var(--color-bg-card);
   color: var(--color-text);
   font-size: 1rem;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23343434' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 1rem center;
 }
 
 .label-base {
@@ -211,8 +219,8 @@ body {
 
 .alert-error {
   padding: 0.75rem;
-  background-color: #FEE2E2;
-  border: 1px solid #FCA5A5;
+  background-color: #fee2e2;
+  border: 1px solid #fca5a5;
   border-radius: 0.375rem;
   margin-bottom: 1rem;
 }
@@ -224,8 +232,8 @@ body {
 
 .alert-success {
   padding: 0.75rem;
-  background-color: #D1FAE5;
-  border: 1px solid #6EE7B7;
+  background-color: #d1fae5;
+  border: 1px solid #6ee7b7;
   border-radius: 0.375rem;
   margin-bottom: 1rem;
 }
