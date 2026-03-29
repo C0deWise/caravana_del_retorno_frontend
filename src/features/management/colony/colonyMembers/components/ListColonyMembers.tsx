@@ -2,9 +2,9 @@
 import { useEffect, useRef } from "react";
 import Spinner from "@/ui/animations/Spinner";
 import { useColonyMembers } from "../hooks/useColonyMembers";
-import { useAuth } from "@/features/auth/context/AuthContext";
+import { useAuth } from "@/auth/context/AuthContext";
 import { MemberList } from "./MemberList";
-import { LoggedUserRole } from "@/features/auth/types/roles";
+import { UserRole } from "@/types/user.types";
 
 interface ListColonyMembersProps {
   paramsId?: number;
@@ -17,8 +17,8 @@ export default function ListColonyMembers({
 
   const targetColonyId =
     user?.role === "admin"
-      ? (paramsId ?? user?.colonyId ?? 1)
-      : (user?.colonyId ?? 0);
+      ? (paramsId ?? user?.codigo_colonia ?? 1)
+      : (user?.codigo_colonia ?? 0);
 
   const { members, colonyLabel, hasMore, loadMore, totalMembers } =
     useColonyMembers(targetColonyId);
@@ -37,7 +37,7 @@ export default function ListColonyMembers({
     return () => observer.disconnect();
   }, [hasMore, loadMore]);
 
-  if (!user?.role || (user?.role !== "admin" && !user?.colonyId)) {
+  if (!user?.role || (user?.role !== "admin" && !user?.codigo_colonia)) {
     return (
       <div className="w-full h-full flex items-center justify-center p-8">
         <div className="text-center">
@@ -73,7 +73,7 @@ export default function ListColonyMembers({
       </header>
 
       <main className="max-w-7xl mx-auto">
-        <MemberList members={members} userRole={user?.role as LoggedUserRole} />
+        <MemberList members={members} userRole={user?.role as UserRole} />
       </main>
 
       {hasMore && (

@@ -4,9 +4,12 @@ import { usePathname } from "next/navigation";
 import { NavItemType } from "../types/navbar.types";
 import { homeNavItems } from "../config/HomeNavItems";
 import HomeNavLink from "./HomeNavLink";
+import LoginPanel from "../../login/components/LoginPanel";
+import { useState } from "react";
 
 export default function HomeNavbar() {
   const pathName = usePathname();
+  const [showLogin, setShowLogin] = useState(false);
 
   return (
     <nav
@@ -30,7 +33,14 @@ export default function HomeNavbar() {
         }
 
         if (item.type === NavItemType.LOGIN) {
-          return <div key={item.label}>Login</div>;
+          return (
+            <div key={item.label} className="relative">
+              <button onClick={() => setShowLogin((prev) => !prev)}>
+                Login
+              </button>
+              {showLogin && <LoginPanel onClose={() => setShowLogin(false)} />}
+            </div>
+          );
         }
       })}
     </nav>

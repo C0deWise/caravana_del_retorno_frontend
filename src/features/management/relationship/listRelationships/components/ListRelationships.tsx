@@ -6,13 +6,13 @@ import { RelationshipList } from "./RelationshipList";
 import Spinner from "@/ui/animations/Spinner";
 
 interface ListRelationshipsProps {
-  paramsId?: string | number;
+  paramsId?: number;
 }
 
 export default function ListRelationships({
   paramsId,
 }: ListRelationshipsProps) {
-  const targetUserId = paramsId ? String(paramsId) : "0"; // Valor por defecto para pruebas
+  const targetUserId = paramsId ? paramsId : 0; // Valor por defecto para pruebas
 
   const { relationships, hasMore, loadMore } =
     useListRelationships(targetUserId);

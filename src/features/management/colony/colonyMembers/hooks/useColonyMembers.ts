@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
-import { useAuth } from "@/features/auth/context/AuthContext";
-import type { Member } from "../types/member";
+import { useAuth } from "@/auth/context/AuthContext";
+import type { Member } from "../types/member.types";
 import { mockColonies, mockAllMembers } from "./mocks";
 
 export function useColonyMembers(targetColonyId: number): {
@@ -14,12 +14,12 @@ export function useColonyMembers(targetColonyId: number): {
   const { user } = useAuth();
 
   const filteredMembers = useMemo(
-    () => mockAllMembers.filter((m) => m.colonyId === targetColonyId),
+    () => mockAllMembers.filter((m) => m.codigo_colonia === targetColonyId),
     [targetColonyId],
   );
 
   const colony = useMemo(
-    () => mockColonies.find((c) => c.id === targetColonyId),
+    () => mockColonies.find((c) => c.codigo === targetColonyId),
     [targetColonyId],
   );
 
@@ -27,9 +27,9 @@ export function useColonyMembers(targetColonyId: number): {
   const limit = 20;
 
   const colonyLabel = colony
-    ? colony.city && colony.department
-      ? `${colony.city}, ${colony.department}`
-      : colony.country
+    ? colony.ciudad && colony.departamento
+      ? `${colony.ciudad}, ${colony.departamento}`
+      : colony.pais
     : "Colony not found";
 
   const members = useMemo(

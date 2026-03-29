@@ -13,15 +13,14 @@ export default function MainText({
 
   return (
     <div
-      className={`inline-block h-${size} w-[${size}px] ${className}`}
+      className={`relative inline-block h-${size} w-[${size}px] ${className}`}
       style={{ width: size, height: height }}
     >
       <Image
         src="/home/Caravana-Del-Retorno-Text.svg"
-        width={size}
-        height={height}
         alt="Caravana del Retorno"
-        className="w-full h-full rounded-lg object-contain"
+        fill
+        className="rounded-lg object-contain"
         unoptimized
       />
     </div>

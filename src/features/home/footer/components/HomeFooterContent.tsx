@@ -1,9 +1,8 @@
 import FooterCurve from "../ui/FooterCurve";
 import FlorenciaMap from "@/ui/social/FlorenciaMap";
 import VerticalSeparator from "@/ui/decorators/VerticalSeparator";
-import Facebook from "@/ui/social/Facebook";
-import Instagram from "@/ui/social/Instagram";
 import MainText from "@/ui/general/MainText";
+import SocialIcon from "@/ui/social/SocialIcon";
 import { ArrowLeftCircleIcon } from "@heroicons/react/24/outline";
 import { PhotoIcon } from "@heroicons/react/24/outline";
 
@@ -58,8 +57,16 @@ export default function HomeFooterContent() {
         </span>
         <div className="flex flex-1 flex-col md:mr-7 md:pb-4 justify-between items-center">
           <MainText size={200} />
-          <Facebook size={20} />
-          <Instagram size={20} />
+          <SocialIcon
+            href="https://facebook.com"
+            src="/social/facebook.svg"
+            label="Facebook"
+          />
+          <SocialIcon
+            href="https://instagram.com"
+            src="/social/instagram.svg"
+            label="Instagram"
+          />
         </div>
       </div>
       <span className="absolute bottom-2 right-2 text-text-inverse text-sm font-light">

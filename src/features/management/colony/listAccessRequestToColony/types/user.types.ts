@@ -1,9 +1,3 @@
-import { UserData } from "@/shared/types/user/user.types";
+import { UserData } from "@/types/user.types";
 
-export type User = Pick<
-UserData,
-   "codigo" 
- | "nombre" 
- | "apellido" 
- | "celular"
- >;
+export type User = Pick<UserData, "id" | "nombre" | "apellido" | "celular">;
