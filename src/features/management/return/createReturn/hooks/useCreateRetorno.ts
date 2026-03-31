@@ -3,7 +3,7 @@ import { retornoService } from '../services/retorno.service';
 import type {
     RetornoData,
     RetornoResponse
-} from '../types/retorno.types';
+} from '../../types/retorno.types';
 
 interface UseCreateRetornoReturn {
     createRetorno: (data: RetornoData) => Promise<RetornoResponse | null>;

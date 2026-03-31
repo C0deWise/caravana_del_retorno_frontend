@@ -1,5 +1,5 @@
 import { apiService } from "@/services/api.services";
-import type { RetornoData, RetornoResponse } from "../types/retorno.types";
+import type { RetornoData, RetornoResponse } from "../../types/retorno.types";
 
 /**
  * Servicio para manejar las operaciones de gestión de retornos.
