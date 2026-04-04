@@ -1,4 +1,4 @@
-import type { RegistrationData } from "../types/registro.types";
+import type { RegistrationFormData } from "../types/registro.types";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DIGITS_ONLY_REGEX = /^\d+$/;
@@ -14,7 +14,7 @@ const DOCUMENT_RULES: Record<
   PA: { min: 5, max: 20, allowsLetters: true },
 };
 
-const REQUIRED_FIELDS: Array<keyof RegistrationData> = [
+const REQUIRED_FIELDS: Array<keyof RegistrationFormData> = [
   "nombre",
   "apellido",
   "documento",
@@ -22,11 +22,11 @@ const REQUIRED_FIELDS: Array<keyof RegistrationData> = [
   "celular",
   "correo",
   "confirmEmail",
-  "password",
+  "contrasenia",
   "confirmPassword",
 ];
 
-export const getTrimmedValue = (value: string | null): string =>
+export const getTrimmedValue = (value: string | null | undefined): string =>
   (value ?? "").trim();
 
 const getTodayLocalDate = (): string => {
@@ -42,13 +42,8 @@ export const validateDocumentByType = (
   const rule = DOCUMENT_RULES[documentType];
   const trimmedDocument = getTrimmedValue(documentNumber);
 
-  if (!trimmedDocument) {
-    return "Este campo es obligatorio";
-  }
-
-  if (!rule) {
-    return "Tipo de documento no válido";
-  }
+  if (!trimmedDocument) return "Este campo es obligatorio";
+  if (!rule) return "Tipo de documento no válido";
 
   if (trimmedDocument.length < rule.min || trimmedDocument.length > rule.max) {
     return `El documento debe tener entre ${rule.min} y ${rule.max} caracteres`;
@@ -66,8 +61,8 @@ export const validateDocumentByType = (
 };
 
 export const validateRegistrationField = (
-  fieldName: keyof RegistrationData,
-  data: RegistrationData,
+  fieldName: keyof RegistrationFormData,
+  data: RegistrationFormData,
 ): string | null => {
   const value = getTrimmedValue(data[fieldName] as string);
 
@@ -80,13 +75,8 @@ export const validateRegistrationField = (
   }
 
   if ((fieldName === "nombre" || fieldName === "apellido") && value) {
-    if (value.length < 3) {
-      return "Debe tener al menos 3 caracteres";
-    }
-
-    if (!NAME_REGEX.test(value)) {
-      return "Solo se permiten letras";
-    }
+    if (value.length < 3) return "Debe tener al menos 3 caracteres";
+    if (!NAME_REGEX.test(value)) return "Solo se permiten letras";
   }
 
   if (fieldName === "correo" && value && !EMAIL_REGEX.test(value)) {
@@ -101,8 +91,16 @@ export const validateRegistrationField = (
     return "Los correos electrónicos no coinciden";
   }
 
-  if (fieldName === "password" && value && value.length < 8) {
+  if (fieldName === "contrasenia" && value && value.length < 8) {
     return "La contraseña debe tener al menos 8 caracteres";
+  }
+
+  if (
+    fieldName === "confirmPassword" &&
+    value &&
+    value !== getTrimmedValue(data.contrasenia)
+  ) {
+    return "Las contraseñas no coinciden";
   }
 
   if (fieldName === "fecha_nacimiento" && value) {
@@ -112,42 +110,29 @@ export const validateRegistrationField = (
     }
   }
 
-  if (
-    fieldName === "confirmPassword" &&
-    value &&
-    value !== getTrimmedValue(data.password)
-  ) {
-    return "Las contraseñas no coinciden";
-  }
-
-  if (fieldName === "celular" && value && !DIGITS_ONLY_REGEX.test(value)) {
-    return "El teléfono solo debe contener números";
-  }
-
-  if (fieldName === "celular" && value && value.length > 10) {
-    return "El teléfono no puede tener más de 10 dígitos";
+  if (fieldName === "celular" && value) {
+    if (!DIGITS_ONLY_REGEX.test(value))
+      return "El teléfono solo debe contener números";
+    if (value.length > 10)
+      return "El teléfono no puede tener más de 10 dígitos";
   }
 
   return null;
 };
 
 export const validateRegistrationData = (
-  data: RegistrationData,
+  data: RegistrationFormData,
 ): Record<string, string> => {
   const errors: Record<string, string> = {};
 
   REQUIRED_FIELDS.forEach((field) => {
     const error = validateRegistrationField(field, data);
-    if (error) {
-      errors[field] = error;
-    }
+    if (error) errors[field] = error;
   });
 
   if (!errors.documento) {
     const documentError = validateDocumentByType(data.tipo_doc, data.documento);
-    if (documentError) {
-      errors.documento = documentError;
-    }
+    if (documentError) errors.documento = documentError;
   }
 
   const country = getTrimmedValue(data.pais);

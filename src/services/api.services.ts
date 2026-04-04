@@ -25,10 +25,10 @@ class ApiService {
     if (!response.ok) {
       const error = await response
         .json()
-        .catch(() => ({ message: response.statusText }));
+        .catch(() => ({ detail: response.statusText }));
       throw new ApiError(
         response.status,
-        error.message || `Error ${response.status}`,
+        error.detail || error.message || `Error: ${response.status}`,
       );
     }
     return response.json();

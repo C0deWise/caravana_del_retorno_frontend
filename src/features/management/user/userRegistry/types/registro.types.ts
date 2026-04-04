@@ -1,18 +1,28 @@
-import { UserApi } from "@/types/user.types";
+import type { UserApi } from "@/types/user.types";
 
-export interface RegistrationData extends UserApi {
-  password: string;
+export type RegistrationRequest = Pick<
+  UserApi,
+  | "tipo_doc"
+  | "documento"
+  | "celular"
+  | "correo"
+  | "nombre"
+  | "apellido"
+  | "genero"
+  | "fecha_nacimiento"
+  | "pais"
+  | "departamento"
+  | "ciudad"
+> & {
+  contrasenia: string;
+};
+
+export type RegistrationFormData = RegistrationRequest & {
   confirmEmail: string;
   confirmPassword: string;
-}
+};
 
 export interface RegistrationResponse {
-  success: boolean;
-  message: string;
-  data?: unknown;
-}
-
-export interface DocumentValidationResponse {
-  valido: boolean;
   mensaje: string;
+  nombre: string;
 }
