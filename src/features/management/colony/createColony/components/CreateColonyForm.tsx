@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Select, { type StylesConfig } from "react-select";
 import { useCreateColonia } from "../hooks/useCreateColony";
 import type { ColonyData } from "@/types/colony.types";
+import { RequireAuth } from "@/auth/components/RequireAuth";
 import {
   getDepartments,
   getCitiesByDepartmentName,
@@ -16,7 +17,7 @@ type SelectOption = {
   label: string;
 };
 
-export default function CrearColonia() {
+function CrearColoniaFeature() {
   const { createColonia, loading, error, success } = useCreateColonia();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [cities, setCities] = useState<City[]>([]);
@@ -24,12 +25,11 @@ export default function CrearColonia() {
   const [coloniaData, setColoniaData] = useState<ColonyData>({
     codigo: 0,
     pais: "Colombia",
-    departamento: "",
-    ciudad: "",
+    departamento: null,
+    ciudad: null,
     lider: 0,
   });
 
-  // Obtener departamentos
   const departments = useMemo(() => {
     if (coloniaData.pais === "Colombia") {
       return getDepartments();
@@ -51,19 +51,19 @@ export default function CrearColonia() {
     setColoniaData({
       codigo: 0,
       pais: pais,
-      departamento: "",
-      ciudad: "",
+      departamento: null,
+      ciudad: null,
       lider: 0,
     });
     setCities([]);
   };
 
   const handleDepartamentoChange = (option: SelectOption | null) => {
-    const departamento = option?.value || "";
+    const departamento = option?.value || null;
     setColoniaData((prev) => ({
       ...prev,
       departamento: departamento,
-      ciudad: "",
+      ciudad: null,
     }));
 
     if (departamento) {
@@ -75,23 +75,17 @@ export default function CrearColonia() {
   };
 
   const handleMunicipioChange = (option: SelectOption | null) => {
-    const municipio = option?.value || "";
+    const municipio = option?.value || null;
     setColoniaData((prev) => ({ ...prev, ciudad: municipio }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validar campos según el país seleccionado
-    if (!coloniaData.pais) {
-      return; // El campo país es requerido siempre
-    }
+    if (!coloniaData.pais) return;
 
-    // Si es Colombia, validar departamento y municipio
     if (coloniaData.pais === "Colombia") {
-      if (!coloniaData.departamento || !coloniaData.ciudad) {
-        return; // Campos requeridos para Colombia
-      }
+      if (!coloniaData.departamento || !coloniaData.ciudad) return;
     }
 
     setShowConfirmModal(true);
@@ -106,42 +100,27 @@ export default function CrearColonia() {
     setShowConfirmModal(false);
   };
 
-  // Estilos personalizados para react-select
   const customStyles: StylesConfig<SelectOption, false> = {
-    control: (base: Record<string, unknown>) => ({
+    control: (base) => ({
       ...base,
       borderColor: "#d1d5db",
       borderRadius: "0.5rem",
       padding: "0.25rem",
       fontSize: "1rem",
-      "&:hover": {
-        borderColor: "(var(--color-bg-border))",
-      },
     }),
-    menu: (base: Record<string, unknown>) => ({
+    menu: (base) => ({
       ...base,
       zIndex: 9999,
     }),
   };
 
   return (
-    <div
-      className="flex flex-col min-h-screen items-center p-4"
-      style={{ backgroundColor: "var(--color-bg)" }}
-    >
-      <div
-        className="rounded-lg shadow-xl w-full max-w-lg p-8"
-        style={{ backgroundColor: "var(--color-bg)" }}
-      >
+    <div className="flex flex-col min-h-screen items-center p-4 bg-bg">
+      <div className="rounded-lg shadow-xl w-full max-w-lg p-8 bg-bg">
         <h1 className="page-title">Creación de colonia</h1>
 
-        <h2 className="section-title">
-          {coloniaData.pais === "Colombia"
-            ? "Seleccione la ubicación de la colonia"
-            : "Seleccione el país de la colonia"}
-        </h2>
+        <h2 className="section-title">Seleccione la ubicación de la colonia</h2>
 
-        {/* Mensajes de estado */}
         {error && (
           <div className="alert-error">
             <p className="alert-error-text">{error}</p>
@@ -179,9 +158,9 @@ export default function CrearColonia() {
                 }
                 onChange={handleDepartamentoChange}
                 placeholder="Seleccione un departamento"
-                isSearchable={true}
-                isClearable={true}
-                openMenuOnFocus={true}
+                isSearchable
+                isClearable
+                openMenuOnFocus
                 styles={customStyles}
                 noOptionsMessage={() => "No se encontraron departamentos"}
               />
@@ -206,9 +185,9 @@ export default function CrearColonia() {
                     ? "Seleccione un municipio"
                     : "Seleccione primero un departamento"
                 }
-                isSearchable={true}
-                isClearable={true}
-                openMenuOnFocus={true}
+                isSearchable
+                isClearable
+                openMenuOnFocus
                 isDisabled={!coloniaData.departamento || cities.length === 0}
                 styles={customStyles}
                 noOptionsMessage={() => "No se encontraron municipios"}
@@ -226,11 +205,8 @@ export default function CrearColonia() {
                 (coloniaData.pais === "Colombia" &&
                   (!coloniaData.departamento || !coloniaData.ciudad))
               }
-              className="w-full py-3 rounded-lg font-semibold transition-opacity disabled:opacity-50"
-              style={{
-                backgroundColor: "var(--color-secondary)",
-                color: "var(--color-text-inverse)",
-              }}
+              className="w-full py-3 rounded-lg font-semibold transition-opacity
+                         disabled:opacity-50 bg-secondary text-text-inverse"
             >
               {loading ? "Creando..." : "Crear"}
             </button>
@@ -240,22 +216,13 @@ export default function CrearColonia() {
 
       {/* Modal de Confirmación */}
       {showConfirmModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div
-            className="rounded-lg shadow-2xl w-full max-w-md p-6 mx-4"
-            style={{ backgroundColor: "var(--color-bg)" }}
-          >
-            <h2
-              className="text-xl font-bold mb-4"
-              style={{ color: "var(--color-primary)" }}
-            >
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/25 backdrop-blur-md">
+          <div className="rounded-lg shadow-2xl w-full max-w-md p-6 mx-4 bg-bg">
+            <h2 className="text-xl font-bold mb-4 text-primary">
               ¿Confirmas la creacion de la colonia?
             </h2>
 
-            <ul
-              className="mb-6 space-y-2"
-              style={{ color: "var(--color-text)" }}
-            >
+            <ul className="mb-6 space-y-2 text-text">
               <li className="flex items-center">
                 <span className="mr-2">•</span>
                 <span>
@@ -285,11 +252,8 @@ export default function CrearColonia() {
                 type="button"
                 onClick={handleConfirm}
                 disabled={loading}
-                className="flex-1 py-2 rounded-lg font-semibold transition-opacity disabled:opacity-50"
-                style={{
-                  backgroundColor: "var(--color-accent-green)",
-                  color: "var(--color-text-inverse)",
-                }}
+                className="flex-1 py-2 rounded-lg font-semibold transition-opacity
+                           disabled:opacity-50 bg-success text-text-inverse"
               >
                 {loading ? "Confirmando..." : "Confirmar"}
               </button>
@@ -297,11 +261,8 @@ export default function CrearColonia() {
                 type="button"
                 onClick={handleCancel}
                 disabled={loading}
-                className="flex-1 py-2 rounded-lg font-semibold transition-opacity disabled:opacity-50"
-                style={{
-                  backgroundColor: "var(--color-danger)",
-                  color: "var(--color-text-inverse)",
-                }}
+                className="flex-1 py-2 rounded-lg font-semibold transition-opacity
+                           disabled:opacity-50 bg-danger text-text-inverse"
               >
                 Cancelar
               </button>
@@ -310,5 +271,13 @@ export default function CrearColonia() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function CrearColonia() {
+  return (
+    <RequireAuth roles={["admin"]}>
+      <CrearColoniaFeature />
+    </RequireAuth>
   );
 }

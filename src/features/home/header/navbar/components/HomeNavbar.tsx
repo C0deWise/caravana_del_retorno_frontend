@@ -35,7 +35,10 @@ export default function HomeNavbar() {
         if (item.type === NavItemType.LOGIN) {
           return (
             <div key={item.label} className="relative">
-              <button onClick={() => setShowLogin((prev) => !prev)}>
+              <button
+                onClick={() => setShowLogin((prev) => !prev)}
+                disabled={true}
+              >
                 Login
               </button>
               {showLogin && <LoginPanel onClose={() => setShowLogin(false)} />}

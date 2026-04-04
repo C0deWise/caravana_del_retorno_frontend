@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useListColonia } from "../hooks/useListColonia";
 import type { ColonyItem } from "@/types/colony.types";
 import { ConfirmModal } from "@/components/confirmModal";
+import { RequireAuth } from "@/auth/components/RequireAuth";
 import { Search } from "lucide-react";
 
 const normalizarTexto = (valor: string): string =>
@@ -12,7 +13,7 @@ const normalizarTexto = (valor: string): string =>
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
 
-export default function InscripcionColoniaForm() {
+function InscripcionColoniaFormFeature() {
   const { listColonia, loading, error } = useListColonia();
   const [colonias, setColonias] = useState<ColonyItem[]>([]);
   const [busqueda, setBusqueda] = useState("");
@@ -186,5 +187,13 @@ export default function InscripcionColoniaForm() {
         cancelLabel="Cerrar"
       />
     </div>
+  );
+}
+
+export default function InscripcionColoniaForm() {
+  return (
+    <RequireAuth>
+      <InscripcionColoniaFormFeature />
+    </RequireAuth>
   );
 }

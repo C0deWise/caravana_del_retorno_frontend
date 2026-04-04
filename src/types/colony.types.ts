@@ -3,7 +3,14 @@ export interface ColonyApi {
   co_pais: string;
   co_departamento: string | null;
   co_ciudad: string | null;
-  lider: number | null;
+  lider: number;
+}
+
+export interface ColonyApiRequest {
+  pais: string;
+  departamento: string | null;
+  ciudad: string | null;
+  lider: number;
 }
 
 export type ColonyData = Pick<ColonyApi, "lider"> & {
