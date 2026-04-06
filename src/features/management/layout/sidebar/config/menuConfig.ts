@@ -11,6 +11,10 @@ export const menuConfig: MenuItem[] = [
         href: "/gestion/colonia/crear",
       },
       {
+        label: "Asignar lider de colonia",
+        href: "/gestion/colonia/asignar-lider",
+      },
+      {
         label: "Inscribir Colonia",
         href: "/gestion/colonia/inscribir-colonia",
       },

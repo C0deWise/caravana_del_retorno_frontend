@@ -23,14 +23,23 @@ class ApiService {
 
   private async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
-      const error = await response
-        .json()
-        .catch(() => ({ detail: response.statusText }));
-      throw new ApiError(
-        response.status,
-        error.detail || error.message || `Error: ${response.status}`,
-      );
+      const error = await response.json().catch(() => null);
+
+      let message = `Error: ${response.status}`;
+
+      if (typeof error?.detail === "string") {
+        message = error.detail;
+      } else if (Array.isArray(error?.detail) && error.detail.length > 0) {
+        message = error.detail[0]?.msg || `Error: ${response.status}`;
+      } else if (typeof error?.message === "string") {
+        message = error.message;
+      } else if (response.statusText) {
+        message = response.statusText;
+      }
+
+      throw new ApiError(response.status, message);
     }
+
     return response.json();
   }
 
@@ -44,6 +53,15 @@ class ApiService {
 
     const response = await fetch(url, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return this.handleResponse<T>(response);
+  }
+
+  public async patch<T>(endpoint: string, data: unknown): Promise<T> {
+    const response = await fetch(`${this.baseURL}${endpoint}`, {
+      method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
