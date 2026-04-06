@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useListColonia } from "../hooks/useListColonia";
+import { useListColonia } from "../../hooks/useListColonia";
 import type { ColonyItem } from "@/types/colony.types";
 import { ConfirmModal } from "@/components/confirmModal";
 import { RequireAuth } from "@/auth/components/RequireAuth";
