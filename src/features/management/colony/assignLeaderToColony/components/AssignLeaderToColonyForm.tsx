@@ -733,10 +733,6 @@ function AssignLeaderToColonyForm() {
                         searchType === "documento"
                           ? user.documento
                           : `${user.nombre} ${user.apellido}`;
-                      const sublabel =
-                        searchType === "documento"
-                          ? `${user.nombre} ${user.apellido}`
-                          : user.documento;
 
                       return (
                         <button
