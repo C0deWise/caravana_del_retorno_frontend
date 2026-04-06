@@ -2,8 +2,13 @@ import { useState } from "react";
 import { userService } from "@/services/user/user.services";
 import { UserData, UserApi } from "@/types/user.types";
 
+interface AssignLeaderParams {
+  userId: number;
+  colonyCode: number;
+}
+
 interface UseAssignLeaderToColonyReturn {
-  assignLeader: (userData: UserData) => Promise<UserApi | null>;
+  assignLeader: (params: AssignLeaderParams) => Promise<UserApi | null>;
   loading: boolean;
   error: string | null;
   success: boolean;
@@ -14,22 +19,18 @@ export const useAssignLeaderToColony = (): UseAssignLeaderToColonyReturn => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const assignLeader = async (data: UserData): Promise<UserApi | null> => {
+  const assignLeader = async (params: AssignLeaderParams): Promise<UserApi | null> => {
     setLoading(true);
     setError(null);
     setSuccess(false);
 
     try {
-      // Validar que el rol no esté vacío
-      if (!data.role) {
-        setError("El campo rol es obligatorio");
-        return null;
-      }
-
-      const response = await userService.patchUser(data.id, {
-        role: data.role,
+      const response = await userService.patchUser(params.userId, {
+        role: "lider_colonia",
+        codigo_colonia: params.colonyCode,
       });
 
+      setSuccess(true);
       return response;
     } catch (error) {
       const message =
