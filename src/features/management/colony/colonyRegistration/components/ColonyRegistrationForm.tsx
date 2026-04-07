@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useListColonia } from "../../hooks/useListColonia";
+import { useListColonies } from "../../hooks/useListColonies";
 import type { ColonyItem } from "@/types/colony.types";
 import { ConfirmModal } from "@/components/confirmModal";
 import { RequireAuth } from "@/auth/components/RequireAuth";
@@ -14,8 +14,8 @@ const normalizarTexto = (valor: string): string =>
     .toLowerCase();
 
 function InscripcionColoniaFormFeature() {
-  const { listColonia, loading, error } = useListColonia();
-  const [colonias, setColonias] = useState<ColonyItem[]>([]);
+  const { listColonies, colonies, loading, error } = useListColonies();
+
   const [busqueda, setBusqueda] = useState("");
   const [seleccionada, setSeleccionada] = useState<ColonyItem | null>(null);
   const [mostrarLista, setMostrarLista] = useState(false);
@@ -23,25 +23,21 @@ function InscripcionColoniaFormFeature() {
   const [mostrarMensajeEspera, setMostrarMensajeEspera] = useState(false);
 
   useEffect(() => {
-    const cargarColonias = async () => {
-      const response = await listColonia();
-      setColonias(response?.success ? (response.data ?? []) : []);
-    };
-    void cargarColonias();
-  }, [listColonia]);
+    void listColonies();
+  }, [listColonies]);
 
   const coloniasFiltradas = useMemo(() => {
     const termino = normalizarTexto(busqueda.trim());
-    if (!termino) return colonias;
-    return colonias.filter((colonia) => {
+    if (!termino) return colonies;
+    return colonies.filter((colonia) => {
       const etiqueta = colonia.departamento
         ? `${colonia.pais} ${colonia.departamento} ${colonia.ciudad}`
         : colonia.pais;
       return normalizarTexto(etiqueta).includes(termino);
     });
-  }, [busqueda, colonias]);
+  }, [busqueda, colonies]);
 
-  const sinColoniasDisponibles = !loading && !error && colonias.length === 0;
+  const sinColoniasDisponibles = !loading && !error && colonies.length === 0;
 
   const seleccionarColonia = (colonia: ColonyItem) => {
     setSeleccionada(colonia);
@@ -68,7 +64,6 @@ function InscripcionColoniaFormFeature() {
         style={{ backgroundColor: "var(--color-bg)" }}
       >
         <h1 className="page-title">Registro de colonia</h1>
-
         <h2 className="section-title">
           Selecciona la colonia a la que deseas unirte
         </h2>
@@ -144,20 +139,19 @@ function InscripcionColoniaFormFeature() {
             <button
               type="button"
               onClick={() => seleccionada && setMostrarConfirmacion(true)}
-              disabled={!seleccionada}
+              disabled={!seleccionada || loading}
               className="w-full py-3 rounded-lg font-semibold transition-opacity disabled:opacity-50"
               style={{
                 backgroundColor: "var(--color-secondary)",
                 color: "var(--color-text-inverse)",
               }}
             >
-              {loading ? "Inscribiendo..." : "Inscribir"}
+              {loading ? "Cargando..." : "Inscribir"}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Modal de confirmación de colonia */}
       <ConfirmModal
         isOpen={mostrarConfirmacion}
         title="¿Confirmas la creación de la colonia?"
@@ -174,7 +168,6 @@ function InscripcionColoniaFormFeature() {
         onCancel={() => setMostrarConfirmacion(false)}
       />
 
-      {/* Modal de mensaje de espera */}
       <ConfirmModal
         isOpen={mostrarMensajeEspera}
         title="Solicitud enviada"

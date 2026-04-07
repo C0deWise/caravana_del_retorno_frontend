@@ -2,54 +2,17 @@
 
 import { useState, useRef, useEffect, useId, useMemo } from "react";
 import { useAssignLeaderToColony } from "../hooks/UseAssignLeaderToColony";
-import { useListColonia } from "../../hooks/useListColonia";
-import { UserData } from "@/types/user.types";
+import { useListColonies } from "../../hooks/useListColonies";
+import { useSearchLeader } from "../hooks/useSearchLeader";
+import type { UserSearchResult } from "../types/leader.types";
 import type { ColonyItem } from "@/types/colony.types";
 import { ConfirmModal } from "@/components/confirmModal";
 import { RequireAuth } from "@/auth/components/RequireAuth";
 
-const USE_MOCK = true;
+type SearchType = "documento" | "nombre";
+
 const NAME_ALLOWED_CHAR_REGEX = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s'-]$/;
 const IDENTIFICATION_ALLOWED_CHAR_REGEX = /^[A-Za-z0-9]$/;
-
-const MOCK_USERS: UserData[] = [
-  {
-    id: 1,
-    tipo_doc: "CC",
-    documento: "1010101010",
-    celular: "3000000001",
-    codigo_colonia: 1,
-    nombre: "Ana",
-    apellido: "Pérez",
-    genero: "F",
-    role: "usuario",
-    fecha_nacimiento: "1998-05-01",
-    pais: "Colombia",
-    departamento: "Antioquia",
-    ciudad: "Medellín",
-    correo: "ana@example.com",
-    fecha_creacion: "",
-  },
-  {
-    id: 2,
-    tipo_doc: "CC",
-    documento: "2020202020",
-    celular: "3000000002",
-    codigo_colonia: 2,
-    nombre: "Carlos",
-    apellido: "Gómez",
-    genero: "M",
-    role: "usuario",
-    fecha_nacimiento: "1995-09-12",
-    pais: "Colombia",
-    departamento: "Cundinamarca",
-    ciudad: "Bogotá",
-    correo: "carlos@example.com",
-    fecha_creacion: "",
-  },
-];
-
-type SearchType = "documento" | "nombre";
 
 const normalizarTexto = (valor: string): string =>
   valor
@@ -58,48 +21,55 @@ const normalizarTexto = (valor: string): string =>
     .toLowerCase();
 
 function AssignLeaderToColonyForm() {
-  const { assignLeader, loading, error, success } = useAssignLeaderToColony();
-  const { listColonia, loading: loadingColonies } = useListColonia();
+  const {
+    assignLeader,
+    loading: assignLoading,
+    error: assignError,
+    success,
+  } = useAssignLeaderToColony();
+  const {
+    listColonies,
+    colonies,
+    loading: loadingColonies,
+  } = useListColonies();
+  const {
+    searchUsers,
+    results,
+    loading: searchLoading,
+    error: searchError,
+  } = useSearchLeader();
+
   const listboxId = useId();
   const colonyListboxId = useId();
 
-  // Estado para selector de usuario
+  // Estado usuario
   const [searchType, setSearchType] = useState<SearchType>("documento");
   const [inputValue, setInputValue] = useState("");
-  const [filteredUsers, setFilteredUsers] = useState<UserData[]>([]);
-  const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserSearchResult | null>(
+    null,
+  );
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
-  
-  // Estado para selector de colonia
-  const [colonies, setColonies] = useState<ColonyItem[]>([]);
+
+  // Estado colonia
   const [colonySearchValue, setColonySearchValue] = useState("");
   const [selectedColony, setSelectedColony] = useState<ColonyItem | null>(null);
   const [isColonyDropdownOpen, setIsColonyDropdownOpen] = useState(false);
   const [highlightedColonyIndex, setHighlightedColonyIndex] = useState(-1);
-  
-  // Estado general
+
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const colonyInputRef = useRef<HTMLInputElement>(null);
-  const colonyDropdownRef = useRef<HTMLDivElement>(null);
   const colonyContainerRef = useRef<HTMLDivElement>(null);
 
-  // Cargar colonias al montar el componente
+  // Cargar colonias al montar
   useEffect(() => {
-    const loadColonies = async () => {
-      const response = await listColonia();
-      if (response?.success) {
-        setColonies(response.data ?? []);
-      }
-    };
-    void loadColonies();
-  }, [listColonia]);
+    void listColonies();
+  }, [listColonies]);
 
-  // Cierra el dropdown de usuarios al hacer click fuera
+  // Cerrar dropdown usuarios al click fuera
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -113,7 +83,7 @@ function AssignLeaderToColonyForm() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Cierra el dropdown de colonias al hacer click fuera
+  // Cerrar dropdown colonias al click fuera
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -127,120 +97,6 @@ function AssignLeaderToColonyForm() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const filterUsers = (term: string, type: SearchType): UserData[] => {
-    if (!term.trim()) return [];
-    
-    // Regla de negocio: solo usuarios de la colonia seleccionada
-    if (!selectedColony) return [];
-    
-    const normalized = term.toLowerCase();
-
-    if (USE_MOCK) {
-      return MOCK_USERS.filter((u) => {
-        // Filtrar solo usuarios de la colonia seleccionada
-        const perteneceAColonia = u.codigo_colonia === selectedColony.codigo;
-        const coincideBusqueda = type === "documento"
-          ? u.documento.toLowerCase().includes(normalized)
-          : `${u.nombre} ${u.apellido}`.toLowerCase().includes(normalized);
-        
-        return perteneceAColonia && coincideBusqueda;
-      });
-    }
-
-    // Aquí se haría la llamada al backend real
-    return [];
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const normalizedValue =
-      searchType === "nombre"
-        ? value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñÜü\s'-]/g, "")
-        : value.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
-
-    setInputValue(normalizedValue);
-    setSelectedUser(null);
-    setHighlightedIndex(-1);
-
-    const results = filterUsers(normalizedValue, searchType);
-    setFilteredUsers(results);
-    setIsDropdownOpen(results.length > 0 && normalizedValue.trim().length > 0);
-  };
-
-  const handleSearchTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const type = e.target.value as SearchType;
-    setSearchType(type);
-    setInputValue("");
-    setSelectedUser(null);
-    setFilteredUsers([]);
-    setIsDropdownOpen(false);
-    inputRef.current?.focus();
-  };
-
-  const handleSelectUser = (user: UserData) => {
-    setSelectedUser(user);
-    setInputValue(
-      searchType === "documento"
-        ? user.documento
-        : `${user.nombre} ${user.apellido}`,
-    );
-    setIsDropdownOpen(false);
-    setHighlightedIndex(-1);
-  };
-
-  // Navegación con teclado
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (
-      searchType === "nombre" &&
-      e.key.length === 1 &&
-      !NAME_ALLOWED_CHAR_REGEX.test(e.key)
-    ) {
-      e.preventDefault();
-      return;
-    }
-
-    if (
-      searchType === "documento" &&
-      e.key.length === 1 &&
-      !IDENTIFICATION_ALLOWED_CHAR_REGEX.test(e.key)
-    ) {
-      e.preventDefault();
-      return;
-    }
-
-    if (!isDropdownOpen) return;
-
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setHighlightedIndex((prev) =>
-        Math.min(prev + 1, filteredUsers.length - 1),
-      );
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setHighlightedIndex((prev) => Math.max(prev - 1, 0));
-    } else if (e.key === "Enter" && highlightedIndex >= 0) {
-      e.preventDefault();
-      handleSelectUser(filteredUsers[highlightedIndex]);
-    } else if (e.key === "Escape") {
-      setIsDropdownOpen(false);
-    }
-  };
-
-  const handleConfirm = async () => {
-    if (!selectedUser || !selectedColony) return;
-    setShowConfirmModal(true);
-  };
-
-  const handleModalConfirm = async () => {
-    if (!selectedUser || !selectedColony) return;
-    await assignLeader({
-      userId: selectedUser.id,
-      colonyCode: selectedColony.codigo,
-    });
-    setShowConfirmModal(false);
-  };
-
-  // Filtrar colonias según búsqueda
   const filteredColonies = useMemo(() => {
     const termino = normalizarTexto(colonySearchValue.trim());
     if (!termino) return colonies;
@@ -252,13 +108,91 @@ function AssignLeaderToColonyForm() {
     });
   }, [colonySearchValue, colonies]);
 
-  // Handlers para selector de colonia
+  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const normalizedValue =
+      searchType === "nombre"
+        ? value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñÜü\s'-]/g, "")
+        : value.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
+
+    setInputValue(normalizedValue);
+    setSelectedUser(null);
+    setHighlightedIndex(-1);
+
+    if (!normalizedValue.trim()) {
+      setIsDropdownOpen(false);
+      return;
+    }
+
+    const response = await searchUsers(searchType, normalizedValue);
+    setIsDropdownOpen(Boolean(response && response.length > 0));
+  };
+
+  const handleSearchTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSearchType(e.target.value as SearchType);
+    setInputValue("");
+    setSelectedUser(null);
+    setIsDropdownOpen(false);
+    setHighlightedIndex(-1);
+    inputRef.current?.focus();
+  };
+
+  const handleSelectUser = (user: UserSearchResult) => {
+    setSelectedUser(user);
+    setInputValue(
+      searchType === "documento"
+        ? user.documento
+        : `${user.nombre} ${user.apellido}`,
+    );
+    setIsDropdownOpen(false);
+    setHighlightedIndex(-1);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (
+      searchType === "nombre" &&
+      e.key.length === 1 &&
+      !NAME_ALLOWED_CHAR_REGEX.test(e.key)
+    ) {
+      e.preventDefault();
+      return;
+    }
+    if (
+      searchType === "documento" &&
+      e.key.length === 1 &&
+      !IDENTIFICATION_ALLOWED_CHAR_REGEX.test(e.key)
+    ) {
+      e.preventDefault();
+      return;
+    }
+    if (!isDropdownOpen) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlightedIndex((prev) => Math.min(prev + 1, results.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlightedIndex((prev) => Math.max(prev - 1, 0));
+    } else if (e.key === "Enter" && highlightedIndex >= 0) {
+      e.preventDefault();
+      handleSelectUser(results[highlightedIndex]);
+    } else if (e.key === "Escape") {
+      setIsDropdownOpen(false);
+    }
+  };
+
   const handleColonySearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setColonySearchValue(value);
     setSelectedColony(null);
     setHighlightedColonyIndex(-1);
-    setIsColonyDropdownOpen(value.trim().length > 0 && filteredColonies.length > 0);
+    setIsColonyDropdownOpen(
+      value.trim().length > 0 && filteredColonies.length > 0,
+    );
+    // Limpiar usuario al cambiar búsqueda de colonia
+    setSelectedUser(null);
+    setInputValue("");
+    setIsDropdownOpen(false);
   };
 
   const handleSelectColony = (colony: ColonyItem) => {
@@ -266,25 +200,21 @@ function AssignLeaderToColonyForm() {
     setColonySearchValue(
       colony.departamento
         ? `${colony.pais} - ${colony.departamento} - ${colony.ciudad}`
-        : colony.pais
+        : colony.pais,
     );
     setIsColonyDropdownOpen(false);
     setHighlightedColonyIndex(-1);
-    
-    // Limpiar selección de usuario al cambiar de colonia
     setSelectedUser(null);
     setInputValue("");
-    setFilteredUsers([]);
     setIsDropdownOpen(false);
   };
 
   const handleColonyKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!isColonyDropdownOpen) return;
-
     if (e.key === "ArrowDown") {
       e.preventDefault();
       setHighlightedColonyIndex((prev) =>
-        Math.min(prev + 1, filteredColonies.length - 1)
+        Math.min(prev + 1, filteredColonies.length - 1),
       );
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
@@ -297,7 +227,17 @@ function AssignLeaderToColonyForm() {
     }
   };
 
-  // Resalta el término buscado dentro del texto del resultado
+  const handleConfirm = () => {
+    if (!selectedUser || !selectedColony) return;
+    setShowConfirmModal(true);
+  };
+
+  const handleModalConfirm = async () => {
+    if (!selectedUser || !selectedColony) return;
+    await assignLeader(selectedColony.codigo, selectedUser.id);
+    setShowConfirmModal(false);
+  };
+
   const highlight = (text: string, term: string) => {
     if (!term.trim()) return text;
     const idx = text.toLowerCase().indexOf(term.toLowerCase());
@@ -320,6 +260,8 @@ function AssignLeaderToColonyForm() {
     );
   };
 
+  const error = searchError || assignError;
+  const loading = assignLoading || searchLoading;
   const placeholder =
     searchType === "documento" ? "Ej: 1234567890" : "Ej: Ana Pérez";
 
@@ -333,12 +275,10 @@ function AssignLeaderToColonyForm() {
         style={{ backgroundColor: "var(--color-bg)" }}
       >
         <h1 className="page-title">Asignar Líder a Colonia</h1>
-
         <h2 className="section-title">
           Primero selecciona la colonia, luego el usuario que será líder
         </h2>
 
-        {/* Alertas */}
         {error && (
           <div className="alert-error">
             <p className="alert-error-text">{error}</p>
@@ -359,7 +299,6 @@ function AssignLeaderToColonyForm() {
             >
               Colonia
             </label>
-
             <div ref={colonyContainerRef} className="relative">
               <div
                 className="flex items-center rounded-lg border overflow-hidden transition-all"
@@ -370,7 +309,6 @@ function AssignLeaderToColonyForm() {
                     : "var(--color-bg-border)",
                 }}
               >
-                {/* Ícono de búsqueda */}
                 <div
                   className="pl-3 pr-2 shrink-0"
                   style={{ color: "var(--color-text-muted)" }}
@@ -391,7 +329,6 @@ function AssignLeaderToColonyForm() {
                     />
                   </svg>
                 </div>
-
                 <input
                   ref={colonyInputRef}
                   type="text"
@@ -399,7 +336,8 @@ function AssignLeaderToColonyForm() {
                   onChange={handleColonySearchChange}
                   onKeyDown={handleColonyKeyDown}
                   onFocus={() => {
-                    if (filteredColonies.length > 0) setIsColonyDropdownOpen(true);
+                    if (filteredColonies.length > 0)
+                      setIsColonyDropdownOpen(true);
                   }}
                   placeholder="Ej: Colombia - Antioquia - Medellín"
                   className="flex-1 py-3 pr-4 text-base bg-transparent outline-none"
@@ -415,8 +353,6 @@ function AssignLeaderToColonyForm() {
                       : undefined
                   }
                 />
-
-                {/* Botón para limpiar */}
                 {colonySearchValue && (
                   <button
                     type="button"
@@ -424,13 +360,11 @@ function AssignLeaderToColonyForm() {
                       setColonySearchValue("");
                       setSelectedColony(null);
                       setIsColonyDropdownOpen(false);
-                      colonyInputRef.current?.focus();
-                      // Limpiar también el usuario
                       setSelectedUser(null);
                       setInputValue("");
-                      setFilteredUsers([]);
+                      colonyInputRef.current?.focus();
                     }}
-                    className="pr-3 shrink-0 transition-opacity hover:opacity-60 text-text-muted"
+                    className="pr-3 shrink-0 transition-opacity hover:opacity-60"
                     aria-label="Limpiar búsqueda"
                   >
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -445,10 +379,8 @@ function AssignLeaderToColonyForm() {
                 )}
               </div>
 
-              {/* Dropdown de colonias */}
               {isColonyDropdownOpen && (
                 <div
-                  ref={colonyDropdownRef}
                   id={colonyListboxId}
                   role="listbox"
                   className="absolute z-50 w-full mt-1 rounded-lg border shadow-lg overflow-hidden max-h-60 overflow-y-auto"
@@ -477,14 +409,15 @@ function AssignLeaderToColonyForm() {
                       const label = colony.departamento
                         ? `${colony.pais} - ${colony.departamento} - ${colony.ciudad}`
                         : colony.pais;
-
                       return (
                         <button
                           key={colony.codigo}
                           id={`${colonyListboxId}-option-${idx}`}
                           type="button"
                           role="option"
-                          aria-selected={selectedColony?.codigo === colony.codigo}
+                          aria-selected={
+                            selectedColony?.codigo === colony.codigo
+                          }
                           onClick={() => handleSelectColony(colony)}
                           onMouseEnter={() => setHighlightedColonyIndex(idx)}
                           className="w-full flex items-center justify-between px-4 py-3 text-left transition-colors border-b last:border-b-0"
@@ -495,14 +428,12 @@ function AssignLeaderToColonyForm() {
                             borderColor: "var(--color-bg-separator)",
                           }}
                         >
-                          <div>
-                            <p
-                              className="text-sm font-medium"
-                              style={{ color: "var(--color-text)" }}
-                            >
-                              {label}
-                            </p>
-                          </div>
+                          <p
+                            className="text-sm font-medium"
+                            style={{ color: "var(--color-text)" }}
+                          >
+                            {label}
+                          </p>
                           {selectedColony?.codigo === colony.codigo && (
                             <svg
                               width="16"
@@ -531,7 +462,6 @@ function AssignLeaderToColonyForm() {
               )}
             </div>
 
-            {/* Chip de la colonia seleccionada */}
             {selectedColony && (
               <div
                 className="mt-2 inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm"
@@ -552,7 +482,7 @@ function AssignLeaderToColonyForm() {
             )}
           </div>
 
-          {/* Select: Buscar por */}
+          {/* Buscar por */}
           <div>
             <label
               className="block text-sm font-semibold mb-1.5"
@@ -582,7 +512,6 @@ function AssignLeaderToColonyForm() {
                 <option value="documento">Número de documento</option>
                 <option value="nombre">Nombre</option>
               </select>
-              {/* ícono chevron personalizado */}
               <div
                 className="pointer-events-none absolute inset-y-0 right-3 flex items-center"
                 style={{ color: "var(--color-primary)" }}
@@ -600,7 +529,7 @@ function AssignLeaderToColonyForm() {
             </div>
           </div>
 
-          {/* Combobox con autocomplete */}
+          {/* Búsqueda de usuario */}
           <div>
             <label
               className="block text-sm font-semibold mb-1.5"
@@ -634,7 +563,6 @@ function AssignLeaderToColonyForm() {
                     : "var(--color-bg-border)",
                 }}
               >
-                {/* Ícono de búsqueda */}
                 <div
                   className="pl-3 pr-2 shrink-0"
                   style={{ color: "var(--color-text-muted)" }}
@@ -655,7 +583,6 @@ function AssignLeaderToColonyForm() {
                     />
                   </svg>
                 </div>
-
                 <input
                   ref={inputRef}
                   type="text"
@@ -663,7 +590,7 @@ function AssignLeaderToColonyForm() {
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
                   onFocus={() => {
-                    if (filteredUsers.length > 0) setIsDropdownOpen(true);
+                    if (results.length > 0) setIsDropdownOpen(true);
                   }}
                   placeholder={placeholder}
                   disabled={!selectedColony}
@@ -680,19 +607,16 @@ function AssignLeaderToColonyForm() {
                       : undefined
                   }
                 />
-
-                {/* Botón para limpiar */}
                 {inputValue && (
                   <button
                     type="button"
                     onClick={() => {
                       setInputValue("");
                       setSelectedUser(null);
-                      setFilteredUsers([]);
                       setIsDropdownOpen(false);
                       inputRef.current?.focus();
                     }}
-                    className="pr-3 shrink-0 transition-opacity hover:opacity-60 text-text-muted"
+                    className="pr-3 shrink-0 transition-opacity hover:opacity-60"
                     aria-label="Limpiar búsqueda"
                   >
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -707,10 +631,8 @@ function AssignLeaderToColonyForm() {
                 )}
               </div>
 
-              {/* Dropdown de resultados */}
               {isDropdownOpen && (
                 <div
-                  ref={dropdownRef}
                   id={listboxId}
                   role="listbox"
                   className="absolute z-50 w-full mt-1 rounded-lg border shadow-lg overflow-hidden"
@@ -719,7 +641,14 @@ function AssignLeaderToColonyForm() {
                     borderColor: "var(--color-bg-border)",
                   }}
                 >
-                  {filteredUsers.length === 0 ? (
+                  {searchLoading ? (
+                    <div
+                      className="px-4 py-3 text-sm"
+                      style={{ color: "var(--color-text-muted)" }}
+                    >
+                      Buscando...
+                    </div>
+                  ) : results.length === 0 ? (
                     <div
                       className="px-4 py-3 text-sm"
                       style={{ color: "var(--color-text-muted)" }}
@@ -727,13 +656,16 @@ function AssignLeaderToColonyForm() {
                       Sin resultados
                     </div>
                   ) : (
-                    filteredUsers.map((user, idx) => {
+                    results.map((user, idx) => {
                       const isHighlighted = idx === highlightedIndex;
                       const label =
                         searchType === "documento"
                           ? user.documento
                           : `${user.nombre} ${user.apellido}`;
-
+                      const sublabel =
+                        searchType === "documento"
+                          ? `${user.nombre} ${user.apellido}`
+                          : user.documento;
                       return (
                         <button
                           key={user.id}
@@ -757,6 +689,12 @@ function AssignLeaderToColonyForm() {
                               style={{ color: "var(--color-text)" }}
                             >
                               {highlight(label, inputValue)}
+                            </p>
+                            <p
+                              className="text-xs mt-0.5"
+                              style={{ color: "var(--color-text-muted)" }}
+                            >
+                              {sublabel}
                             </p>
                           </div>
                           {selectedUser?.id === user.id && (
@@ -787,7 +725,6 @@ function AssignLeaderToColonyForm() {
               )}
             </div>
 
-            {/* Chip del usuario seleccionado */}
             {selectedUser && (
               <div
                 className="mt-2 inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm"
@@ -810,7 +747,6 @@ function AssignLeaderToColonyForm() {
             )}
           </div>
 
-          {/* Botón confirmar */}
           <button
             type="button"
             onClick={handleConfirm}
@@ -821,12 +757,11 @@ function AssignLeaderToColonyForm() {
               color: "var(--color-text-inverse)",
             }}
           >
-            {loading ? "Asignando..." : "Confirmar asignación"}
+            {assignLoading ? "Asignando..." : "Confirmar asignación"}
           </button>
         </div>
       </div>
 
-      {/* Modal de confirmación */}
       <ConfirmModal
         isOpen={showConfirmModal}
         title="¿Confirmas la asignación del líder?"
@@ -839,12 +774,12 @@ function AssignLeaderToColonyForm() {
             <span className="font-bold text-lg">Colonia:</span>{" "}
             {selectedColony?.departamento
               ? `${selectedColony.pais} - ${selectedColony.departamento} - ${selectedColony.ciudad}`
-              : `${selectedColony?.pais}`}
+              : selectedColony?.pais}
           </>,
         ]}
         onConfirm={handleModalConfirm}
         onCancel={() => setShowConfirmModal(false)}
-        loading={loading}
+        loading={assignLoading}
       />
     </div>
   );

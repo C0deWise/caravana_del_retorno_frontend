@@ -1,14 +1,13 @@
 import { useState } from "react";
-import { userService } from "@/services/user/user.services";
-import { UserData, UserApi } from "@/types/user.types";
-
-interface AssignLeaderParams {
-  userId: number;
-  colonyCode: number;
-}
+import { ApiError } from "@/services/api.services";
+import { leaderService } from "../services/leader.service";
+import type { SetLeaderResponse } from "../types/leader.types";
 
 interface UseAssignLeaderToColonyReturn {
-  assignLeader: (params: AssignLeaderParams) => Promise<UserApi | null>;
+  assignLeader: (
+    coloniaCodigo: number,
+    liderId: number,
+  ) => Promise<SetLeaderResponse | null>;
   loading: boolean;
   error: string | null;
   success: boolean;
@@ -19,25 +18,33 @@ export const useAssignLeaderToColony = (): UseAssignLeaderToColonyReturn => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const assignLeader = async (params: AssignLeaderParams): Promise<UserApi | null> => {
+  const assignLeader = async (
+    coloniaCodigo: number,
+    liderId: number,
+  ): Promise<SetLeaderResponse | null> => {
     setLoading(true);
     setError(null);
     setSuccess(false);
 
     try {
-      const response = await userService.patchUser(params.userId, {
-        role: "lider_colonia",
-        codigo_colonia: params.colonyCode,
+      const response = await leaderService.setLeader(coloniaCodigo, {
+        lider_id: liderId,
       });
 
       setSuccess(true);
       return response;
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Error al asignar el líder a la colonia";
-      setError(message);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        if (err.status === 404) {
+          setError("Colonia o líder no encontrado.");
+        } else if (err.status === 422) {
+          setError("Datos inválidos o campos faltantes.");
+        } else {
+          setError(err.message);
+        }
+      } else {
+        setError("Error de conexión, intenta de nuevo");
+      }
       return null;
     } finally {
       setLoading(false);
