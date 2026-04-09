@@ -5,8 +5,8 @@ const MOCK_USER_BASE: Omit<UserData, "role" | "codigo_colonia"> = {
   tipo_doc: "CC",
   nombre: "Carlos",
   apellido: "Pérez",
-  id: 0,
-  fecha_creacion: "",
+  id: 999,
+  fecha_creacion: "2026-04-08T00:00:00.000Z",
   celular: "0123456789",
   correo: "example@email.com",
   genero: "M",
@@ -15,8 +15,6 @@ const MOCK_USER_BASE: Omit<UserData, "role" | "codigo_colonia"> = {
   departamento: "Cauca",
   ciudad: "Popayan",
 };
-
-export const MOCK_COLONIAS = [2, 3, 6];
 
 export const buildMockUsers = (
   coloniaId: number | null,

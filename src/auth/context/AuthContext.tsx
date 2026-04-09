@@ -2,7 +2,7 @@
 
 import { createContext, useContext, ReactNode, useState } from "react";
 import { UserData, UserRole } from "@/types/user.types";
-import { buildMockUsers, MOCK_COLONIAS } from "../utils/mockUsers";
+import { buildMockUsers } from "../utils/mockUsers";
 
 const IS_DEV = process.env.NEXT_PUBLIC_DEV_TOOLS === "true";
 
@@ -17,7 +17,8 @@ interface AuthContextType {
   setRoleOverride?: (role: UserRole | undefined) => void;
   mockColoniaId?: number | null;
   setMockColoniaId?: (id: number | null) => void;
-  mockColonias?: number[];
+  mockUserId?: number;
+  setMockUserId?: (id: number) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -27,13 +28,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [roleOverride, setRoleOverride] = useState<UserRole | undefined>(
     undefined,
   );
-  const [mockColoniaId, setMockColoniaId] = useState<number | null>(1);
+  const [mockColoniaId, setMockColoniaId] = useState<number | null>(null);
+  const [mockUserId, setMockUserId] = useState(999);
 
   const effectiveUser: UserData | null =
     IS_DEV && roleOverride !== undefined
-      ? (buildMockUsers(mockColoniaId)[
-          roleOverride as Exclude<UserRole, undefined>
-        ] ?? null)
+      ? {
+          ...buildMockUsers(mockColoniaId)[
+            roleOverride as Exclude<UserRole, undefined>
+          ]!,
+          id: mockUserId,
+        }
       : user;
 
   const effectiveRole =
@@ -60,7 +65,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setRoleOverride,
           mockColoniaId,
           setMockColoniaId,
-          mockColonias: MOCK_COLONIAS,
+          mockUserId,
+          setMockUserId,
         }),
       }}
     >
