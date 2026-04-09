@@ -13,25 +13,42 @@ async function forwardRequest(
   const url = `${API_BASE}/${path.join("/")}`;
 
   const isReadMethod = method === "GET" || method === "DELETE";
-  const body = isReadMethod ? undefined : JSON.stringify(await request.json());
+
+  let body: string | undefined;
+  if (!isReadMethod) {
+    const rawBody = await request.text();
+    body = rawBody.trim() ? rawBody : undefined;
+  }
+
+  const headers: HeadersInit = {};
+  if (body) {
+    headers["Content-Type"] = "application/json";
+  }
 
   const response = await fetch(url, {
     method,
-    headers: { "Content-Type": "application/json" },
+    headers,
     body,
     redirect: "follow",
   });
 
   const text = await response.text();
 
-  let data: unknown;
-  try {
-    data = text ? JSON.parse(text) : null;
-  } catch {
-    data = { detail: text };
+  if (response.status === 204 || !text) {
+    return new NextResponse(null, { status: response.status });
   }
 
-  return NextResponse.json(data, { status: response.status });
+  try {
+    const data = JSON.parse(text);
+    return NextResponse.json(data, { status: response.status });
+  } catch {
+    return new NextResponse(text, {
+      status: response.status,
+      headers: {
+        "Content-Type": response.headers.get("content-type") ?? "text/plain",
+      },
+    });
+  }
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {

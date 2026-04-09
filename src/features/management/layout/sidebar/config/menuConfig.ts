@@ -23,8 +23,8 @@ export const menuConfig: MenuItem[] = [
         href: "/gestion/colonia/miembros",
       },
       {
-        label: "Solicitudes de acceso",
-        href: "/gestion/colonia/notificaciones",
+        label: "Solicitudes de ingreso",
+        href: "/gestion/colonia/solicitudes-ingreso",
       },
     ],
   },

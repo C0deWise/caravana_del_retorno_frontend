@@ -1,22 +1,5 @@
-import axios from "axios";
+import { apiService, ApiError } from "@/services/api.services";
 import { UserApi, UserData, CODE_TO_ROLE } from "@/types/user.types";
-
-const api = axios.create({
-  baseURL: "/api",
-  timeout: 10000,
-});
-
-api.interceptors.response.use(
-  (res) => res,
-  (err) => {
-    console.error("🚨 API Error:", {
-      url: err.config?.url,
-      status: err.response?.status,
-      headers: err.response?.headers,
-    });
-    return Promise.reject(err);
-  },
-);
 
 const mapFromApi = (apiUser: UserApi): UserData => ({
   ...apiUser,
@@ -25,12 +8,16 @@ const mapFromApi = (apiUser: UserApi): UserData => ({
 
 export const authService = {
   loginByDocument: async (document: string): Promise<UserData> => {
-    const { data } = await api.get<UserApi[]>("/v1/usuario/todos");
+    const normalizedDocument = document.trim();
 
-    const found = data.find((u: UserApi) => u.documento === document);
+    if (!normalizedDocument) {
+      throw new ApiError(400, "Debes ingresar un número de documento");
+    }
 
-    if (!found) throw new Error("Usuario no encontrado");
+    const user = await apiService.get<UserApi>(
+      `/api/v1/usuario/buscar_documento/${encodeURIComponent(normalizedDocument)}`,
+    );
 
-    return mapFromApi(found);
+    return mapFromApi(user);
   },
 };

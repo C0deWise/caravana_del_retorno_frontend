@@ -36,8 +36,8 @@ export default function HomeNavbar() {
           return (
             <div key={item.label} className="relative">
               <button
+                className="cursor-pointer"
                 onClick={() => setShowLogin((prev) => !prev)}
-                disabled={true}
               >
                 Login
               </button>

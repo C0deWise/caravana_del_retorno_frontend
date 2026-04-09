@@ -17,15 +17,23 @@ export default function LoginPanel({ onClose }: LoginPanelProps) {
 
   const { login } = useAuth();
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const trimmedDocument = document.trim();
+
+    if (!trimmedDocument || isLoading) {
+      return;
+    }
+
     setIsLoading(true);
     setError("");
 
     try {
-      const userData = await authService.loginByDocument(document);
+      const userData = await authService.loginByDocument(trimmedDocument);
       login(userData);
-      onClose();
       setDocument("");
+      onClose();
       router.push("/gestion");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error desconocido");
@@ -35,33 +43,60 @@ export default function LoginPanel({ onClose }: LoginPanelProps) {
   };
 
   return (
-    <div className="absolute top-full -right-9 z-50 mt-2 w-80 bg-primary rounded-bl-xl shadow-lg p-6">
-      <h2 className="text-xl font-semibold mb-4">Iniciar sesión</h2>
+    <div className="absolute top-full -right-9 z-50 mt-2 w-80 rounded-bl-xl bg-primary p-6 shadow-lg">
+      <h2 className="mb-4 text-xl font-semibold">Iniciar sesión</h2>
 
-      <div className="flex flex-col gap-3">
-        <label className="text-sm font-medium">Número de documento</label>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        <label htmlFor="documento-login" className="text-sm font-medium">
+          Número de documento
+        </label>
+
         <input
+          id="documento-login"
           type="text"
           value={document}
           onChange={(e) => {
             setDocument(e.target.value);
             setError("");
           }}
-          placeholder="Ej: CC10000000"
+          placeholder="Ej: 1085123456"
           disabled={isLoading}
-          className="bg-bg-separator border rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 placeholder:text-gray-400"
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? "login-document-error" : undefined}
+          className="rounded-lg border bg-bg-separator px-3 py-2 text-sm text-text placeholder:text-gray-400 focus:outline-none focus:ring-2"
         />
 
-        {error && <p className="text-red-500 text-xs">{error}</p>}
+        {error && (
+          <p
+            id="login-document-error"
+            role="alert"
+            className="text-xs text-red-500"
+          >
+            {error}
+          </p>
+        )}
 
         <button
-          onClick={handleSubmit}
+          type="submit"
           disabled={isLoading || !document.trim()}
-          className="bg-black text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50"
+          aria-disabled={isLoading || !document.trim()}
+          aria-busy={isLoading}
+          className="cursor-pointer rounded-lg bg-accent-green py-2 text-sm font-medium text-text-inverse transition-all duration-200 hover:brightness-110 hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100 disabled:hover:shadow-none"
         >
           {isLoading ? "Cargando..." : "Ingresar"}
         </button>
-      </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            onClose();
+            router.push("/registro");
+          }}
+          className="cursor-pointer rounded-lg bg-secondary py-2 text-sm font-medium text-text-inverse transition-all duration-200 hover:brightness-110 hover:shadow-md active:scale-[0.98]"
+        >
+          Registrarse
+        </button>
+      </form>
     </div>
   );
 }
