@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const API_BASE = "https://caravana-api-dev.onrender.com";
+const API_BASE = process.env.API_BASE_URL!;
 
 type RouteParams = { params: Promise<{ path: string[] }> };
 
