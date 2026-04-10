@@ -36,6 +36,7 @@ function InscripcionColoniaFormFeature() {
   const [mostrarMensajeEspera, setMostrarMensajeEspera] = useState(false);
 
   const yaPertenecAColonia = Boolean(user?.codigo_colonia);
+  const esAdmin = Boolean(user?.role === "admin");
   const loading = loadingColonies || loadingSignup;
   const error = errorColonies ?? errorSignup;
 
@@ -86,7 +87,13 @@ function InscripcionColoniaFormFeature() {
         </h2>
 
         <div className="mt-10">
-          {yaPertenecAColonia ? (
+          {esAdmin ? (
+            <div className="rounded-lg border border-bg-border bg-bg-card px-4 py-5">
+              <p className="text-sm text-text-muted">
+                El usuario administrador no puede inscribirse a una colonia.
+              </p>
+            </div>
+          ) : yaPertenecAColonia ? (
             <div className="rounded-lg border border-bg-border bg-bg-card px-4 py-5">
               <p className="text-sm text-text-muted">
                 Ya perteneces a una colonia. No puedes inscribirte a otra.

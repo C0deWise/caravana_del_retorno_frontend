@@ -1,7 +1,7 @@
 "use client";
 
 import { UserGroupIcon } from "@heroicons/react/24/outline";
-import { RelationshipItem } from "../types/relationship.type";
+import type { RelationshipItem } from "../types/relationship.type";
 import { RelationshipCard } from "./RelationshipCard";
 
 interface RelationshipListProps {

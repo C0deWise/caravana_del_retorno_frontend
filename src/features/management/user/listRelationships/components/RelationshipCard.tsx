@@ -1,6 +1,7 @@
 "use client";
+
 import { UserIcon } from "@heroicons/react/24/solid";
-import { RelationshipItem } from "../types/relationship.type";
+import type { RelationshipItem } from "../types/relationship.type";
 
 interface RelationshipCardProps {
   relationship: RelationshipItem;
@@ -14,9 +15,11 @@ export function RelationshipCard({
   targetUserId,
 }: RelationshipCardProps) {
   const { relationshipType, status, user, relatedUser } = relationship;
+
   const displayUser = user.id === targetUserId ? relatedUser : user;
   const displayUserName =
     `${displayUser.nombre} ${displayUser.apellido}`.trim();
+
   const normalizedStatus = status.toLowerCase();
   const statusLabel =
     normalizedStatus.charAt(0).toUpperCase() + normalizedStatus.slice(1);
@@ -31,7 +34,7 @@ export function RelationshipCard({
           : "bg-bg-card text-text-muted border-bg-border";
 
   return (
-    <div className="bg-bg border border-gray-100 rounded-4x1 p-6 shadow-sm">
+    <div className="bg-bg border border-gray-100 rounded-4xl p-6 shadow-sm">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex items-center space-x-4">
           <span className="text-lg font-mono text-text-muted w-6 text-center shrink-0">

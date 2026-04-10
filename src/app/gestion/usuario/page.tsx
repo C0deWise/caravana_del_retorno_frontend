@@ -1,7 +1,7 @@
-export default function Parentesco() {
+export default function Usuario() {
   return (
     <div className="flex justify-center items-center h-170 border-4 border-accent-red">
-      Gestion Parentesco Component
+      Gestion Usuario Component
     </div>
   );
 }
