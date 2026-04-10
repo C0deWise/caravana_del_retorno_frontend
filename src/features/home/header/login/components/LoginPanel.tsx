@@ -90,7 +90,7 @@ export default function LoginPanel({ onClose }: LoginPanelProps) {
           type="button"
           onClick={() => {
             onClose();
-            router.push("/registro");
+            router.push("/auth/registro");
           }}
           className="cursor-pointer rounded-lg bg-secondary py-2 text-sm font-medium text-text-inverse transition-all duration-200 hover:brightness-110 hover:shadow-md active:scale-[0.98]"
         >
