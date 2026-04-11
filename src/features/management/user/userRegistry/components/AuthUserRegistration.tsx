@@ -261,7 +261,7 @@ export default function AuthUserRegistration() {
                   </div>
                 </div>
 
-                {/* Teléfono y Ubicación */}
+                {/* Teléfono */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="label-base">Teléfono</label>
@@ -283,34 +283,52 @@ export default function AuthUserRegistration() {
                     )}
                   </div>
 
+                  {/* Género */}
                   <div>
-                    <label className="label-base">Lugar de residencia</label>
-                    <button
-                      type="button"
-                      onClick={() => setIsLocationModalOpen(true)}
-                      className={`input-base text-left flex items-center justify-between ${fieldErrors.ciudad ? "input-error" : ""}`}
+                    <label className="label-base">Género</label>
+                    <select
+                      name="genero"
+                      value={formData.genero}
+                      onChange={handleChange}
+                      onBlur={() => handleBlur("genero")}
+                      className="input-base pr-8"
                     >
-                      <span>{getLocationDisplay()}</span>
-                      <svg
-                        className="w-5 h-5 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </button>
-                    {fieldErrors.ciudad && (
-                      <p className="validation-message validation-error">
-                        {fieldErrors.ciudad}
-                      </p>
-                    )}
-                  </div>
+                      <option value="femenino">Femenino</option>
+                      <option value="masculino">Masculino</option>
+                      <option value="otro">Prefiero no decirlo</option>
+                    </select>
+                    
+                  </div>                  
+                </div>
+
+                {/* Lugar de Residencia */}
+                <div>
+                  <label className="label-base">Lugar de residencia</label>
+                  <button
+                    type="button"
+                    onClick={() => setIsLocationModalOpen(true)}
+                    className={`input-base text-left flex items-center justify-between ${fieldErrors.ciudad ? "input-error" : ""}`}
+                  >
+                    <span>{getLocationDisplay()}</span>
+                    <svg
+                      className="w-5 h-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                  {fieldErrors.ciudad && (
+                    <p className="validation-message validation-error">
+                      {fieldErrors.ciudad}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
