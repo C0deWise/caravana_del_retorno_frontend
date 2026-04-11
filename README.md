@@ -17,11 +17,7 @@ npm install
 ```
 
 ### Start server
-Once dependencies installed, to startup the server run:
-```bash
-npx next dev
-```
-or also:
+Once dependencies installed, to decrypt the .env file and startup the server run:
 ```bash
 npm run dev
 ```
