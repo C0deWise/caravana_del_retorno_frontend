@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useCreateRetorno } from "../hooks/useCreateRetorno";
+import { RequireAuth } from "@/auth/components/RequireAuth";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 11 }, (_, i) => CURRENT_YEAR - 5 + i);
 
-export default function CrearRetorno() {
+function CrearRetornoFeature() {
   const { createRetorno, loading, error, success, resetState } =
     useCreateRetorno();
 
@@ -132,5 +133,13 @@ export default function CrearRetorno() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function CrearRetorno() {
+  return (
+    <RequireAuth roles={["admin"]}>
+      <CrearRetornoFeature />
+    </RequireAuth>
   );
 }
