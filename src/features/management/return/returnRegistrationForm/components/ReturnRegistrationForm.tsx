@@ -64,7 +64,7 @@ export default function ReturnRegistrationForm() {
 				const activeReturn = await returnRegistrationService.getActiveReturn();
 				if (!isMounted) return;
 
-				const parsedCode = Number(activeReturn?.re_codigo);
+				const parsedCode = Number(activeReturn?.codigo);
 				const normalizedCode =
 					Number.isInteger(parsedCode) && parsedCode > 0 ? parsedCode : null;
 

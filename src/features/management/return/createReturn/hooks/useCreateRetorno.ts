@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ApiError } from "@/services/api.services";
 import { retornoService } from "../services/retorno.service";
-import type { Retorno, RetornoCreateRequest } from "../types/retorno.types";
+import type { Retorno, RetornoCreateRequest } from "../../types/retorno.types";
 
 interface UseCreateRetornoReturn {
   createRetorno: (data: RetornoCreateRequest) => Promise<Retorno | null>;

@@ -1,5 +1,5 @@
 import { apiService } from "@/services/api.services";
-import type { Retorno, RetornoCreateRequest } from "../types/retorno.types";
+import type { Retorno, RetornoCreateRequest } from "../../types/retorno.types";
 
 class RetornoService {
   private endpoint = "/retornos/";
