@@ -129,12 +129,12 @@ export default function ReturnRegistrationForm() {
 
 		if (formData.people_in_charge === "") {
 			nextErrors.people_in_charge =
-				"Ingresa un numero de personas a cargo (0 si no aplica).";
+				"Ingresa un número de personas a cargo (0 si no aplica).";
 		} else {
 			const parsed = Number(formData.people_in_charge);
 			if (!Number.isFinite(parsed) || parsed < 0) {
 				nextErrors.people_in_charge =
-					"El numero de personas a cargo no puede ser negativo.";
+					"El número de personas a cargo no puede ser negativo.";
 			}
 		}
 
@@ -150,18 +150,6 @@ export default function ReturnRegistrationForm() {
 
 		const numeric = raw.replace(/[^\d-]/g, "");
 		setFormData((prev) => ({ ...prev, people_in_charge: numeric }));
-		setFieldErrors((prev) => ({ ...prev, people_in_charge: undefined }));
-	};
-
-	const increasePeopleInCharge = () => {
-		const next = normalizedPeopleInCharge + 1;
-		setFormData((prev) => ({ ...prev, people_in_charge: String(next) }));
-		setFieldErrors((prev) => ({ ...prev, people_in_charge: undefined }));
-	};
-
-	const decreasePeopleInCharge = () => {
-		const next = Math.max(0, normalizedPeopleInCharge - 1);
-		setFormData((prev) => ({ ...prev, people_in_charge: String(next) }));
 		setFieldErrors((prev) => ({ ...prev, people_in_charge: undefined }));
 	};
 
@@ -314,9 +302,6 @@ export default function ReturnRegistrationForm() {
 					<p className="text-text font-medium">
 						Ya has confirmado tu asistencia a este retorno.
 					</p>
-					<p className="text-text-muted mt-2">
-						No es posible registrar el mismo formulario dos veces.
-					</p>
 				</div>
 			</div>
 		);
@@ -358,7 +343,7 @@ export default function ReturnRegistrationForm() {
 	return (
 		<div className="bg-white px-4 py-6">
 			<div className="mx-auto w-full max-w-2xl rounded-2xl bg-bg p-6 shadow-md sm:p-8">
-				<h1 className="page-title">Registro de asistencia al retorno</h1>
+				<h1 className="page-title">Registro de Asistencia al Retorno</h1>
 				<h2 className="section-title">Confirma tu disponibilidad de viaje</h2>
 
 				{error && (
@@ -382,7 +367,7 @@ export default function ReturnRegistrationForm() {
 									checked={formData.accomodation === "si"}
 									onChange={() => handleRadioChange("accomodation", "si")}
 								/>
-								Si
+								Sí
 							</label>
 							<label className="inline-flex items-center gap-2 text-text">
 								<input
@@ -417,7 +402,7 @@ export default function ReturnRegistrationForm() {
 									checked={formData.transport === "si"}
 									onChange={() => handleRadioChange("transport", "si")}
 								/>
-								Si
+								Sí
 							</label>
 							<label className="inline-flex items-center gap-2 text-text">
 								<input
@@ -440,7 +425,7 @@ export default function ReturnRegistrationForm() {
 
 					<div>
 						<label htmlFor="people-in-charge" className="label-primary">
-							Numero de personas a cargo
+							Número de personas a cargo
 						</label>
 						<p className="validation-message validation-info">
 							Menores de edad, personas con discapacidad o cualquier persona que requiera asistencia durante el retorno deben ser registradas como personas a cargo.
@@ -449,14 +434,6 @@ export default function ReturnRegistrationForm() {
 						<div
 							className={`mt-2 inline-flex items-center gap-2 rounded-lg p-2 ${fieldErrors.people_in_charge ? "border-2 border-danger" : "border border-bg-border"}`}
 						>
-							<button
-								type="button"
-								onClick={decreasePeopleInCharge}
-								className="h-9 w-9 rounded-md bg-bg-separator text-primary font-bold"
-								aria-label="Disminuir personas a cargo"
-							>
-								-
-							</button>
 							<input
 								id="people-in-charge"
 								name="people-in-charge"
@@ -468,14 +445,6 @@ export default function ReturnRegistrationForm() {
 								className="h-9 w-20 rounded-md border border-bg-border bg-white px-2 text-center text-text"
 								aria-invalid={Boolean(fieldErrors.people_in_charge)}
 							/>
-							<button
-								type="button"
-								onClick={increasePeopleInCharge}
-								className="h-9 w-9 rounded-md bg-bg-separator text-primary font-bold"
-								aria-label="Aumentar personas a cargo"
-							>
-								+
-							</button>
 						</div>
 						{fieldErrors.people_in_charge && (
 							<p className="validation-message validation-error">
