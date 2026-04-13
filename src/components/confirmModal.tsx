@@ -30,7 +30,7 @@ export function ConfirmModal({
             onClick={(e) => { if (e.target === e.currentTarget) onCancel(); }}
         >
             <div
-                className="w-full max-w-sm rounded-xl p-6 shadow-lg"
+                className="w-full max-w-lg rounded-xl p-6 shadow-lg"
                 style={{ backgroundColor: 'var(--color-bg)' }}
                 role="dialog"
                 aria-modal="true"
