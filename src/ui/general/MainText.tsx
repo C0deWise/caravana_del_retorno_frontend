@@ -21,6 +21,7 @@ export default function MainText({
         alt="Caravana del Retorno"
         fill
         className="rounded-lg object-contain"
+        loading="eager"
         unoptimized
       />
     </div>

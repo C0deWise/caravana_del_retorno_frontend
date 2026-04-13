@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useRegisterUser } from "../hooks/useUserRegistration";
-import { useDocumentValidation } from "../hooks/useDocumentValidation";
-import type { RegistrationData } from "../types/registro.types";
+import type { RegistrationFormData } from "../types/registro.types";
 import {
   validateRegistrationData,
   validateRegistrationField,
@@ -20,36 +19,26 @@ const TODAY_LOCAL_DATE = (() => {
 
 export default function AuthUserRegistration() {
   const { registerUser, loading, error, success } = useRegisterUser();
-  const {
-    validate: validateDocument,
-    validating,
-    validationError,
-  } = useDocumentValidation();
 
-  const [formData, setFormData] = useState<RegistrationData>({
-    id: 0,
+  const [formData, setFormData] = useState<RegistrationFormData>({
     tipo_doc: "CC",
     documento: "",
     celular: "",
     nombre: "",
     apellido: "",
-    genero: "F",
+    genero: "F" as UserGender,
     fecha_nacimiento: "",
     pais: "",
-    departamento: "",
-    ciudad: "",
+    departamento: null,
+    ciudad: null,
     correo: "",
+    contrasenia: "",
     confirmEmail: "",
-    password: "",
     confirmPassword: "",
-    fecha_creacion: "",
-    codigo_colonia: 0,
-    codigo_rol: 3,
   });
 
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
-  const [hasSubmitAttempted, setHasSubmitAttempted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -95,22 +84,18 @@ export default function AuthUserRegistration() {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
 
-    // Limpiar error del campo cuando el usuario empieza a escribir
     if (fieldErrors[name]) {
       setFieldErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors[name];
-        if (name === "tipo_doc") {
-          delete newErrors.documento;
-        }
+        if (name === "tipo_doc") delete newErrors.documento;
         return newErrors;
       });
     }
   };
 
-  const handleBlur = (fieldName: string) => {
-    const key = fieldName as keyof RegistrationData;
-    const fieldError = validateRegistrationField(key, formData);
+  const handleBlur = (fieldName: keyof RegistrationFormData) => {
+    const fieldError = validateRegistrationField(fieldName, formData);
 
     setFieldErrors((prev) => {
       const next = { ...prev };
@@ -123,69 +108,27 @@ export default function AuthUserRegistration() {
     });
   };
 
-  const buildRegistrationDataFromForm = (
-    submittedFormData: FormData,
-  ): RegistrationData => {
-    const getValue = (field: keyof RegistrationData) => {
-      const value = submittedFormData.get(field);
-      return typeof value === "string" ? value : "";
-    };
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-    return {
-      id: Number(getValue("id")),
-      tipo_doc: getValue("tipo_doc"),
-      documento: getValue("documento"),
-      celular: getValue("celular"),
-      nombre: getValue("nombre"),
-      apellido: getValue("apellido"),
-      genero: getValue("genero") as UserGender,
-      fecha_nacimiento: getValue("fecha_nacimiento"),
-      pais: getValue("pais"),
-      departamento: getValue("departamento"),
-      ciudad: getValue("ciudad"),
-      correo: getValue("correo"),
-      confirmEmail: getValue("confirmEmail"),
-      password: getValue("password"),
-      confirmPassword: getValue("confirmPassword"),
-      fecha_creacion: "",
-      codigo_colonia: 0,
-      codigo_rol: 1,
-    };
-  };
-
-  const handleFormAction = async (submittedFormData: FormData) => {
-    setHasSubmitAttempted(true);
-    const submissionData = buildRegistrationDataFromForm(submittedFormData);
-
-    const formErrors = validateRegistrationData(submissionData);
+    const formErrors = validateRegistrationData(formData);
     setFieldErrors(formErrors);
 
-    if (Object.keys(formErrors).length > 0) {
-      return;
-    }
+    if (Object.keys(formErrors).length > 0) return;
 
-    // Validar documento antes de enviar
-    const documentoValido = await validateDocument(
-      submissionData.tipo_doc,
-      submissionData.documento,
-    );
-    if (!documentoValido) {
-      return;
-    }
-
-    await registerUser(submissionData);
+    const { ...registrationData } = formData;
+    await registerUser(registrationData);
   };
 
   const handleLocationSave = (locationData: LocationData) => {
     setFormData((prev) => ({
       ...prev,
       pais: locationData.pais,
-      departamento: locationData.departamento,
-      ciudad: locationData.municipio,
+      departamento: locationData.departamento || null,
+      ciudad: locationData.municipio || null,
     }));
     setIsLocationModalOpen(false);
 
-    // Limpiar errores de ubicación si existen
     if (fieldErrors.ciudad) {
       setFieldErrors((prev) => {
         const newErrors = { ...prev };
@@ -193,14 +136,6 @@ export default function AuthUserRegistration() {
         return newErrors;
       });
     }
-  };
-
-  const handleLocationModalOpen = () => {
-    setIsLocationModalOpen(true);
-  };
-
-  const handleLocationModalClose = () => {
-    setIsLocationModalOpen(false);
   };
 
   const getLocationDisplay = () => {
@@ -211,21 +146,15 @@ export default function AuthUserRegistration() {
         return `${formData.pais}, ${formData.departamento}`;
       }
     }
-
-    // Si solo hay país o cualquier otro caso
-    if (formData.pais) {
-      return formData.pais;
-    }
-    return "Seleccionar ubicación";
+    return formData.pais || "Seleccionar ubicación";
   };
 
   return (
     <div className="min-h-screen bg-white p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Título */}
         <h1 className="page-title">Registro de usuario</h1>
 
-        <form action={handleFormAction}>
+        <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-8">
             {/* Columna Izquierda - Datos Personales */}
             <div>
@@ -240,9 +169,6 @@ export default function AuthUserRegistration() {
                       type="text"
                       name="nombre"
                       value={formData.nombre}
-                      minLength={3}
-                      pattern="[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s'-]{3,}"
-                      title="Debe tener al menos 3 caracteres y solo letras"
                       onChange={handleChange}
                       onBlur={() => handleBlur("nombre")}
                       placeholder="Jhon"
@@ -260,9 +186,6 @@ export default function AuthUserRegistration() {
                       type="text"
                       name="apellido"
                       value={formData.apellido}
-                      minLength={3}
-                      pattern="[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s'-]{3,}"
-                      title="Debe tener al menos 3 caracteres y solo letras"
                       onChange={handleChange}
                       onBlur={() => handleBlur("apellido")}
                       placeholder="Doe"
@@ -305,27 +228,12 @@ export default function AuthUserRegistration() {
                               ? 12
                               : 10
                         }
-                        pattern={
-                          formData.tipo_doc === "PA" ? "[A-Za-z0-9]*" : "[0-9]*"
-                        }
                         onChange={handleChange}
                         onBlur={() => handleBlur("documento")}
                         placeholder="1234567890"
                         className={`input-base flex-1 ${fieldErrors.documento ? "input-error" : ""}`}
                       />
                     </div>
-                    {validating && (
-                      <p className="validation-message validation-info">
-                        Validando...
-                      </p>
-                    )}
-                    {hasSubmitAttempted &&
-                      validationError &&
-                      !fieldErrors.documento && (
-                        <p className="validation-message validation-error">
-                          {validationError}
-                        </p>
-                      )}
                     {fieldErrors.documento && (
                       <p className="validation-message validation-error">
                         {fieldErrors.documento}
@@ -343,7 +251,6 @@ export default function AuthUserRegistration() {
                       max={TODAY_LOCAL_DATE}
                       onChange={handleChange}
                       onBlur={() => handleBlur("fecha_nacimiento")}
-                      placeholder="04/08/1999"
                       className={`input-base ${fieldErrors.fecha_nacimiento ? "input-error" : ""}`}
                     />
                     {fieldErrors.fecha_nacimiento && (
@@ -364,7 +271,6 @@ export default function AuthUserRegistration() {
                       value={formData.celular}
                       inputMode="numeric"
                       maxLength={10}
-                      pattern="[0-9]*"
                       onChange={handleChange}
                       onBlur={() => handleBlur("celular")}
                       placeholder="1234567890"
@@ -377,35 +283,52 @@ export default function AuthUserRegistration() {
                     )}
                   </div>
 
-                  {/* Ubicación */}
+                  {/* Género */}
                   <div>
-                    <label className="label-base">Lugar de residencia</label>
-                    <button
-                      type="button"
-                      onClick={handleLocationModalOpen}
-                      className={`input-base text-left flex items-center justify-between ${fieldErrors.ciudad ? "input-error" : ""}`}
+                    <label className="label-base">Género</label>
+                    <select
+                      name="genero"
+                      value={formData.genero}
+                      onChange={handleChange}
+                      onBlur={() => handleBlur("genero")}
+                      className="input-base pr-8"
                     >
-                      <span>{getLocationDisplay()}</span>
-                      <svg
-                        className="w-5 h-5 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </button>
-                    {fieldErrors.ciudad && (
-                      <p className="validation-message validation-error">
-                        {fieldErrors.ciudad}
-                      </p>
-                    )}
-                  </div>
+                      <option value="femenino">Femenino</option>
+                      <option value="masculino">Masculino</option>
+                      <option value="otro">Prefiero no decirlo</option>
+                    </select>
+                    
+                  </div>                  
+                </div>
+
+                {/* Lugar de Residencia */}
+                <div>
+                  <label className="label-base">Lugar de residencia</label>
+                  <button
+                    type="button"
+                    onClick={() => setIsLocationModalOpen(true)}
+                    className={`input-base text-left flex items-center justify-between ${fieldErrors.ciudad ? "input-error" : ""}`}
+                  >
+                    <span>{getLocationDisplay()}</span>
+                    <svg
+                      className="w-5 h-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                  {fieldErrors.ciudad && (
+                    <p className="validation-message validation-error">
+                      {fieldErrors.ciudad}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -425,25 +348,25 @@ export default function AuthUserRegistration() {
                 {/* Correo Electrónico */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="label-base">Correo Electronico</label>
+                    <label className="label-base">Correo electrónico</label>
                     <input
                       type="email"
-                      name="email"
+                      name="correo"
                       value={formData.correo}
                       onChange={handleChange}
-                      onBlur={() => handleBlur("email")}
+                      onBlur={() => handleBlur("correo")}
                       placeholder="example@gmail.com"
-                      className={`input-base ${fieldErrors.email ? "input-error" : ""}`}
+                      className={`input-base ${fieldErrors.correo ? "input-error" : ""}`}
                     />
-                    {fieldErrors.email && (
+                    {fieldErrors.correo && (
                       <p className="validation-message validation-error">
-                        {fieldErrors.email}
+                        {fieldErrors.correo}
                       </p>
                     )}
                   </div>
                   <div>
                     <label className="label-primary">
-                      Ingrese nuevamente el correo electronico
+                      Confirmar correo electrónico
                     </label>
                     <input
                       type="email"
@@ -469,12 +392,12 @@ export default function AuthUserRegistration() {
                     <div className="relative">
                       <input
                         type={showPassword ? "text" : "password"}
-                        name="password"
-                        value={formData.password}
+                        name="contrasenia"
+                        value={formData.contrasenia}
                         onChange={handleChange}
-                        onBlur={() => handleBlur("password")}
+                        onBlur={() => handleBlur("contrasenia")}
                         placeholder="**********"
-                        className={`input-base pr-20 ${fieldErrors.password ? "input-error" : ""}`}
+                        className={`input-base pr-10 ${fieldErrors.contrasenia ? "input-error" : ""}`}
                       />
                       <button
                         type="button"
@@ -493,15 +416,15 @@ export default function AuthUserRegistration() {
                         )}
                       </button>
                     </div>
-                    {fieldErrors.password && (
+                    {fieldErrors.contrasenia && (
                       <p className="validation-message validation-error">
-                        {fieldErrors.password}
+                        {fieldErrors.contrasenia}
                       </p>
                     )}
                   </div>
                   <div>
                     <label className="label-primary">
-                      Ingrese nuevamente la contraseña
+                      Confirmar contraseña
                     </label>
                     <div className="relative">
                       <input
@@ -511,7 +434,7 @@ export default function AuthUserRegistration() {
                         onChange={handleChange}
                         onBlur={() => handleBlur("confirmPassword")}
                         placeholder="**********"
-                        className={`input-base pr-20 ${fieldErrors.confirmPassword ? "input-error" : ""}`}
+                        className={`input-base pr-10 ${fieldErrors.confirmPassword ? "input-error" : ""}`}
                       />
                       <button
                         type="button"
@@ -541,14 +464,6 @@ export default function AuthUserRegistration() {
             </div>
           </div>
 
-          <input type="hidden" name="pais" value={formData.pais} />
-          <input
-            type="hidden"
-            name="departamento"
-            value={formData.departamento ?? ""}
-          />
-          <input type="hidden" name="ciudad" value={formData.ciudad ?? ""} />
-
           {/* Mensajes de Error y Éxito */}
           {error && (
             <div className="alert-error">
@@ -559,31 +474,26 @@ export default function AuthUserRegistration() {
           {success && (
             <div className="alert-success">
               <p className="alert-success-text">
-                ¡Registro exitoso! Redirigiendo al login...
+                ¡Registro exitoso! Redirigiendo...
               </p>
             </div>
           )}
 
           {/* Botón de Envío */}
           <div className="mt-8 flex justify-center">
-            <button
-              type="submit"
-              disabled={loading || validating}
-              className="btn-primary"
-            >
+            <button type="submit" disabled={loading} className="btn-primary">
               {loading ? "Registrando..." : "Registrarse"}
             </button>
           </div>
         </form>
 
-        {/* Modal de ubicación */}
         {isLocationModalOpen && (
           <LocationModal
-            onClose={handleLocationModalClose}
+            onClose={() => setIsLocationModalOpen(false)}
             onSave={handleLocationSave}
             initialData={{
               pais: formData.pais,
-              departamento: formData.departamento || "",
+              departamento: formData.departamento ?? "",
               municipio: formData.ciudad ?? "",
             }}
           />

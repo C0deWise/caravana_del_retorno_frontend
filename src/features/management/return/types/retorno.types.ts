@@ -1,16 +1,18 @@
-export interface RetornoData {
-    re_fecha_creacion: string; // Fecha en formato ISO (YYYY-MM-DD)
+export interface RetornoCreateRequest {
+  anio: number;
+  estado: string;
 }
 
 export interface Retorno {
-    re_codigo: string;
-    re_fecha_creacion: string;
-    re_año: number;
-    re_estado: string;
+  codigo: number;
+  fecha_creacion: string;
+  anio: number;
+  estado: string;
 }
 
-export interface RetornoResponse {
-    success: boolean;
-    message: string;
-    data?: Retorno;
+export interface ApiErrorResponse {
+  detail?: string;
+  message?: string;
+  errors?: Record<string, string[]>;
+  codigo?: number;
 }

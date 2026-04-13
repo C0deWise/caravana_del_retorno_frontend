@@ -1,57 +1,80 @@
-import { useState } from 'react';
-import { retornoService } from '../services/retorno.service';
-import type {
-    RetornoData,
-    RetornoResponse
-} from '../../types/retorno.types';
+import { useState } from "react";
+import { ApiError } from "@/services/api.services";
+import { retornoService } from "../services/retorno.service";
+import type { Retorno, RetornoCreateRequest } from "../types/retorno.types";
 
 interface UseCreateRetornoReturn {
-    createRetorno: (data: RetornoData) => Promise<RetornoResponse | null>;
-    loading: boolean;
-    error: string | null;
-    success: boolean;
+  createRetorno: (data: RetornoCreateRequest) => Promise<Retorno | null>;
+  loading: boolean;
+  error: string | null;
+  success: boolean;
+  resetState: () => void;
 }
 
 export const useCreateRetorno = (): UseCreateRetornoReturn => {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
-    const createRetorno = async (data: RetornoData): Promise<RetornoResponse | null> => {
-        setLoading(true);
-        setError(null);
-        setSuccess(false);
+  const resetState = () => {
+    setError(null);
+    setSuccess(false);
+  };
 
-        try {
-            // Validar que la fecha no esté vacía
-            if (!data.re_fecha_creacion) {
-                setError('La fecha es obligatoria');
-                return null;
-            }
+  const createRetorno = async (
+    data: RetornoCreateRequest,
+  ): Promise<Retorno | null> => {
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
 
-            const response = await retornoService.createRetorno(data);
-            
-            if (response.success) {
-                setSuccess(true);
-            } else {
-                setError(response.message || 'Error al crear el retorno');
-            }
-            
-            return response;
+    try {
+      if (!data.anio) {
+        setError("El año es obligatorio");
+        return null;
+      }
 
-        } catch (error) {
-            const mensaje = error instanceof Error ? error.message : 'Error al crear el retorno';
-            setError(mensaje);
-            return null;
-        } finally {
-            setLoading(false);
+      if (!data.estado.trim()) {
+        setError("El estado es obligatorio");
+        return null;
+      }
+
+      const response = await retornoService.create(data);
+
+      setSuccess(true);
+      return response;
+    } catch (err) {
+      if (err instanceof ApiError) {
+        switch (err.status) {
+          case 409:
+            setError(
+              "Ya existe un evento de El Retorno para el año seleccionado.",
+            );
+            break;
+
+          case 422:
+            setError("Año anterior al año actual del sistema.");
+            break;
+
+          default:
+            setError(err.message || "Error al crear el retorno.");
+            break;
         }
-    };
+      } else {
+        setError("Error inesperado al crear el retorno.");
+      }
 
-    return {
-        createRetorno,
-        loading,
-        error,
-        success
-    };
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return {
+    createRetorno,
+    loading,
+    error,
+    success,
+    resetState,
+  };
 };

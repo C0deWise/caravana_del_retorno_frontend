@@ -1,0 +1,3 @@
+# Proteger archivos sops/binarios
+.env.* binary
+*.encrypted binary

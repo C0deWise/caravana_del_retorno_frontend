@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import Spinner from "@/ui/animations/Spinner";
 import { useColonyMembers } from "../hooks/useColonyMembers";
 import { useAuth } from "@/auth/context/AuthContext";
+import { RequireAuth } from "@/auth/components/RequireAuth";
 import { MemberList } from "./MemberList";
 import { UserRole } from "@/types/user.types";
 
@@ -10,9 +11,7 @@ interface ListColonyMembersProps {
   paramsId?: number;
 }
 
-export default function ListColonyMembers({
-  paramsId,
-}: ListColonyMembersProps) {
+function ColonyMembersFeature({ paramsId }: ListColonyMembersProps) {
   const { user } = useAuth();
 
   const targetColonyId =
@@ -36,19 +35,6 @@ export default function ListColonyMembers({
     if (sentinelRef.current) observer.observe(sentinelRef.current);
     return () => observer.disconnect();
   }, [hasMore, loadMore]);
-
-  if (!user?.role || (user?.role !== "admin" && !user?.codigo_colonia)) {
-    return (
-      <div className="w-full h-full flex items-center justify-center p-8">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-text mb-4">Acceso negado</h1>
-          <p className="text-text-muted">
-            Por favor inicia sesión para ver los miembros de tu colonia.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="w-full min-h-screen md:pb-30 space-y-8">
@@ -88,5 +74,15 @@ export default function ListColonyMembers({
         </div>
       )}
     </div>
+  );
+}
+
+export default function ListColonyMembers({
+  paramsId,
+}: ListColonyMembersProps) {
+  return (
+    <RequireAuth>
+      <ColonyMembersFeature paramsId={paramsId} />
+    </RequireAuth>
   );
 }

@@ -37,7 +37,6 @@ export default function LocationModal({
   onSave,
   initialData,
 }: LocationModalProps) {
-  // Estados
   const [locationData, setLocationData] = useState<LocationData>(
     () => initialData ?? EMPTY_LOCATION_DATA,
   );
@@ -48,8 +47,6 @@ export default function LocationModal({
     return [];
   });
 
-  // Cargar departamentos solo si el país es Colombia
-  // Nota: useMemo evita re-renders innecesarios y responde a cambios en la selección del país
   const departments = useMemo(() => {
     if (locationData.pais === "Colombia") {
       return getDepartments();
@@ -68,33 +65,15 @@ export default function LocationModal({
   );
 
   const handlePaisChange = (pais: string) => {
-    // Actualizar país y resetear departamento y municipio
-    setLocationData({
-      pais,
-      departamento: "",
-      municipio: "",
-    });
-
-    // Limpiar ciudades cuando cambia el país
-    if (pais !== "Colombia") {
-      setCities([]);
-    }
+    setLocationData({ pais, departamento: "", municipio: "" });
+    if (pais !== "Colombia") setCities([]);
   };
 
   const handleDepartamentoChange = (option: SelectOption | null) => {
     const departamento = option?.value || "";
-
-    // Actualizar departamento y resetear municipio
-    setLocationData((prev) => ({
-      ...prev,
-      departamento,
-      municipio: "", // Resetear municipio cuando cambia el departamento
-    }));
-
-    // Cargar las ciudades del departamento seleccionado
+    setLocationData((prev) => ({ ...prev, departamento, municipio: "" }));
     if (departamento) {
-      const ciudades = getCitiesByDepartmentName(departamento);
-      setCities(ciudades);
+      setCities(getCitiesByDepartmentName(departamento));
     } else {
       setCities([]);
     }
@@ -110,31 +89,24 @@ export default function LocationModal({
     onClose();
   };
 
-  // Estilos personalizados para react-select
   const customStyles: StylesConfig<SelectOption, false> = {
-    control: (base: Record<string, unknown>) => ({
+    control: (base) => ({
       ...base,
       borderColor: "#d1d5db",
       borderRadius: "0.5rem",
       padding: "0.25rem",
       fontSize: "1rem",
-      "&:hover": {
-        borderColor: "#9ca3af",
-      },
     }),
-    menu: (base: Record<string, unknown>) => ({
+    menu: (base) => ({
       ...base,
       zIndex: 9999,
     }),
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 mx-4">
-        <h2
-          className="text-2xl font-bold mb-6"
-          style={{ color: "var(--color-primary)" }}
-        >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="bg-bg rounded-lg shadow-2xl w-full max-w-md p-6 mx-4">
+        <h2 className="text-2xl font-bold mb-6 text-primary">
           Seleccione su lugar de residencia
         </h2>
 
@@ -163,9 +135,9 @@ export default function LocationModal({
                 }
                 onChange={handleDepartamentoChange}
                 placeholder="Seleccione un departamento"
-                isSearchable={true}
-                isClearable={true}
-                openMenuOnFocus={true}
+                isSearchable
+                isClearable
+                openMenuOnFocus
                 styles={customStyles}
                 noOptionsMessage={() => "No se encontraron departamentos"}
               />
@@ -191,9 +163,9 @@ export default function LocationModal({
                     ? "Seleccione un municipio"
                     : "Seleccione primero un departamento"
                 }
-                isSearchable={true}
-                isClearable={true}
-                openMenuOnFocus={true}
+                isSearchable
+                isClearable
+                openMenuOnFocus
                 isDisabled={!locationData.departamento || cities.length === 0}
                 styles={customStyles}
                 noOptionsMessage={() => "No se encontraron municipios"}
@@ -207,19 +179,15 @@ export default function LocationModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-2 border rounded-lg transition-colors"
-            style={{
-              borderColor: "var(--color-bg-border)",
-              color: "var(--color-text)",
-            }}
+            className="px-6 py-2 border border-border rounded-lg
+                       text-text transition-colors hover:bg-surface-offset"
           >
             Cancelar
           </button>
           <button
             type="button"
             onClick={handleSave}
-            className="btn-primary"
-            style={{ padding: "0.5rem 1.5rem" }}
+            className="btn-primary px-6 py-2"
           >
             Guardar
           </button>
