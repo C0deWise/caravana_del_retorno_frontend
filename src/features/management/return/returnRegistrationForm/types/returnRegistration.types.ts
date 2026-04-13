@@ -1,4 +1,4 @@
-export type ReturnRegistrationAnswer = "si" | "no";
+export type ReturnRegistrationAnswer = 0 | 1;
 
 export interface ReturnRegistrationApi {
     id: number;
@@ -6,7 +6,7 @@ export interface ReturnRegistrationApi {
     return_code: number;
     accomodation: ReturnRegistrationAnswer;
     transport: ReturnRegistrationAnswer;
-    people_in_charge: number;
+    parking: ReturnRegistrationAnswer;
 }
 
 export type ReturnRegistrationItem = Omit<ReturnRegistrationApi, "id" | "user_code" | "return_code">;

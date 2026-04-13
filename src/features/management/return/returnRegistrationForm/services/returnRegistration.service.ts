@@ -13,10 +13,10 @@ const mockRegisteredUsers = new Set<string>(
 );
 
 const mockActiveReturn: Retorno = {
-    re_codigo: String(MOCK_RETURN_CODE),
-    re_fecha_creacion: '2026-01-01T00:00:00.000Z',
-    re_año: 2026,
-    re_estado: 'activo',
+    codigo: MOCK_RETURN_CODE,
+    fecha_creacion: '2026-01-01T00:00:00.000Z',
+    anio: 2026,
+    estado: 'activo',
 };
 
 const ACTIVE_RETURN_STATES = new Set([
@@ -64,12 +64,12 @@ export const returnRegistrationService = {
             const response = await apiService.get<Retorno | Retorno[]>('/retornos');
 
             if (Array.isArray(response)) {
-                const activeReturn = response.find((item) => hasActiveState(item.re_estado));
+                const activeReturn = response.find((item) => hasActiveState(item.estado));
                 return activeReturn ?? null;
             }
 
             if (!response) return null;
-            return hasActiveState(response.re_estado) ? response : null;
+            return hasActiveState(response.estado) ? response : null;
         } catch (error) {
             console.error('Error en getActiveReturn:', error);
             throw error;
@@ -139,7 +139,7 @@ export const returnRegistrationService = {
                 return_code: MOCK_RETURN_CODE,
                 accomodation: data.accomodation,
                 transport: data.transport,
-                people_in_charge: data.people_in_charge,
+                parking: data.parking,
             };
         }
         // ------------------------------------------------

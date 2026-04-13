@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { RequireAuth } from "@/auth/components/RequireAuth";
 import { useAuth } from "@/auth/context/AuthContext";
 import { ConfirmModal } from "@/components/confirmModal";
 import Spinner from "@/ui/animations/Spinner";
@@ -15,21 +16,24 @@ import type {
 type FormErrors = {
 	accomodation?: string;
 	transport?: string;
+	parking?: string;
 	people_in_charge?: string;
 };
 
 const initialForm: {
 	accomodation: ReturnRegistrationAnswer | "";
 	transport: ReturnRegistrationAnswer | "";
+	parking: ReturnRegistrationAnswer | "";
 	people_in_charge: string;
 } = {
 	accomodation: "",
 	transport: "",
+	parking: "",
 	people_in_charge: "0",
 };
 
-export default function ReturnRegistrationForm() {
-	const { user, isAuthenticated } = useAuth();
+function ReturnRegistrationFormContent() {
+	const { user } = useAuth();
 	const { sendReturnRegistration, loading, error } = useSendReturnRegistration();
 
 	const [formData, setFormData] = useState(initialForm);
@@ -45,7 +49,7 @@ export default function ReturnRegistrationForm() {
 	);
 
 	useEffect(() => {
-		if (!isAuthenticated || !user || !user.codigo_colonia) {
+		if (!user || !user.codigo_colonia) {
 			setEligibilityLoading(false);
 			setEligibilityError(null);
 			setAlreadyRegistered(false);
@@ -99,62 +103,38 @@ export default function ReturnRegistrationForm() {
 		return () => {
 			isMounted = false;
 		};
-	}, [isAuthenticated, user]);
-
-	const normalizedPeopleInCharge = useMemo(() => {
-		const parsed = Number(formData.people_in_charge);
-		if (!Number.isFinite(parsed) || parsed < 0) return 0;
-		return Math.floor(parsed);
-	}, [formData.people_in_charge]);
+	}, [user]);
 
 	const confirmDetails = useMemo(
 		() => [
-			`Hospedaje: ${formData.accomodation === "si" ? "Si" : "No"}`,
-			`Transporte: ${formData.transport === "si" ? "Si" : "No"}`,
-			`Personas a cargo: ${normalizedPeopleInCharge}`,
+			`Hospedaje: ${formData.accomodation === 1 ? "Sí" : "No"}`,
+			`Transporte: ${formData.transport === 1 ? "Sí" : "No"}`,
+			`Parqueadero: ${formData.parking === 1 ? "Sí" : "No"}`,
 		],
-		[formData.accomodation, formData.transport, normalizedPeopleInCharge],
+		[formData.accomodation, formData.transport, formData.parking],
 	);
 
 	const validateForm = (): boolean => {
 		const nextErrors: FormErrors = {};
 
-		if (!formData.accomodation) {
+		if (formData.accomodation === "") {
 			nextErrors.accomodation = "Selecciona si cuentas con hospedaje.";
 		}
 
-		if (!formData.transport) {
+		if (formData.transport === "") {
 			nextErrors.transport = "Selecciona si cuentas con transporte.";
 		}
 
-		if (formData.people_in_charge === "") {
-			nextErrors.people_in_charge =
-				"Ingresa un número de personas a cargo (0 si no aplica).";
-		} else {
-			const parsed = Number(formData.people_in_charge);
-			if (!Number.isFinite(parsed) || parsed < 0) {
-				nextErrors.people_in_charge =
-					"El número de personas a cargo no puede ser negativo.";
-			}
+		if (formData.parking === "") {
+			nextErrors.parking = "Selecciona si cuentas con parqueadero.";
 		}
 
 		setFieldErrors(nextErrors);
 		return Object.keys(nextErrors).length === 0;
 	};
 
-	const onPeopleInChargeChange = (raw: string) => {
-		if (raw === "") {
-			setFormData((prev) => ({ ...prev, people_in_charge: "" }));
-			return;
-		}
-
-		const numeric = raw.replace(/[^\d-]/g, "");
-		setFormData((prev) => ({ ...prev, people_in_charge: numeric }));
-		setFieldErrors((prev) => ({ ...prev, people_in_charge: undefined }));
-	};
-
 	const handleRadioChange = (
-		field: "accomodation" | "transport",
+		field: "accomodation" | "transport" | "parking",
 		value: ReturnRegistrationAnswer,
 	) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
@@ -208,7 +188,7 @@ export default function ReturnRegistrationForm() {
 		const payload: ReturnRegistrationItem = {
 			accomodation: formData.accomodation as ReturnRegistrationAnswer,
 			transport: formData.transport as ReturnRegistrationAnswer,
-			people_in_charge: normalizedPeopleInCharge,
+			parking: formData.parking as ReturnRegistrationAnswer,
 		};
 
 		const response = await sendReturnRegistration(payload);
@@ -226,21 +206,7 @@ export default function ReturnRegistrationForm() {
 		setFieldErrors({});
 	};
 
-	if (!isAuthenticated || !user) {
-		return (
-			<div className="bg-white px-4 py-6 flex justify-center">
-				<div className="w-full max-w-xl rounded-2xl bg-bg-card p-8 shadow-md text-center">
-					<h1 className="page-title mb-4">Registro de asistencia al retorno</h1>
-					<p className="text-text text-lg font-medium">No puedes inscribirte aún.</p>
-					<p className="text-text-muted mt-2">
-						Debes registrarte e iniciar sesión para continuar con la inscripción.
-					</p>
-				</div>
-			</div>
-		);
-	}
-
-	if (!user.codigo_colonia) {
+	if (!user || !user.codigo_colonia) {
 		return (
 			<div className="bg-white px-4 py-6 flex items-center justify-center">
 				<div className="w-full max-w-xl rounded-2xl bg-bg-card p-8 shadow-md text-center">
@@ -283,8 +249,7 @@ export default function ReturnRegistrationForm() {
 			<div className="bg-white px-4 py-6 flex items-center justify-center">
 				<div className="w-full max-w-xl rounded-2xl bg-bg-card p-8 shadow-md text-center">
 					<h1 className="page-title mb-4">Registro de asistencia al retorno</h1>
-					<h2 className="section-title mb-4">Estado vacio</h2>
-					<p className="text-text font-medium">No hay un retorno activo habilitado.</p>
+					<h2 className="section-title mb-4">No hay un retorno activo habilitado</h2>
 					<p className="text-text-muted mt-2">
 						Cuando un retorno sea habilitado, podras completar este formulario.
 					</p>
@@ -322,12 +287,14 @@ export default function ReturnRegistrationForm() {
 
 					<ul className="mt-4 list-disc pl-6 text-text space-y-1">
 						<li>
-							Hospedaje: {submittedRecord.accomodation === "si" ? "Si" : "No"}
+							Hospedaje: {submittedRecord.accomodation === 1 ? "Si" : "No"}
 						</li>
 						<li>
-							Transporte: {submittedRecord.transport === "si" ? "Si" : "No"}
+							Transporte: {submittedRecord.transport === 1 ? "Si" : "No"}
 						</li>
-						<li>Personas a cargo: {submittedRecord.people_in_charge}</li>
+						<li>
+							Parqueadero: {submittedRecord.transport === 1 ? "Si" : "No"}
+						</li>
 					</ul>
 
 					<div className="mt-8 flex justify-center">
@@ -359,26 +326,26 @@ export default function ReturnRegistrationForm() {
 							<div
 								className={`inline-flex items-center gap-5 rounded-lg px-3 py-2 ${fieldErrors.accomodation ? "border border-danger" : "border border-transparent"}`}
 							>
-							<label className="inline-flex items-center gap-2 text-text">
-								<input
-									type="radio"
-									name="accomodation"
-									value="si"
-									checked={formData.accomodation === "si"}
-									onChange={() => handleRadioChange("accomodation", "si")}
-								/>
-								Sí
-							</label>
-							<label className="inline-flex items-center gap-2 text-text">
-								<input
-									type="radio"
-									name="accomodation"
-									value="no"
-									checked={formData.accomodation === "no"}
-									onChange={() => handleRadioChange("accomodation", "no")}
-								/>
-								No
-							</label>
+								<label className="inline-flex items-center gap-2 text-text">
+									<input
+										type="radio"
+										name="accomodation"
+										value="si"
+										checked={formData.accomodation === 1}
+										onChange={() => handleRadioChange("accomodation", 1)}
+									/>
+									Sí
+								</label>
+								<label className="inline-flex items-center gap-2 text-text">
+									<input
+										type="radio"
+										name="accomodation"
+										value="no"
+										checked={formData.accomodation === 0}
+										onChange={() => handleRadioChange("accomodation", 0)}
+									/>
+									No
+								</label>
 							</div>
 						</div>
 						{fieldErrors.accomodation && (
@@ -394,26 +361,26 @@ export default function ReturnRegistrationForm() {
 							<div
 								className={`inline-flex items-center gap-5 rounded-lg px-3 py-2 ${fieldErrors.transport ? "border border-danger" : "border border-transparent"}`}
 							>
-							<label className="inline-flex items-center gap-2 text-text">
-								<input
-									type="radio"
-									name="transport"
-									value="si"
-									checked={formData.transport === "si"}
-									onChange={() => handleRadioChange("transport", "si")}
-								/>
-								Sí
-							</label>
-							<label className="inline-flex items-center gap-2 text-text">
-								<input
-									type="radio"
-									name="transport"
-									value="no"
-									checked={formData.transport === "no"}
-									onChange={() => handleRadioChange("transport", "no")}
-								/>
-								No
-							</label>
+								<label className="inline-flex items-center gap-2 text-text">
+									<input
+										type="radio"
+										name="transport"
+										value="si"
+										checked={formData.transport === 1}
+										onChange={() => handleRadioChange("transport", 1)}
+									/>
+									Sí
+								</label>
+								<label className="inline-flex items-center gap-2 text-text">
+									<input
+										type="radio"
+										name="transport"
+										value="no"
+										checked={formData.transport === 0}
+										onChange={() => handleRadioChange("transport", 0)}
+									/>
+									No
+								</label>
 							</div>
 						</div>
 						{fieldErrors.transport && (
@@ -423,34 +390,57 @@ export default function ReturnRegistrationForm() {
 						)}
 					</fieldset>
 
-					<div>
-						<label htmlFor="people-in-charge" className="label-primary">
-							Número de personas a cargo
-						</label>
-						<p className="validation-message validation-info">
-							Menores de edad, personas con discapacidad o cualquier persona que requiera asistencia durante el retorno deben ser registradas como personas a cargo.
-							Si no tienes personas a cargo, ingresa 0.
-						</p>
-						<div
-							className={`mt-2 inline-flex items-center gap-2 rounded-lg p-2 ${fieldErrors.people_in_charge ? "border-2 border-danger" : "border border-bg-border"}`}
-						>
-							<input
-								id="people-in-charge"
-								name="people-in-charge"
-								type="number"
-								inputMode="numeric"
-								min={0}
-								value={formData.people_in_charge}
-								onChange={(event) => onPeopleInChargeChange(event.target.value)}
-								className="h-9 w-20 rounded-md border border-bg-border bg-white px-2 text-center text-text"
-								aria-invalid={Boolean(fieldErrors.people_in_charge)}
-							/>
+					<fieldset>
+						<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+							<legend className="label-primary mb-0">¿Tiene parqueadero?</legend>
+							<div
+								className={`inline-flex items-center gap-5 rounded-lg px-3 py-2 ${fieldErrors.parking ? "border border-danger" : "border border-transparent"}`}
+							>
+								<label className="inline-flex items-center gap-2 text-text">
+									<input
+										type="radio"
+										name="parking"
+										value="si"
+										checked={formData.parking === 1}
+										onChange={() => handleRadioChange("parking", 1)}
+									/>
+									Sí
+								</label>
+								<label className="inline-flex items-center gap-2 text-text">
+									<input
+										type="radio"
+										name="parking"
+										value="no"
+										checked={formData.parking === 0}
+										onChange={() => handleRadioChange("parking", 0)}
+									/>
+									No
+								</label>
+							</div>
 						</div>
-						{fieldErrors.people_in_charge && (
+						{fieldErrors.parking && (
 							<p className="validation-message validation-error">
-								{fieldErrors.people_in_charge}
+								{fieldErrors.parking}
 							</p>
 						)}
+					</fieldset>
+
+					<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+						<div>
+							<label htmlFor="people-in-charge" className="label-primary mb-0">
+								¿Personas a cargo o visitantes?
+							</label>
+							<p className="validation-message validation-info mt-1">
+								Realiza una inscripción grupal con los menores, personas con discapacidad o visitantes que requieran asistencia a través del siguiente botón.
+							</p>
+						</div>
+						<button
+							type="button"
+							className="btn-secondary"
+							onClick={() => alert("Funcionalidad en desarrollo. Pronto podrás registrar personas a cargo o visitantes.")}
+						>
+							Registrar
+						</button>
 					</div>
 
 					<div className="flex justify-center pt-1">
@@ -477,5 +467,13 @@ export default function ReturnRegistrationForm() {
 				cancelLabel="Cancelar"
 			/>
 		</div>
+	);
+}
+
+export default function ReturnRegistrationForm() {
+	return (
+		<RequireAuth>
+			<ReturnRegistrationFormContent />
+		</RequireAuth>
 	);
 }
