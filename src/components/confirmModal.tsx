@@ -59,7 +59,7 @@ export function ConfirmModal({
       }}
     >
       <div
-        className="w-full max-w-sm rounded-xl bg-bg p-6 shadow-lg"
+        className="w-full max-w-lg rounded-xl bg-bg p-6 shadow-lg"
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
