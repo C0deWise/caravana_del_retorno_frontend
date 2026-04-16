@@ -13,7 +13,7 @@ export default function HomeNavbar() {
 
   return (
     <nav
-      className="flex h-full max-w-390 justify-between items-center text-3xl font-semibold text-(--color-text-inverse) md:text-2xl md:px-5"
+      className="flex h-full max-w-390 justify-between items-center text-3xl font-semibold text-(--color-text-inverse) md:text-xl md:px-5"
       aria-label="Navegación principal"
     >
       {homeNavItems.map((item) => {

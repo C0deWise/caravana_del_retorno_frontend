@@ -13,7 +13,7 @@ export default function HomeHeaderContent() {
         </Link>
         <span className="self-stretch w-1.5 rounded-4xl bg-bg ml-4 mr-1 my-2"></span>
         <Link href="/">
-          <MainText className="mt-1.5 md:mr-10 shrink-0" size={220} />
+          <MainText className="mt-1.5 md:mr-20 shrink-0" size={220} />
         </Link>
         <div className="flex-1 md:px-4">
           <HomeNavbar />

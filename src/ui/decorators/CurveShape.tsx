@@ -27,7 +27,7 @@ export default function CurveShape({ className, withShadow }: CurveShapeProps) {
         </filter>
       </defs>
       <path
-        d="M121.358 25.939C69.823 24.413 24.105 20.344 0 0h698.225C403.142 0 172.894 27.465 121.358 25.939"
+        d="M121.358 25.939C69.823 24.413 24.105 20.344 0 0H699C403.142 0 172.894 27.465 121.358 25.939"
         className="fill-primary"
         filter={withShadow ? "url(#shadow)" : undefined}
       />

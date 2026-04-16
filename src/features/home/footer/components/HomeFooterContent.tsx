@@ -3,7 +3,6 @@ import FlorenciaMap from "@/ui/social/FlorenciaMap";
 import VerticalSeparator from "@/ui/decorators/VerticalSeparator";
 import MainText from "@/ui/general/MainText";
 import SocialIcon from "@/ui/social/SocialIcon";
-import { ArrowLeftCircleIcon } from "@heroicons/react/24/outline";
 import { PhotoIcon } from "@heroicons/react/24/outline";
 
 export default function HomeFooterContent() {
@@ -16,9 +15,8 @@ export default function HomeFooterContent() {
         </div>
         <div className="md:w-fit md:h-full justify-center">
           <div className="flex flex-col md:pl-10 md:pr-10 md:h-full md:py-5 md:w-300">
-            <div className="flex w-fit items-center space-x-10">
-              <ArrowLeftCircleIcon className="text-text-inverse md:w-16 md:h-16 flex-none" />
-              <span className="text-text-inverse font-semibold text-4xl text-shadow-lg">
+            <div className="flex w-fit items-center">
+              <span className="text-text-inverse font-semibold text-3xl md:text-2xl text-shadow-lg">
                 ¡Encuentranos en el mapa!
               </span>
             </div>
@@ -56,7 +54,7 @@ export default function HomeFooterContent() {
           <VerticalSeparator />
         </span>
         <div className="flex flex-1 flex-col md:mr-7 md:pb-4 justify-between items-center">
-          <MainText size={200} />
+          <MainText size={220} />
           <SocialIcon
             href="https://facebook.com"
             src="/social/facebook.svg"
@@ -69,10 +67,10 @@ export default function HomeFooterContent() {
           />
         </div>
       </div>
-      <span className="absolute bottom-2 right-2 text-text-inverse text-sm font-light">
+      <div className="absolute bottom-2 left-0 right-0 text-center text-text-inverse text-sm font-light">
         © {new Date().getFullYear()} All rights reserved | Caravana del retorno,
         Florencia, Cauca
-      </span>
+      </div>
     </div>
   );
 }
