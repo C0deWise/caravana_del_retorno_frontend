@@ -1,23 +1,24 @@
 "use client";
 import { useEffect, useRef } from "react";
-import Spinner from "@/ui/animations/Spinner";
+import Spinner from "@/ui/general/Spinner";
 import { useColonyMembers } from "../hooks/useColonyMembers";
-import { useAuth } from "@/auth/context/AuthContext";
-import { RequireAuth } from "@/auth/components/RequireAuth";
+import { useAuth } from "@/features/auth/context/AuthContext";
 import { MemberList } from "./MemberList";
-import { UserRole } from "@/types/user.types";
+import { LoggedUserRole } from "@/features/auth/types/roles";
 
 interface ListColonyMembersProps {
   paramsId?: number;
 }
 
-function ColonyMembersFeature({ paramsId }: ListColonyMembersProps) {
+export default function ListColonyMembers({
+  paramsId,
+}: ListColonyMembersProps) {
   const { user } = useAuth();
 
   const targetColonyId =
     user?.role === "admin"
-      ? (paramsId ?? user?.codigo_colonia ?? 1)
-      : (user?.codigo_colonia ?? 0);
+      ? (paramsId ?? user?.colonyId ?? 1)
+      : (user?.colonyId ?? 0);
 
   const { members, colonyLabel, hasMore, loadMore, totalMembers } =
     useColonyMembers(targetColonyId);
@@ -35,6 +36,19 @@ function ColonyMembersFeature({ paramsId }: ListColonyMembersProps) {
     if (sentinelRef.current) observer.observe(sentinelRef.current);
     return () => observer.disconnect();
   }, [hasMore, loadMore]);
+
+  if (!user?.role || (user?.role !== "admin" && !user?.colonyId)) {
+    return (
+      <div className="w-full h-full flex items-center justify-center p-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-text mb-4">Acceso negado</h1>
+          <p className="text-text-muted">
+            Por favor inicia sesión para ver los miembros de tu colonia.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-screen md:pb-30 space-y-8">
@@ -59,7 +73,7 @@ function ColonyMembersFeature({ paramsId }: ListColonyMembersProps) {
       </header>
 
       <main className="max-w-7xl mx-auto">
-        <MemberList members={members} userRole={user?.role as UserRole} />
+        <MemberList members={members} userRole={user?.role as LoggedUserRole} />
       </main>
 
       {hasMore && (
@@ -74,15 +88,5 @@ function ColonyMembersFeature({ paramsId }: ListColonyMembersProps) {
         </div>
       )}
     </div>
-  );
-}
-
-export default function ListColonyMembers({
-  paramsId,
-}: ListColonyMembersProps) {
-  return (
-    <RequireAuth>
-      <ColonyMembersFeature paramsId={paramsId} />
-    </RequireAuth>
   );
 }

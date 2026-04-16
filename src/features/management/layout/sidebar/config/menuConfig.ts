@@ -1,19 +1,8 @@
-import { MenuItem } from "@/features/management/layout/sidebar/types/menu.types";
+import { MenuItem } from "@/types/menu";
 
 export const menuConfig: MenuItem[] = [
   {
-    label: "Gestión de Usuario",
-    href: "/gestion/usuario",
-    icon: "user",
-    subitems: [
-      {
-        label: "Parentesco",
-        href: "/gestion/usuario/parentesco",
-      },
-    ],
-  },
-  {
-    label: "Gestión de Colonia",
+    label: "Gestión Colonia",
     href: "/gestion/colonia",
     icon: "home",
     subitems: [
@@ -22,20 +11,12 @@ export const menuConfig: MenuItem[] = [
         href: "/gestion/colonia/crear",
       },
       {
-        label: "Asignar lider de Colonia",
-        href: "/gestion/colonia/asignar-lider",
-      },
-      {
-        label: "Inscribirse a una Colonia",
+        label: "Inscribir Colonia",
         href: "/gestion/colonia/inscribir-colonia",
       },
       {
-        label: "Miembros de la Colonia*",
+        label: "Miembros",
         href: "/gestion/colonia/miembros",
-      },
-      {
-        label: "Solicitudes de ingreso a la Colonia",
-        href: "/gestion/colonia/solicitudes-ingreso",
       },
     ],
   },

@@ -1,17 +1,17 @@
-import type { UserRole } from "@/types/user.types";
-import { Member } from "../types/member.types";
+import type { LoggedUserRole } from "@/features/auth/types/roles";
+import { Member } from "../types/member";
 
 export const getVisibleMemberData = (
   member: Member,
-  loggedUserRole: UserRole,
+  loggedUserRole: LoggedUserRole,
 ): Partial<Member> => {
   switch (loggedUserRole) {
     case "usuario":
       return {
-        nombre: `${member.nombre.split(" ")[0]}...`,
-        apellido: `${member.apellido.split(" ")[0]}...`,
+        firstName: `${member.firstName.split(" ")[0]}...`,
+        lastName: `${member.lastName.split(" ")[0]}...`,
         role: member.role,
-        correo: member.correo,
+        email: member.email,
       };
     case "lider_colonia":
     case "admin":

@@ -1,4 +1,4 @@
-import { NavItem, NavItemType } from "../types/navbar.types";
+import { NavItem, NavItemType } from "@/types/navbar.types";
 
 export const homeNavItems: NavItem[] = [
   { label: "¿Quiénes somos?", href: "/", type: NavItemType.LINK },
