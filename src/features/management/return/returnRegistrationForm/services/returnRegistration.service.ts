@@ -15,7 +15,7 @@ const mockRegisteredUsers = new Set<string>(
 const mockActiveReturn: Retorno = {
     codigo: MOCK_RETURN_CODE,
     fecha_creacion: '2026-01-01T00:00:00.000Z',
-    anio: 2026,
+    anio: 2028,
     estado: 'activo',
 };
 
