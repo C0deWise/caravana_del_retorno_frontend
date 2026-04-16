@@ -188,99 +188,101 @@ export default function ListAccessRequest() {
 
   return (
     <RequireAuth roles={["admin", "lider_colonia"]}>
-      <div className="w-full min-h-screen space-y-8 md:pb-30">
+      <div className="flex flex-col w-full min-h-screen">
         <header className="sticky top-0 z-10 mx-10 rounded-xl bg-bg-card px-8 py-4 shadow-xl">
-          <div className="flex flex-col gap-6">
-            <div className="flex items-end justify-between gap-6">
-              <div>
-                <span className="text-md uppercase tracking-wide text-text-muted">
-                  Solicitudes de ingreso
-                </span>
-                <p className="text-3xl font-bold text-secondary">
-                  {isLoadingColonies && targetColonyId
-                    ? "Cargando ubicación..."
-                    : colonyLabel}
-                </p>
-              </div>
-
-              <div className="text-right">
-                <span className="text-sm uppercase tracking-wide text-text-muted">
-                  Solicitudes
-                </span>
-                <p className="text-4xl font-bold text-secondary">
-                  {targetColonyId ? totalRequests : "-"}
-                </p>
-              </div>
-            </div>
-
-            {isAdmin && (
-              <div className="max-w-xl">
-                <label className="mb-2 block text-sm font-medium text-text-muted">
-                  Buscar colonia
-                </label>
-
-                <div className="relative">
-                  <Search
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted"
-                    size={20}
-                  />
-
-                  <input
-                    id="buscar-colonia-admin"
-                    type="text"
-                    value={busqueda}
-                    onChange={(e) => {
-                      setBusqueda(e.target.value);
-                      setSelectedColony(null);
-                      setMostrarLista(true);
-                    }}
-                    onFocus={() => setMostrarLista(true)}
-                    placeholder="Buscar colonia"
-                    className="w-full rounded-lg border border-bg-border bg-white px-4 py-3 pr-10 text-lg text-text outline-none transition focus:ring-2 focus:ring-primary"
-                  />
-
-                  {mostrarLista && (
-                    <ul className="absolute z-20 mt-2 max-h-56 w-full overflow-auto rounded-lg border border-bg-border bg-white shadow-md">
-                      {isLoadingColonies && (
-                        <li className="px-4 py-3 text-sm text-text-muted">
-                          Cargando colonias...
-                        </li>
-                      )}
-
-                      {!isLoadingColonies && coloniasFiltradas.length === 0 && (
-                        <li className="px-4 py-3 text-sm text-text-muted">
-                          No hay colonias disponibles para esta búsqueda.
-                        </li>
-                      )}
-
-                      {!isLoadingColonies &&
-                        coloniasFiltradas.map((colonia, index) => (
-                          <li
-                            key={
-                              colonia.codigo ??
-                              `${colonia.pais}-${colonia.departamento}-${colonia.ciudad}-${index}`
-                            }
-                          >
-                            <button
-                              type="button"
-                              onClick={() => seleccionarColonia(colonia)}
-                              className="w-full px-4 py-3 text-left text-base text-text hover:bg-bg-separator"
-                            >
-                              {formatColonyLabel(colonia)}
-                            </button>
-                          </li>
-                        ))}
-                    </ul>
-                  )}
+            <div className="flex flex-col gap-6">
+              <div className="flex items-end justify-between gap-6">
+                <div>
+                  <span className="text-md uppercase tracking-wide text-text-muted">
+                    Solicitudes de ingreso
+                  </span>
+                  <p className="text-3xl font-bold text-secondary">
+                    {isLoadingColonies && targetColonyId
+                      ? "Cargando ubicación..."
+                      : colonyLabel}
+                  </p>
                 </div>
 
-                {coloniesError && (
-                  <p className="mt-2 text-sm text-danger">{coloniesError}</p>
-                )}
+                <div className="text-right">
+                  <span className="text-sm uppercase tracking-wide text-text-muted">
+                    Solicitudes
+                  </span>
+                  <p className="text-4xl font-bold text-secondary">
+                    {targetColonyId ? totalRequests : "-"}
+                  </p>
+                </div>
               </div>
-            )}
-          </div>
+
+              {isAdmin && (
+                <div className="max-w-xl">
+                  <label className="mb-2 block text-sm font-medium text-text-muted">
+                    Buscar colonia
+                  </label>
+
+                  <div className="relative">
+                    <Search
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted"
+                      size={20}
+                    />
+
+                    <input
+                      id="buscar-colonia-admin"
+                      type="text"
+                      value={busqueda}
+                      onChange={(e) => {
+                        setBusqueda(e.target.value);
+                        setSelectedColony(null);
+                        setMostrarLista(true);
+                      }}
+                      onFocus={() => setMostrarLista(true)}
+                      placeholder="Buscar colonia"
+                      className="w-full rounded-lg border border-bg-border bg-white px-4 py-3 pr-10 text-lg text-text outline-none transition focus:ring-2 focus:ring-primary"
+                    />
+
+                    {mostrarLista && (
+                      <ul className="absolute z-20 mt-2 max-h-56 w-full overflow-auto rounded-lg border border-bg-border bg-white shadow-md">
+                        {isLoadingColonies && (
+                          <li className="px-4 py-3 text-sm text-text-muted">
+                            Cargando colonias...
+                          </li>
+                        )}
+
+                        {!isLoadingColonies && coloniasFiltradas.length === 0 && (
+                          <li className="px-4 py-3 text-sm text-text-muted">
+                            No hay colonias disponibles para esta búsqueda.
+                          </li>
+                        )}
+
+                        {!isLoadingColonies &&
+                          coloniasFiltradas.map((colonia, index) => (
+                            <li
+                              key={
+                                colonia.codigo ??
+                                `${colonia.pais}-${colonia.departamento}-${colonia.ciudad}-${index}`
+                              }
+                            >
+                              <button
+                                type="button"
+                                onClick={() => seleccionarColonia(colonia)}
+                                className="w-full px-4 py-3 text-left text-base text-text hover:bg-bg-separator"
+                              >
+                                {formatColonyLabel(colonia)}
+                              </button>
+                            </li>
+                          ))}
+                      </ul>
+                    )}
+                  </div>
+
+                  {coloniesError && (
+                    <p className="mt-2 text-sm text-danger">{coloniesError}</p>
+                  )}
+                </div>
+              )}
+            </div>
         </header>
+
+        <div className="flex-1 overflow-y-auto space-y-8 md:pb-30 pt-4">
 
         {isAdmin && !targetColonyId ? (
           <div className="mx-auto max-w-3xl rounded-xl border border-bg-border bg-bg-card p-6">
@@ -372,6 +374,7 @@ export default function ListAccessRequest() {
           onCancel={handleCloseModal}
           loading={isProcessingAction}
         />
+        </div>
       </div>
     </RequireAuth>
   );
