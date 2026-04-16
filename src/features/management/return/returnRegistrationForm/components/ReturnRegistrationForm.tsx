@@ -47,6 +47,7 @@ function ReturnRegistrationFormContent() {
 	const [activeReturnCode, setActiveReturnCode] = useState<number | null>(
 		null,
 	);
+	const [activeReturnYear, setActiveReturnYear] = useState<number | null>(null);
 
 	useEffect(() => {
 		if (!user || !user.codigo_colonia) {
@@ -73,6 +74,7 @@ function ReturnRegistrationFormContent() {
 					Number.isInteger(parsedCode) && parsedCode > 0 ? parsedCode : null;
 
 				setActiveReturnCode(normalizedCode);
+				setActiveReturnYear(activeReturn?.anio ?? null);
 
 				if (!normalizedCode) {
 					setAlreadyRegistered(false);
@@ -311,7 +313,10 @@ function ReturnRegistrationFormContent() {
 		<div className="bg-white px-4 py-6">
 			<div className="mx-auto w-full max-w-2xl rounded-2xl bg-bg p-6 shadow-md sm:p-8">
 				<h1 className="page-title">Registro de Asistencia al Retorno</h1>
-				<h2 className="section-title">Confirma tu disponibilidad de viaje</h2>
+				<h2 className="section-title">
+					Confirma tu disponibilidad de viaje
+					{activeReturnYear ? ` — Retorno ${activeReturnYear}` : ` — Retorno #${activeReturnCode}`}
+				</h2>
 
 				{error && (
 					<div className="alert-error">
