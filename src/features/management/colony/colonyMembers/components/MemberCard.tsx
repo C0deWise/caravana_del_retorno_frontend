@@ -6,18 +6,18 @@ import {
   UserIcon,
   EnvelopeIcon,
 } from "@heroicons/react/24/solid";
-import { Member } from "../types/member.types";
-import { UserRole } from "@/types/user.types";
+import { Member } from "../types/member";
+import { LoggedUserRole } from "@/features/auth/types/roles";
 import { getVisibleMemberData } from "../utils/rolePermissions";
-import calculateAge from "@/utils/calculateAge";
+import calculateAge from "../utils/calculateAge";
 
 interface MemberCardProps {
   member: Member;
-  userRole: UserRole;
+  userRole: LoggedUserRole;
   index: number;
 }
 
-function getRoleConfig(role: UserRole) {
+function getRoleConfig(role: LoggedUserRole) {
   if (role === "admin")
     return { label: "Admin", badgeClass: "bg-accent-red text-text-inverse" };
   if (role === "lider_colonia")
@@ -43,10 +43,10 @@ export function MemberCard({ member, userRole, index }: MemberCardProps) {
             {index}
           </span>
           <div className="w-14 h-14 bg-linear-to-tl from-primary/90 to-secondary/90 rounded-xl flex items-center justify-center shadow-md shrink-0">
-            {visibleData.nombre || visibleData.apellido ? (
+            {visibleData.firstName || visibleData.lastName ? (
               <span className="text-white font-bold text-xl">
-                {visibleData.nombre?.charAt(0).toUpperCase()}
-                {visibleData.apellido?.charAt(0).toUpperCase()}
+                {visibleData.firstName?.charAt(0).toUpperCase()}
+                {visibleData.lastName?.charAt(0).toUpperCase()}
               </span>
             ) : (
               <UserIcon className="w-7 h-7 text-text-inverse" />
@@ -54,7 +54,7 @@ export function MemberCard({ member, userRole, index }: MemberCardProps) {
           </div>
           <div>
             <h3 className="font-bold text-xl text-text">
-              {visibleData.nombre} {visibleData.apellido}
+              {visibleData.firstName} {visibleData.lastName}
             </h3>
             <span
               className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full mt-1 ${badgeClass}`}
@@ -65,27 +65,20 @@ export function MemberCard({ member, userRole, index }: MemberCardProps) {
         </div>
         <div className="flex flex-col sm:flex-row gap-4 text-sm text-text-muted">
           <div
-            className={`group flex items-center space-x-2 ${visibleData.correo ? "cursor-pointer" : ""}`}
-            onClick={() =>
-              visibleData.correo &&
-              navigator.clipboard.writeText(visibleData.correo)
-            }
-            title={visibleData.correo ? "Copiar correo" : undefined}
+            className={`group flex items-center space-x-2 ${visibleData.email ? 'cursor-pointer' : ''}`}
+            onClick={() => visibleData.email && navigator.clipboard.writeText(visibleData.email)}
+            title={visibleData.email ? "Copiar correo" : undefined}
           >
-            <EnvelopeIcon
-              className={`w-5 h-5 shrink-0 transition-colors ${visibleData.correo ? "text-text-muted group-hover:text-primary" : "text-text-muted"}`}
-            />
-            <span
-              className={`transition-colors ${visibleData.correo ? "group-hover:text-primary" : ""}`}
-            >
-              {visibleData.correo || "—"}
+            <EnvelopeIcon className={`w-5 h-5 shrink-0 transition-colors ${visibleData.email ? 'text-text-muted group-hover:text-primary' : 'text-text-muted'}`} />
+            <span className={`transition-colors ${visibleData.email ? 'group-hover:text-primary' : ''}`}>
+              {visibleData.email || "—"}
             </span>
           </div>
 
           {userRole !== "usuario" && (
             <div className="flex items-center space-x-2">
               <PhoneIcon className="w-5 h-5 text-text-muted shrink-0" />
-              <span>{visibleData.celular || "—"}</span>
+              <span>{visibleData.phone || "—"}</span>
             </div>
           )}
 
@@ -93,18 +86,18 @@ export function MemberCard({ member, userRole, index }: MemberCardProps) {
             <div className="flex items-center space-x-2">
               <CakeIcon className="w-5 h-5 text-text-muted shrink-0" />
               <span>
-                {visibleData.fecha_nacimiento
-                  ? `${calculateAge(visibleData.fecha_nacimiento)} años`
+                {visibleData.birthDate
+                  ? `${calculateAge(visibleData.birthDate)} años`
                   : "—"}
               </span>
             </div>
           )}
 
-          {userRole !== "usuario" && visibleData.documento && (
+          {userRole !== "usuario" && visibleData.documentNumber && (
             <div className="flex items-center space-x-2">
               <IdentificationIcon className="w-5 h-5 text-text-muted shrink-0" />
               <span>
-                {visibleData.tipo_doc} {visibleData.documento}
+                {visibleData.documentType} {visibleData.documentNumber}
               </span>
             </div>
           )}

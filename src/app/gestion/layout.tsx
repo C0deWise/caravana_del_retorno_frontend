@@ -2,10 +2,11 @@
 
 import Breadcrumb from "@/features/management/layout/breadcrumb/components/Breadcrumb";
 import Sidebar from "@/features/management/layout/sidebar/components/Sidebar";
-import PageTransition from "@/ui/animations/PageTransition";
+import PageTransition from "@/ui/general/PageTransition";
 import ErrorBoundary from "@/ui/general/ErrorBoundary";
 import { usePathname } from "next/navigation";
-import { RoleSwitcherClient } from "@/auth/utils/RoleSwitcherClient-DEVTOOL"; // TODO: Elminar en produccion
+import { AuthProvider } from "@/features/auth/context/AuthContext";
+import { RoleSwitcherClient } from "@/features/auth/utils/RoleSwitcherClient-DEVTOOL"; // TODO: Elminar en produccion
 
 export default function GestionLayout({
   children,
@@ -31,12 +32,14 @@ export default function GestionLayout({
                 </div>
               }
             >
-              <>
-                {/*  TODO: Eliminar en produccion */}
-                <RoleSwitcherClient />
+              <AuthProvider>
+                <>
+                  {/*  TODO: Eliminar en produccion */}
+                  <RoleSwitcherClient />
 
-                {children}
-              </>
+                  {children}
+                </>
+              </AuthProvider>
             </ErrorBoundary>
           </PageTransition>
         </div>

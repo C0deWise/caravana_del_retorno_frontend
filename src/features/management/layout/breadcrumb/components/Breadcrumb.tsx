@@ -1,6 +1,6 @@
 "use client";
 
-import AnimatedLink from "@/ui/animations/AnimatedLink";
+import AnimatedLink from "@/ui/general/AnimatedLink";
 import { useBreadcrumb } from "../hooks/useBreadcrumb";
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
 

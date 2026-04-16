@@ -1,4 +1,4 @@
-import CrearRetorno from "@/features/management/return/createReturn/components/CrearRetorno";
+import CrearRetorno from "@/features/management/return/components/CrearRetorno";
 
 export default function CrearRetornoPage() {
   return <CrearRetorno />;
