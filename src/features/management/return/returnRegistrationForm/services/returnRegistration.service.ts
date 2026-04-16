@@ -2,7 +2,7 @@ import { apiService } from '@/services/api.services';
 import type { ReturnRegistrationItem, ReturnRegistrationApi} from '../types/returnRegistration.types';
 import type { Retorno } from '../../types/retorno.types';
 
-const USE_MOCKS = process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
+const USE_MOCKS = true; // TODO: reemplazar con process.env.NEXT_PUBLIC_USE_MOCKS === 'true' al integrar con la API real
 const MOCK_HAS_ACTIVE_RETURN = process.env.NEXT_PUBLIC_MOCK_HAS_ACTIVE_RETURN !== 'false';
 const MOCK_ALREADY_REGISTERED = process.env.NEXT_PUBLIC_MOCK_ALREADY_REGISTERED === 'true';
 const MOCK_RETURN_CODE = Number(process.env.NEXT_PUBLIC_MOCK_RETURN_CODE ?? 55);
