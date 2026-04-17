@@ -6,6 +6,7 @@ const mapColonyApiToItem = (colony: ColonyApi): ColonyItem => ({
   pais: colony.co_pais,
   departamento: colony.co_departamento,
   ciudad: colony.co_ciudad,
+  lider: colony.lider,
 });
 
 export const coloniaService = {

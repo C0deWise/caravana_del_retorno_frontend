@@ -20,4 +20,4 @@ export type ColonyData = Pick<ColonyApi, "lider"> & {
   ciudad: string | null;
 };
 
-export type ColonyItem = Omit<ColonyData, "lider">;
+export type ColonyItem = ColonyData;
