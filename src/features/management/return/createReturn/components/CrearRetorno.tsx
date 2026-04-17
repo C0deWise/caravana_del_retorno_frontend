@@ -6,7 +6,7 @@ import { RequireAuth } from "@/auth/components/RequireAuth";
 import { ConfirmModal } from "@/components/confirmModal";
 
 const CURRENT_YEAR = new Date().getFullYear();
-const YEARS = Array.from({ length: 11 }, (_, i) => CURRENT_YEAR - 5 + i);
+const YEARS = Array.from({ length: 11 }, (_, i) => CURRENT_YEAR + i);
 
 function CrearRetornoFeature() {
   const { createRetorno, loading, error, success, resetState } =
@@ -92,7 +92,7 @@ function CrearRetornoFeature() {
               type="button"
               onClick={handleCreateClick}
               disabled={!selectedYear || loading}
-              className="btn-primary w-full py-3 font-semibold transition-opacity disabled:opacity-50"
+              className="btn-primary bg-secondary w-full py-3 font-semibold transition-opacity disabled:opacity-50"
             >
               {loading ? "Creando..." : "Crear"}
             </button>
