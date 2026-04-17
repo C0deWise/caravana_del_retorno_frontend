@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { returnRegistrationService } from "../services/returnRegistration.service";
-import type { ReturnRegistrationApi, ReturnRegistrationItem } from "../types/returnRegistration.types";
+import type { ReturnRegistrationApi, ReturnRegistrationCreateRequest } from "../types/returnRegistration.types";
 
 interface UseSendReturnRegistration {
-    sendReturnRegistration:(data: ReturnRegistrationItem) => Promise<ReturnRegistrationApi | null>;
+    sendReturnRegistration:(data: ReturnRegistrationCreateRequest) => Promise<ReturnRegistrationApi | null>;
     loading: boolean;
     error: string | null;
     success: boolean;
@@ -14,7 +14,7 @@ export const useSendReturnRegistration = (): UseSendReturnRegistration => {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
 
-    const sendReturnRegistration = async (data: ReturnRegistrationItem): Promise<ReturnRegistrationApi | null> => {
+    const sendReturnRegistration = async (data: ReturnRegistrationCreateRequest): Promise<ReturnRegistrationApi | null> => {
         setLoading(true);
         setError(null);
         setSuccess(false);

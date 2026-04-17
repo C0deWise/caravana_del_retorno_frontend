@@ -10,7 +10,7 @@ import { returnRegistrationService } from "../services/returnRegistration.servic
 import type {
   ReturnRegistrationAnswer,
   ReturnRegistrationApi,
-  ReturnRegistrationItem,
+  ReturnRegistrationCreateRequest,
 } from "../types/returnRegistration.types";
 
 type FormErrors = {
@@ -186,10 +186,12 @@ function ReturnRegistrationFormContent() {
       return;
     }
 
-    const payload: ReturnRegistrationItem = {
-      accomodation: formData.accomodation as ReturnRegistrationAnswer,
-      transport: formData.transport as ReturnRegistrationAnswer,
-      parking: formData.parking as ReturnRegistrationAnswer,
+    const payload: ReturnRegistrationCreateRequest = {
+      usuario: user.id,
+      retorno: activeReturnCode,
+      num_hospedaje: formData.accomodation as ReturnRegistrationAnswer,
+      num_transporte: formData.transport as ReturnRegistrationAnswer,
+      num_parqueadero: formData.parking as ReturnRegistrationAnswer,
     };
 
     const response = await sendReturnRegistration(payload);
@@ -295,11 +297,11 @@ function ReturnRegistrationFormContent() {
 
           <ul className="mt-4 list-disc pl-6 text-text space-y-1">
             <li>
-              Hospedaje: {submittedRecord.accomodation === 1 ? "Si" : "No"}
+              Hospedaje: {submittedRecord.num_hospedaje === 1 ? "Si" : "No"}
             </li>
-            <li>Transporte: {submittedRecord.transport === 1 ? "Si" : "No"}</li>
+            <li>Transporte: {submittedRecord.num_transporte === 1 ? "Si" : "No"}</li>
             <li>
-              Parqueadero: {submittedRecord.transport === 1 ? "Si" : "No"}
+              Parqueadero: {submittedRecord.num_parqueadero === 1 ? "Si" : "No"}
             </li>
           </ul>
 

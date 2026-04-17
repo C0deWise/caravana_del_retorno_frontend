@@ -1,12 +1,18 @@
 export type ReturnRegistrationAnswer = 0 | 1;
 
-export interface ReturnRegistrationApi {
-    id: number;
-    user_code: number;
-    return_code: number;
-    accomodation: ReturnRegistrationAnswer;
-    transport: ReturnRegistrationAnswer;
-    parking: ReturnRegistrationAnswer;
+export interface ReturnRegistrationCreateRequest {
+    usuario: number;
+    retorno: number;
+    num_hospedaje: number;
+    num_transporte: number;
+    num_parqueadero: number;
 }
 
-export type ReturnRegistrationItem = Omit<ReturnRegistrationApi, "id" | "user_code" | "return_code">;
+export interface ReturnRegistrationApi {
+    id: number;
+    usuario: number;
+    retorno: number;
+    num_hospedaje: number;
+    num_transporte: number;
+    num_parqueadero: number;
+}
