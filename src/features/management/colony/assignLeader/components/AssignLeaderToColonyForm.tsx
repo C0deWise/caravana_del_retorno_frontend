@@ -11,8 +11,8 @@ import { RequireAuth } from "@/auth/components/RequireAuth";
 
 type SearchType = "documento" | "nombre";
 
-const NAME_ALLOWED_CHAR_REGEX = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s'-]$/;
-const IDENTIFICATION_ALLOWED_CHAR_REGEX = /^[A-Za-z0-9]$/;
+const NAME_ALLOWED_CHAR_REGEX = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]$/;
+const IDENTIFICATION_ALLOWED_CHAR_REGEX = /^[0-9]$/;
 
 const normalizarTexto = (valor: string): string =>
   valor
@@ -112,8 +112,8 @@ function AssignLeaderToColonyForm() {
     const value = e.target.value;
     const normalizedValue =
       searchType === "nombre"
-        ? value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñÜü\s'-]/g, "")
-        : value.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
+        ? value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]/g, "")
+        : value.replace(/[^0-9]/g, "");
 
     setInputValue(normalizedValue);
     setSelectedUser(null);
@@ -260,6 +260,7 @@ function AssignLeaderToColonyForm() {
     );
   };
 
+  const colonyHasLeader = Boolean(selectedColony?.lider);
   const error = searchError || assignError;
   const loading = assignLoading || searchLoading;
   const placeholder =
@@ -279,6 +280,15 @@ function AssignLeaderToColonyForm() {
           Primero selecciona la colonia, luego el usuario que será líder
         </h2>
 
+        {colonyHasLeader && (
+          <div className="alert-warning">
+            <p className="alert-warning-text">
+              Esta colonia ya tiene un líder asignado. Debes removerlo antes de
+              asignar uno nuevo.
+            </p>
+          </div>
+        )}
+
         {error && (
           <div className="alert-error">
             <p className="alert-error-text">{error}</p>
@@ -290,7 +300,7 @@ function AssignLeaderToColonyForm() {
           </div>
         )}
 
-        <div className="space-y-5">
+        <div className="space-y-5 mt-4">
           {/* Selector de Colonia */}
           <div>
             <label
@@ -750,7 +760,7 @@ function AssignLeaderToColonyForm() {
           <button
             type="button"
             onClick={handleConfirm}
-            disabled={!selectedUser || !selectedColony || loading}
+            disabled={!selectedUser || !selectedColony || loading || colonyHasLeader}
             className="w-full py-3 rounded-lg font-semibold transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
             style={{
               backgroundColor: "var(--color-secondary)",

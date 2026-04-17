@@ -10,7 +10,7 @@ export interface ColonyApiRequest {
   pais: string;
   departamento: string | null;
   ciudad: string | null;
-  lider: number;
+  lider: number | null;
 }
 
 export type ColonyData = Pick<ColonyApi, "lider"> & {

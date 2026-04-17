@@ -167,6 +167,17 @@ body {
     color: var(--color-accent-green);
   }
 
+  .alert-warning {
+    @apply mt-6 p-4 rounded border-l-4;
+    background-color: #fff3cd;
+    border-color: var(--color-secondary);
+  }
+
+  .alert-warning-text {
+    @apply text-sm;
+    color: #856404;
+  }
+
   /* Barra de colores colombiana */
   .colombia-bar {
     @apply hidden lg:flex flex-col w-2 rounded-full overflow-hidden;
