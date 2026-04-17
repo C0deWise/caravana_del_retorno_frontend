@@ -9,7 +9,19 @@ type RequireAuthProps = {
 };
 
 export function RequireAuth({ children, roles }: RequireAuthProps) {
-  const { user } = useAuth();
+  const { user, isHydrating } = useAuth();
+
+  if (isHydrating) {
+    return (
+      <div className="w-full h-full flex items-center justify-center p-8">
+        <div className="text-center">
+          <p className="text-text-muted text-sm animate-pulse">
+            Cargando sesión...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const allowed =
     !!user?.role && (!roles || roles.includes(user.role as UserRole));

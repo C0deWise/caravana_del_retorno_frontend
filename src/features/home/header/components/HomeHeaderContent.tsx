@@ -1,6 +1,6 @@
 import MainIcon from "@/ui/general/MainIcon";
 import MainText from "@/ui/general/MainText";
-import HeaderCurve from "../ui/HeaderCurve";
+import HeaderCurve from "@/ui/general/HeaderCurve";
 import HomeNavbar from "../navbar/components/HomeNavbar";
 import Link from "next/link";
 

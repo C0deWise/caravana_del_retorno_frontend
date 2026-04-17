@@ -1,4 +1,4 @@
-import { MenuItem } from "@/features/management/layout/sidebar/types/menu.types";
+import { MenuItem } from "@/features/management/layout/types/menu.types";
 
 export const menuConfig: MenuItem[] = [
   {
@@ -42,7 +42,7 @@ export const menuConfig: MenuItem[] = [
   {
     label: "Gestión Retorno",
     href: "/gestion/retorno",
-    icon: "arrowLeft",
+    icon: "arrowTurnLeft",
     subitems: [
       {
         label: "Crear Retorno",

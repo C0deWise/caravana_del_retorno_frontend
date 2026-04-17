@@ -2,7 +2,7 @@ import AuthUserRegistration from "@/features/management/user/userRegistry/compon
 
 export default function RegistroPage() {
   return (
-    <div className="flex justify-center items-center h-190 m-10 border-0 rounded-lg bg-white shadow-lg">
+    <div className="flex justify-center items-center h-140 mt-60 border-0 rounded-lg bg-white shadow-lg">
       <AuthUserRegistration />
     </div>
   );

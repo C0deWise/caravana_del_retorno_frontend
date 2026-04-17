@@ -1,4 +1,4 @@
-import FooterCurve from "../ui/FooterCurve";
+import FooterCurve from "@/ui/general/FooterCurve";
 import FlorenciaMap from "@/ui/social/FlorenciaMap";
 import VerticalSeparator from "@/ui/decorators/VerticalSeparator";
 import MainText from "@/ui/general/MainText";

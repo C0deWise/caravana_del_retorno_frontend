@@ -1,10 +1,11 @@
 import CurveShape from "@/ui/decorators/CurveShape";
 
-export default function FooterCurve() {
+export default function HeaderCurve() {
   return (
     <CurveShape
-      className="absolute right-0 -top-[39px] w-full h-10 rotate-180 pointer-events-none"
+      className="absolute -bottom-11.75 -left-1 w-full h-12"
       style={{ transform: "translateY(calc(4% - 5px)) translateX(-15px)" }}
+      withShadow
     />
   );
 }

@@ -10,29 +10,25 @@ interface LoginPanelProps {
 }
 
 export default function LoginPanel({ onClose }: LoginPanelProps) {
-  const [document, setDocument] = useState("1085123456");
+  const [documento, setDocumento] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
-
   const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const trimmedDocument = document.trim();
-
-    if (!trimmedDocument || isLoading) {
-      return;
-    }
+    const trimmed = documento.trim();
+    if (!trimmed || isLoading) return;
 
     setIsLoading(true);
     setError("");
 
     try {
-      const userData = await authService.loginByDocument(trimmedDocument);
+      const userData = await authService.loginByDocument(trimmed);
       login(userData);
-      setDocument("");
+      setDocumento("");
       onClose();
       router.push("/gestion");
     } catch (err: unknown) {
@@ -54,9 +50,9 @@ export default function LoginPanel({ onClose }: LoginPanelProps) {
         <input
           id="documento-login"
           type="text"
-          value={document}
+          value={documento}
           onChange={(e) => {
-            setDocument(e.target.value);
+            setDocumento(e.target.value);
             setError("");
           }}
           placeholder="Ej: 1085123456"
@@ -78,8 +74,8 @@ export default function LoginPanel({ onClose }: LoginPanelProps) {
 
         <button
           type="submit"
-          disabled={isLoading || !document.trim()}
-          aria-disabled={isLoading || !document.trim()}
+          disabled={isLoading || !documento.trim()}
+          aria-disabled={isLoading || !documento.trim()}
           aria-busy={isLoading}
           className="cursor-pointer rounded-lg bg-accent-green py-2 text-sm font-medium text-text-inverse transition-all duration-200 hover:brightness-110 hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100 disabled:hover:shadow-none"
         >

@@ -19,7 +19,7 @@ export default function CurveShape({ className, withShadow }: CurveShapeProps) {
         <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
           <feDropShadow
             dx="0"
-            dy="2"
+            dy="1"
             stdDeviation="3"
             floodColor="#000000"
             floodOpacity="0.7"
