@@ -19,7 +19,7 @@ npm install
 ### Start server
 Once dependencies installed, to decrypt the .env file and startup the server run:
 ```bash
-npm run dev
+npx next dev
 ```
 
 Then, open [http://localhost:3000](http://localhost:3000) with your browser to see the webpage.
