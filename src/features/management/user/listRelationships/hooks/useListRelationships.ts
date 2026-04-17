@@ -19,13 +19,14 @@ const PAGE_SIZE = 20;
 
 const normalizeStatus = (status?: string): RelationshipStatus | null => {
   if (!status) return null;
-  const normalized = status.toLowerCase();
+  const normalized = status.toLowerCase().trim();
   if (
     normalized === "pendiente" ||
     normalized === "aceptada" ||
-    normalized === "rechazada"
+    normalized === "rechazada" ||
+    normalized === "expirada"
   ) {
-    return normalized;
+    return normalized as RelationshipStatus;
   }
   return null;
 };

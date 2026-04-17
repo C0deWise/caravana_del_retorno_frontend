@@ -33,14 +33,11 @@ export const listRelationshipsWithUsersService = async (
   ]);
 
   return relationships.map((relationship): RelationshipItem => {
-    const solicitante = findUserById(users, relationship.us_codigo_solicitante);
-    const destinatario = findUserById(
-      users,
-      relationship.us_codigo_destinatario,
-    );
+    const solicitante = findUserById(users, relationship.codigo_solicitante);
+    const destinatario = findUserById(users, relationship.codigo_destinatario);
 
     return {
-      codigo: String(relationship.pa_codigo),
+      codigo: String(relationship.codigo),
       user: {
         id: solicitante?.id ?? 0,
         nombre: solicitante?.nombre ?? "Usuario desconocido",
@@ -51,8 +48,8 @@ export const listRelationshipsWithUsersService = async (
         nombre: destinatario?.nombre ?? "Usuario desconocido",
         apellido: destinatario?.apellido ?? "",
       },
-      relationshipType: relationship.pa_tipo_parentesco,
-      status: relationship.pa_estado,
+      relationshipType: relationship.tipo_parentesco,
+      status: relationship.estado,
     };
   });
 };

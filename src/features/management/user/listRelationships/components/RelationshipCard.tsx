@@ -1,59 +1,130 @@
 "use client";
 
-import { UserIcon } from "@heroicons/react/24/solid";
+import { CheckIcon, UserIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import type { RelationshipItem } from "../types/relationship.type";
 
 interface RelationshipCardProps {
   relationship: RelationshipItem;
   index: number;
   targetUserId: number;
+  onApprove?: (relationshipId: string) => void;
+  onReject?: (relationshipId: string) => void;
 }
 
 export function RelationshipCard({
   relationship,
   index,
   targetUserId,
+  onApprove,
+  onReject,
 }: RelationshipCardProps) {
-  const { relationshipType, status, user, relatedUser } = relationship;
+  const { codigo, relationshipType, status, user, relatedUser } = relationship;
 
   const displayUser = user.id === targetUserId ? relatedUser : user;
   const displayUserName =
     `${displayUser.nombre} ${displayUser.apellido}`.trim();
 
-  const normalizedStatus = status.toLowerCase();
-  const statusLabel =
-    normalizedStatus.charAt(0).toUpperCase() + normalizedStatus.slice(1);
+  const normalizedStatus = (status ?? "").trim().toLowerCase();
+  const isPending = normalizedStatus === "pendiente";
 
-  const statusStyles =
-    normalizedStatus === "aceptada"
-      ? "bg-accent-green/12 text-accent-green border-accent-green/30"
-      : normalizedStatus === "rechazada"
-        ? "bg-danger/12 text-danger border-danger/30"
-        : normalizedStatus === "pendiente"
-          ? "bg-secondary/12 text-secondary border-secondary/30"
-          : "bg-bg-card text-text-muted border-bg-border";
+  // Solo el destinatario ve los botones
+  const isRecipient = relatedUser.id === targetUserId;
+  const showActions = isPending && isRecipient;
+
+  const getStatusConfig = (currentStatus: string) => {
+    if (currentStatus === "aceptada") {
+      return {
+        label: "Aceptada",
+        badgeClass: "bg-accent-green/20 text-accent-green",
+      };
+    }
+
+    if (currentStatus === "rechazada") {
+      return {
+        label: "Rechazada",
+        badgeClass: "bg-accent-red/15 text-accent-red",
+      };
+    }
+
+    if (currentStatus === "expirada") {
+      return {
+        label: "Expirada",
+        badgeClass: "bg-text-muted/15 text-text-muted",
+      };
+    }
+
+    return {
+      label: "Pendiente",
+      badgeClass: "bg-secondary/15 text-secondary",
+    };
+  };
+
+  const { label, badgeClass } = getStatusConfig(normalizedStatus);
 
   return (
-    <div className="bg-bg border border-gray-100 rounded-4xl p-6 shadow-sm">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="flex items-center space-x-4">
-          <span className="text-lg font-mono text-text-muted w-6 text-center shrink-0">
+    <div className="rounded-4xl border border-gray-100 bg-bg py-3 px-4 shadow-sm">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex items-start gap-4">
+          <span className="w-6 shrink-0 pt-3 text-center font-mono text-lg text-text-muted">
             {index + 1}
           </span>
-          <div className="w-14 h-14 bg-linear-to-tl from-primary/90 rounded-xl flex items-center justify-center shadow-md shrink-0">
-            <UserIcon className="w-6 h-6 text-text-inverse" />
+
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-linear-to-tl from-primary/90 to-secondary/90 shadow-md">
+            <UserIcon className="h-6 w-6 text-white" />
           </div>
+
           <div>
-            <h3 className="font-bold text-xl text-text">{displayUserName}</h3>
-            <p className="text-sm text-text-muted">{relationshipType}</p>
+            <h3 className="text-xl font-bold text-text">{displayUserName}</h3>
+
+            <div className="mt-2 flex flex-wrap items-center gap-6 text-sm">
+              <span className="inline-flex items-center gap-1 text-text-muted">
+                Parentesco:{" "}
+                <span className="font-medium text-text">
+                  {relationshipType}
+                </span>
+              </span>
+
+              <span className="inline-flex items-center gap-1 text-text-muted">
+                Estado:{" "}
+                <span
+                  className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${badgeClass}`}
+                >
+                  {label}
+                </span>
+              </span>
+            </div>
           </div>
         </div>
 
-        <span
-          className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border ${statusStyles}`}
-        >
-          {statusLabel}
-        </span>
+        {showActions ? (
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => codigo && onApprove?.(codigo)}
+              className="inline-flex items-center gap-2 rounded-xl bg-accent-green/15 px-3 py-2 text-accent-green transition-colors hover:bg-accent-green/25"
+              aria-label={`Aceptar solicitud de parentesco con ${displayUserName}`}
+            >
+              <CheckIcon className="h-5 w-5" />
+              Aceptar
+            </button>
+
+            <button
+              type="button"
+              onClick={() => codigo && onReject?.(codigo)}
+              className="inline-flex items-center gap-2 rounded-xl bg-accent-red/10 px-3 py-2 text-accent-red transition-colors hover:bg-accent-red/20"
+              aria-label={`Rechazar solicitud de parentesco con ${displayUserName}`}
+            >
+              <XMarkIcon className="h-5 w-5" />
+              Rechazar
+            </button>
+          </div>
+        ) : (
+          <p className="text-sm text-text-muted">
+            {isPending
+              ? "Solicitud pendiente de aprobación"
+              : "Solicitud ya procesada"}
+          </p>
+        )}
       </div>
     </div>
   );
