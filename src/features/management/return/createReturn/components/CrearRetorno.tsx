@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useCreateRetorno } from "../hooks/useCreateRetorno";
 import { RequireAuth } from "@/auth/components/RequireAuth";
+import { ConfirmModal } from "@/components/confirmModal";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 11 }, (_, i) => CURRENT_YEAR - 5 + i);
@@ -49,11 +50,11 @@ function CrearRetornoFeature() {
     <div className="flex min-h-screen flex-col bg-(--color-bg)">
       <div className="flex flex-1 items-start justify-center p-4 pt-16">
         <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-xl">
-          <h1 className="mb-2 text-center text-2xl font-bold text-blue-900">
+          <h1 className="page-title mb-4">
             Creación de un retorno
           </h1>
 
-          <h2 className="mb-6 text-center text-lg text-blue-900">
+          <h2 className="mb-6 section-title">
             Seleccione el año del retorno
           </h2>
 
@@ -91,7 +92,7 @@ function CrearRetornoFeature() {
               type="button"
               onClick={handleCreateClick}
               disabled={!selectedYear || loading}
-              className="w-full rounded-lg bg-orange-500 py-3 font-semibold text-white transition-opacity hover:bg-orange-600 disabled:opacity-50"
+              className="btn-primary w-full py-3 font-semibold transition-opacity disabled:opacity-50"
             >
               {loading ? "Creando..." : "Crear"}
             </button>
@@ -100,37 +101,16 @@ function CrearRetornoFeature() {
       </div>
 
       {showModal && selectedYear && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="mx-4 w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
-            <h3 className="mb-4 text-center text-xl font-bold">
-              ¿Confirmas la creación del retorno?
-            </h3>
-
-            <div className="mb-6 text-center">
-              <p className="text-lg font-semibold">• Año: {selectedYear}</p> 
-            </div>
-
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={handleConfirm}
-                disabled={loading}
-                className="flex-1 rounded-lg bg-green-500 py-3 font-semibold text-white transition-opacity hover:bg-green-600 disabled:opacity-50"
-              >
-                {loading ? "Confirmando..." : "Confirmar"}
-              </button>
-
-              <button
-                type="button"
-                onClick={handleCancel}
-                disabled={loading}
-                className="flex-1 rounded-lg bg-red-800 py-3 font-semibold text-white transition-opacity hover:bg-red-900 disabled:opacity-50"
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
+        <ConfirmModal
+          isOpen={showModal}
+          title="¿Confirmas la creación del retorno?"
+          details={[`Año: ${selectedYear}`]}
+          onConfirm={handleConfirm}
+          onCancel={handleCancel}
+          loading={loading}
+          confirmLabel="Confirmar"
+          cancelLabel="Cancelar"
+        />
       )}
     </div>
   );
