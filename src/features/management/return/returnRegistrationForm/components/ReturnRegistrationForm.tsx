@@ -108,9 +108,11 @@ function ReturnRegistrationFormContent() {
 
   const confirmDetails = useMemo(
     () => [
-      `Hospedaje: ${formData.accomodation === 1 ? "Sí" : "No"}`,
-      `Transporte: ${formData.transport === 1 ? "Sí" : "No"}`,
-      `Parqueadero: ${formData.parking === 1 ? "Sí" : "No"}`,
+      `Tiene hospedaje: ${formData.accomodation === 1 ? "Sí" : "No"}`,
+      `Tiene transporte: ${formData.transport === 1 ? "Sí" : "No"}`,
+      ...(formData.transport === 1
+        ? [`Necesita parqueadero: ${formData.parking === 1 ? "Sí" : "No"}`]
+        : []),
     ],
     [formData.accomodation, formData.transport, formData.parking],
   );
@@ -126,8 +128,8 @@ function ReturnRegistrationFormContent() {
       nextErrors.transport = "Selecciona si cuentas con transporte.";
     }
 
-    if (formData.parking === "") {
-      nextErrors.parking = "Selecciona si cuentas con parqueadero.";
+    if (formData.transport === 1 && formData.parking === "") {
+      nextErrors.parking = "Selecciona si necesitas parqueadero.";
     }
 
     setFieldErrors(nextErrors);
@@ -138,8 +140,20 @@ function ReturnRegistrationFormContent() {
     field: "accomodation" | "transport" | "parking",
     value: ReturnRegistrationAnswer,
   ) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    setFieldErrors((prev) => ({ ...prev, [field]: undefined }));
+    setFormData((prev) => {
+      const next = { ...prev, [field]: value };
+      if (field === "transport" && value === 0) {
+        next.parking = "";
+      }
+      return next;
+    });
+    setFieldErrors((prev) => {
+      const next = { ...prev, [field]: undefined };
+      if (field === "transport" && value === 0) {
+        next.parking = undefined;
+      }
+      return next;
+    });
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -189,9 +203,9 @@ function ReturnRegistrationFormContent() {
     const payload: ReturnRegistrationCreateRequest = {
       usuario: user.id,
       retorno: activeReturnCode,
-      num_hospedaje: formData.accomodation as ReturnRegistrationAnswer,
-      num_transporte: formData.transport as ReturnRegistrationAnswer,
-      num_parqueadero: formData.parking as ReturnRegistrationAnswer,
+      num_hospedaje: formData.accomodation === 1 ? 0 : 1,
+      num_transporte: formData.transport === 1 ? 0 : 1,
+      num_parqueadero: formData.transport === 0 ? 0 : (formData.parking as ReturnRegistrationAnswer),
     };
 
     const response = await sendReturnRegistration(payload);
@@ -297,12 +311,14 @@ function ReturnRegistrationFormContent() {
 
           <ul className="mt-4 list-disc pl-6 text-text space-y-1">
             <li>
-              Hospedaje: {submittedRecord.num_hospedaje === 1 ? "Si" : "No"}
+              Tiene hospedaje: {submittedRecord.num_hospedaje === 0 ? "Sí" : "No"}
             </li>
-            <li>Transporte: {submittedRecord.num_transporte === 1 ? "Si" : "No"}</li>
-            <li>
-              Parqueadero: {submittedRecord.num_parqueadero === 1 ? "Si" : "No"}
-            </li>
+            <li>Tiene transporte: {submittedRecord.num_transporte === 0 ? "Sí" : "No"}</li>
+            {submittedRecord.num_transporte === 0 && (
+              <li>
+                Necesita parqueadero: {submittedRecord.num_parqueadero === 1 ? "Sí" : "No"}
+              </li>
+            )}
           </ul>
 
           <div className="mt-8 flex justify-center">
@@ -403,10 +419,11 @@ function ReturnRegistrationFormContent() {
             )}
           </fieldset>
 
+          {formData.transport === 1 && (
           <fieldset>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <legend className="label-primary mb-0">
-                ¿Tiene parqueadero?
+                ¿Necesita parqueadero?
               </legend>
               <div
                 className={`inline-flex items-center gap-5 rounded-lg px-3 py-2 ${fieldErrors.parking ? "border border-danger" : "border border-transparent"}`}
@@ -439,6 +456,7 @@ function ReturnRegistrationFormContent() {
               </p>
             )}
           </fieldset>
+          )}
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
@@ -467,7 +485,7 @@ function ReturnRegistrationFormContent() {
           <div className="flex justify-center pt-1">
             <button
               type="submit"
-              className="btn-primary min-w-48 inline-flex items-center justify-center gap-2"
+              className="btn-primary bg-secondary min-w-48 inline-flex items-center justify-center gap-2"
               disabled={loading}
             >
               {loading && <Spinner size="sm" />}
