@@ -188,8 +188,10 @@ function InscripcionColoniaFormFeature() {
         details={
           seleccionada
             ? [
-                `${seleccionada.ciudad}, ${seleccionada.departamento}, ${seleccionada.pais}`,
-              ].filter((v): v is string => v !== null)
+                seleccionada.pais.toLowerCase() === "colombia"
+                  ? `${seleccionada.ciudad}, ${seleccionada.departamento}, ${seleccionada.pais}`
+                  : seleccionada.pais,
+              ]
             : []
         }
         onConfirm={confirmarInscripcion}
