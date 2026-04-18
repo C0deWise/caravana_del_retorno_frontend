@@ -24,13 +24,13 @@ const descriptionByHref: Record<string, string> = {
 };
 
 export default function Gestion() {
-  const { effectiveRole, isHydrating } = useAuth();
+  const { user, isHydrating } = useAuth();
 
   if (isHydrating) {
     return null;
   }
 
-  const managementModules = getMenuByRole(effectiveRole);
+  const managementModules = getMenuByRole(user);
 
   return (
     <section className="w-full min-h-168 rounded-2xl bg-bg-separator shadow-lg p-8 md:p-10">

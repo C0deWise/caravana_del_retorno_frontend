@@ -6,28 +6,37 @@ import {
   UserIcon,
   EnvelopeIcon,
 } from "@heroicons/react/24/solid";
-import { Member } from "../types/member.types";
-import { UserRole } from "@/types/user.types";
+import { ColonyMember } from "../types/colony-members.types";
+import { UserRole, CODE_TO_ROLE } from "@/types/user.types";
 import { getVisibleMemberData } from "../utils/rolePermissions";
 import calculateAge from "@/utils/calculateAge";
 
 interface MemberCardProps {
-  member: Member;
+  member: ColonyMember;
   userRole: UserRole;
   index: number;
 }
 
-function getRoleConfig(role: UserRole) {
-  if (role === "admin")
+function getRoleConfig(roleId: number) {
+  const roleCode = CODE_TO_ROLE[roleId as keyof typeof CODE_TO_ROLE];
+
+  if (roleCode === "admin")
     return { label: "Admin", badgeClass: "bg-accent-red text-text-inverse" };
-  if (role === "lider_colonia")
+  if (roleCode === "lider_colonia")
     return {
       label: "Líder de colonia",
       badgeClass: "bg-secondary/85 text-text-inverse",
     };
+  if (roleCode === "usuario") {
+    return {
+      label: "Usuario",
+      badgeClass: "bg-accent-green/20 text-accent-green",
+    };
+  }
+
   return {
-    label: "Usuario",
-    badgeClass: "bg-accent-green/20 text-accent-green",
+    label: "Invitado",
+    badgeClass: "bg-gray-200 text-text-muted",
   };
 }
 
@@ -36,7 +45,7 @@ export function MemberCard({ member, userRole, index }: MemberCardProps) {
   const { label, badgeClass } = getRoleConfig(member.role);
 
   return (
-    <div className="bg-bg border border-gray-100 rounded-4xl p-6 shadow-sm">
+    <div className="bg-bg border border-gray-100 rounded-4xl px-5 py-4 shadow-sm">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex items-center space-x-4">
           <span className="text-lg font-mono text-text-muted w-6 text-center shrink-0">

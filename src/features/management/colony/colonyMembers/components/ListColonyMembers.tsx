@@ -1,5 +1,4 @@
 "use client";
-import { useEffect, useRef } from "react";
 import Spinner from "@/ui/animations/Spinner";
 import { useColonyMembers } from "../hooks/useColonyMembers";
 import { useAuth } from "@/auth/context/AuthContext";
@@ -19,25 +18,11 @@ function ColonyMembersFeature({ paramsId }: ListColonyMembersProps) {
       ? (paramsId ?? user?.codigo_colonia ?? 1)
       : (user?.codigo_colonia ?? 0);
 
-  const { members, colonyLabel, hasMore, loadMore, totalMembers } =
+  const { members, colonyLabel, isLoading, error, totalMembers } =
     useColonyMembers(targetColonyId);
 
-  const sentinelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (targetColonyId) loadMore();
-  }, [targetColonyId, loadMore]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && hasMore) loadMore();
-    });
-    if (sentinelRef.current) observer.observe(sentinelRef.current);
-    return () => observer.disconnect();
-  }, [hasMore, loadMore]);
-
   return (
-    <div className="w-full min-h-screen md:pb-30 space-y-8">
+    <div className="w-full md:pb-30 space-y-8">
       <header className="mx-10 px-8 py-4 rounded-xl shadow-xl bg-bg-card sticky top-0 z-10">
         <div className="flex items-end justify-between gap-6">
           <div>
@@ -59,20 +44,33 @@ function ColonyMembersFeature({ paramsId }: ListColonyMembersProps) {
       </header>
 
       <main className="max-w-7xl mx-auto">
-        <MemberList members={members} userRole={user?.role as UserRole} />
-      </main>
-
-      {hasMore && (
-        <div className="flex items-center justify-center py-12">
-          <div
-            ref={sentinelRef}
-            className="flex items-center space-x-3 text-primary"
-          >
-            <Spinner size="sm" />
-            <span className="font-medium">Cargando mas miembros...</span>
+        {isLoading && (
+          <div className="flex items-center justify-center py-12">
+            <div className="flex items-center space-x-3 text-primary">
+              <Spinner size="sm" />
+              <span className="font-medium">Cargando miembros...</span>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {error && (
+          <div className="flex justify-center p-8">
+            <div className="bg-red-100 text-red-500 rounded p-4 text-center">
+              <p>{error}</p>
+            </div>
+          </div>
+        )}
+
+        {!isLoading && !error && members.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-12 text-text-muted">
+            <p>No hay miembros en esta colonia.</p>
+          </div>
+        )}
+
+        {!isLoading && members.length > 0 && (
+          <MemberList members={members} userRole={user?.role as UserRole} />
+        )}
+      </main>
     </div>
   );
 }

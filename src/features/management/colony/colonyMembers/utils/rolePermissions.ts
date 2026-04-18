@@ -1,10 +1,10 @@
 import type { UserRole } from "@/types/user.types";
-import { Member } from "../types/member.types";
+import { ColonyMember } from "../types/colony-members.types";
 
 export const getVisibleMemberData = (
-  member: Member,
+  member: ColonyMember,
   loggedUserRole: UserRole,
-): Partial<Member> => {
+): Partial<ColonyMember> => {
   switch (loggedUserRole) {
     case "usuario":
       return {

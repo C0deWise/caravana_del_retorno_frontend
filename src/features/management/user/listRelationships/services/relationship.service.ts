@@ -3,6 +3,7 @@ import {
   RelationshipApiItem,
   RelationshipItem,
   UserByIdResponse,
+  RequestRelationshipDto,
 } from "../types/relationship.type";
 
 export const listRelationshipsService = async (
@@ -52,4 +53,10 @@ export const listRelationshipsWithUsersService = async (
       status: relationship.estado,
     };
   });
+};
+
+export const requestRelationshipService = async (
+  payload: RequestRelationshipDto,
+): Promise<void> => {
+  await apiService.post("/api/v1/usuario/solicitar-parentesco", payload);
 };

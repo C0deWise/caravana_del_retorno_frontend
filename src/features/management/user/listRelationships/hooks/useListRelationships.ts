@@ -13,6 +13,7 @@ interface UseListRelationshipsReturn {
   error: string | null;
   hasMore: boolean;
   loadMore: () => void;
+  refetch: () => void;
 }
 
 const PAGE_SIZE = 20;
@@ -54,6 +55,11 @@ export function useListRelationships(
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fetchVersion, setFetchVersion] = useState(0);
+
+  const refetch = useCallback(() => {
+    setFetchVersion((v) => v + 1);
+  }, []);
 
   useEffect(() => {
     if (!targetUserId) {
@@ -93,7 +99,7 @@ export function useListRelationships(
     return () => {
       cancelled = true;
     };
-  }, [targetUserId]);
+  }, [targetUserId, fetchVersion]);
 
   const uniqueRelationships = useMemo(() => {
     const map = new Map<string, RelationshipItem>();
@@ -145,5 +151,6 @@ export function useListRelationships(
     error,
     hasMore,
     loadMore,
+    refetch,
   };
 }

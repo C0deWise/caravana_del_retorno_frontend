@@ -1,5 +1,38 @@
 import { UserData } from "@/types/user.types";
 
+export type KinshipType =
+  | "padre"
+  | "madre"
+  | "hermano (a)"
+  | "hijo (a)"
+  | "abuelo (a)"
+  | "tio (a)"
+  | "primo (a)"
+  | "madrastra"
+  | "padrastro"
+  | "hijastro (a)"
+  | "conyuge";
+
+export const KINSHIP_TYPE_OPTIONS: { label: string; value: KinshipType }[] = [
+  { label: "Padre", value: "padre" },
+  { label: "Madre", value: "madre" },
+  { label: "Hermano(a)", value: "hermano (a)" },
+  { label: "Hijo(a)", value: "hijo (a)" },
+  { label: "Abuelo(a)", value: "abuelo (a)" },
+  { label: "Tío(a)", value: "tio (a)" },
+  { label: "Primo(a)", value: "primo (a)" },
+  { label: "Madrastra", value: "madrastra" },
+  { label: "Padrastro", value: "padrastro" },
+  { label: "Hijastro(a)", value: "hijastro (a)" },
+  { label: "Cónyuge", value: "conyuge" },
+];
+
+export interface RequestRelationshipDto {
+  codigo_solicitante: number;
+  codigo_destinatario: number;
+  tipo_parentesco: KinshipType;
+}
+
 export type RelationshipStatus =
   | "pendiente"
   | "aceptada"

@@ -7,13 +7,13 @@ import { useAuth } from "@/auth/context/AuthContext";
 
 export default function SidebarMenu() {
   const { isCollapsed } = useSidebarContext();
-  const { effectiveRole, isHydrating } = useAuth();
+  const { user, isHydrating } = useAuth();
 
   if (isHydrating) {
     return null;
   }
 
-  const filteredMenu = getMenuByRole(effectiveRole);
+  const filteredMenu = getMenuByRole(user);
 
   return (
     <nav className="flex-1 p-4 space-y-2 overflow-hidden">

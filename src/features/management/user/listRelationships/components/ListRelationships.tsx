@@ -1,19 +1,23 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/auth/context/AuthContext";
 import { useListRelationships } from "../hooks/useListRelationships";
 import { RelationshipList } from "./RelationshipList";
+import { RequestRelationshipModal } from "./RequestRelationshipModal";
 import Spinner from "@/ui/animations/Spinner";
 import { RequireAuth } from "@/auth/components/RequireAuth";
+import { PlusIcon } from "@heroicons/react/24/outline";
 
 function ListRelationshipsComponent() {
   const { user } = useAuth();
   const targetUserId = user?.id ?? 0;
   const esAdmin = Boolean(user?.role === "admin");
 
-  const { relationships, loading, error, hasMore, loadMore } =
+  const { relationships, loading, error, hasMore, loadMore, refetch } =
     useListRelationships(targetUserId);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const visibleCount = relationships?.length ?? 0;
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -43,6 +47,10 @@ function ListRelationshipsComponent() {
     };
   }, [targetUserId, hasMore, loading, loadMore]);
 
+  const handleModalSuccess = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
   return (
     <div className="w-full min-h-screen space-y-8 md:pb-30">
       <header className="sticky top-0 z-10 mx-10 rounded-xl bg-bg-card px-8 py-4 shadow-xl">
@@ -57,6 +65,18 @@ function ListRelationshipsComponent() {
                 : `Mostrando ${visibleCount} registro${visibleCount === 1 ? "" : "s"}${hasMore ? " (desplázate para cargar más)" : ""}`}
             </p>
           </div>
+
+          {!esAdmin && (
+            <button
+              type="button"
+              id="btn-solicitar-parentesco"
+              onClick={() => setIsModalOpen(true)}
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+            >
+              <PlusIcon className="h-4 w-4" />
+              Solicitar parentesco
+            </button>
+          )}
         </div>
       </header>
 
@@ -96,6 +116,13 @@ function ListRelationshipsComponent() {
           <span className="font-medium">Cargando más parentescos...</span>
         </div>
       )}
+
+      <RequestRelationshipModal
+        isOpen={isModalOpen}
+        solicitanteId={targetUserId}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={handleModalSuccess}
+      />
     </div>
   );
 }

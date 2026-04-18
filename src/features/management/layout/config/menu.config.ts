@@ -30,7 +30,7 @@ export const menuConfig: MenuItem[] = [
         href: "/gestion/colonia/inscribir-colonia",
       },
       {
-        label: "Miembros de la Colonia*",
+        label: "Miembros de la Colonia",
         href: "/gestion/colonia/miembros",
       },
       {
