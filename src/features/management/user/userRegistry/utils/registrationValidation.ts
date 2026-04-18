@@ -98,7 +98,7 @@ export const validateRegistrationField = (
   if (
     fieldName === "confirmPassword" &&
     value &&
-    value !== getTrimmedValue(data.contrasenia)
+    data.confirmPassword !== data.contrasenia
   ) {
     return "Las contraseñas no coinciden";
   }
@@ -107,6 +107,12 @@ export const validateRegistrationField = (
     const today = getTodayLocalDate();
     if (value > today) {
       return "La fecha de nacimiento no puede ser superior a la fecha de hoy";
+    }
+    const birthDate = new Date(value);
+    const minDate = new Date(today);
+    minDate.setFullYear(minDate.getFullYear() - 18);
+    if (birthDate > minDate) {
+      return "Debes tener al menos 18 años para registrarte";
     }
   }
 
@@ -119,6 +125,18 @@ export const validateRegistrationField = (
 
   return null;
 };
+
+export const normalizeFormData = (
+  data: RegistrationFormData,
+): RegistrationFormData => ({
+  ...data,
+  nombre: getTrimmedValue(data.nombre),
+  apellido: getTrimmedValue(data.apellido),
+  celular: getTrimmedValue(data.celular),
+  documento: getTrimmedValue(data.documento),
+  correo: getTrimmedValue(data.correo),
+  confirmEmail: getTrimmedValue(data.confirmEmail),
+});
 
 export const validateRegistrationData = (
   data: RegistrationFormData,

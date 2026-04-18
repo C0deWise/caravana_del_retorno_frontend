@@ -5,6 +5,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { useRegisterUser } from "../hooks/useUserRegistration";
 import type { RegistrationFormData } from "../types/registro.types";
 import {
+  normalizeFormData,
   validateRegistrationData,
   validateRegistrationField,
 } from "../utils/registrationValidation";
@@ -111,12 +112,15 @@ export default function AuthUserRegistration() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const formErrors = validateRegistrationData(formData);
+    const normalized = normalizeFormData(formData);
+    setFormData(normalized);
+
+    const formErrors = validateRegistrationData(normalized);
     setFieldErrors(formErrors);
 
     if (Object.keys(formErrors).length > 0) return;
 
-    const { ...registrationData } = formData;
+    const { confirmEmail: _, confirmPassword: __, ...registrationData } = normalized;
     await registerUser(registrationData);
   };
 
@@ -137,6 +141,10 @@ export default function AuthUserRegistration() {
       });
     }
   };
+
+  const isFormValid =
+    Object.keys(fieldErrors).length === 0 &&
+    Object.keys(validateRegistrationData(formData)).length === 0;
 
   const getLocationDisplay = () => {
     if (formData.pais === "Colombia") {
@@ -293,8 +301,8 @@ export default function AuthUserRegistration() {
                       onBlur={() => handleBlur("genero")}
                       className="input-base pr-8"
                     >
-                      <option value="femenino">Femenino</option>
-                      <option value="masculino">Masculino</option>
+                      <option value="F">Femenino</option>
+                      <option value="M">Masculino</option>
                       <option value="otro">Prefiero no decirlo</option>
                     </select>
                     
@@ -481,7 +489,7 @@ export default function AuthUserRegistration() {
 
           {/* Botón de Envío */}
           <div className="mt-8 flex justify-center">
-            <button type="submit" disabled={loading} className="btn-primary">
+            <button type="submit" disabled={loading || !isFormValid} className="btn-primary">
               {loading ? "Registrando..." : "Registrarse"}
             </button>
           </div>
