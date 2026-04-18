@@ -58,9 +58,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const rehidrate = async () => {
       setIsFetchingSession(true);
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s máximo
+
       try {
         const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "";
-        const res = await fetch(`${baseURL}/api/v1/usuario/todos`);
+        const res = await fetch(`${baseURL}/api/v1/usuario/todos`, {
+          signal: controller.signal,
+        });
 
         if (!res.ok) throw new Error("No se pudo consultar la sesión");
 
@@ -81,6 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem(STORAGE_KEY);
         setUser(null);
       } finally {
+        clearTimeout(timeoutId);
         setIsFetchingSession(false);
         setSessionChecked(true);
       }
