@@ -50,7 +50,11 @@ export const menuConfig: MenuItem[] = [
       },
       {
         label: "Registrar Formulario de inscripción",
-        href: "/gestion/retorno/registro",
+        href: "/gestion/retorno/registro/inscripcion",
+      },
+      {
+        label: "Cancelar inscripción a Retorno",
+        href: "/gestion/retorno/registro/cancelar",
       },
     ],
   },
