@@ -8,11 +8,11 @@ import {
 import type { GrupalInvitation } from "../types/grupalInscription.types";
 
 interface GrupalInvitationCardProps {
-  invitation: GrupalInvitation;
-  onAccept: (invitationId: number) => void;
-  onReject: (invitationId: number) => void;
+  readonly invitation: GrupalInvitation;
+  readonly onAccept: (invitationId: number) => void;
+  readonly onReject: (invitationId: number) => void;
   /** Bloquea las acciones cuando el usuario ya aceptó otra invitación */
-  hasActiveGroup: boolean;
+  readonly hasActiveGroup: boolean;
 }
 
 const STATUS_CONFIG: Record<

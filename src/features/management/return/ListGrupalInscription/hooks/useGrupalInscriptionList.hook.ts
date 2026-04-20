@@ -47,7 +47,7 @@ export function useGrupalInscriptionList(): UseGrupalInscriptionListReturn {
   }, []);
 
   useEffect(() => {
-    void fetchInvitations();
+    fetchInvitations();
   }, [fetchInvitations]);
 
   const updateInvitationLocally = useCallback((updated: GrupalInvitation) => {

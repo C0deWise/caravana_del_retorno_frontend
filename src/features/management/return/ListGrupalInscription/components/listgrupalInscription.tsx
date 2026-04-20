@@ -115,6 +115,93 @@ export default function ListGrupalInscription() {
   const hasActionError = acceptError ?? rejectError;
   const isProcessingAction = isAccepting || isRejecting;
 
+  let bodyContent: React.ReactNode;
+  if (isLoading) {
+    bodyContent = (
+      <div className="flex items-center justify-center py-12">
+        <div className="flex items-center space-x-3 text-primary">
+          <Spinner size="sm" />
+          <span className="font-medium">Cargando invitaciones...</span>
+        </div>
+      </div>
+    );
+  } else if (error) {
+    bodyContent = (
+      <div className="mx-auto max-w-3xl rounded-xl border border-bg-border bg-bg-card p-6">
+        <p className="text-sm text-text-muted">{error}</p>
+        <button
+          onClick={() => void refetch()}
+          className="mt-4 rounded-md bg-primary px-4 py-2 text-text-inverse"
+        >
+          Reintentar
+        </button>
+      </div>
+    );
+  } else {
+    bodyContent = (
+      <>
+        {/* Error de acción */}
+        {hasActionError && (
+          <div className="mx-auto max-w-3xl rounded-xl border border-bg-border bg-bg-card p-6">
+            <p className="text-sm text-danger">{hasActionError}</p>
+            <button
+              onClick={() => {
+                resetAccept();
+                resetReject();
+              }}
+              className="mt-4 rounded-md bg-primary px-4 py-2 text-text-inverse"
+            >
+              Cerrar
+            </button>
+          </div>
+        )}
+
+        {/* Spinner de procesamiento */}
+        {isProcessingAction && (
+          <div className="flex items-center justify-center py-4">
+            <div className="flex items-center space-x-3 text-primary">
+              <Spinner size="sm" />
+              <span className="font-medium">
+                Procesando invitación...
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Aviso de grupo activo */}
+        {hasActiveGroup && (
+          <div className="mx-auto max-w-3xl rounded-xl border border-accent-green/30 bg-accent-green/10 p-4">
+            <p className="text-sm text-accent-green font-medium">
+              Ya perteneces a un grupo familiar. Las demás invitaciones no
+              están disponibles para aceptar.
+            </p>
+          </div>
+        )}
+
+        {/* Lista o estado vacío */}
+        {invitations.length === 0 ? (
+          <div className="mx-auto max-w-3xl rounded-xl border border-bg-border bg-bg-card p-6 text-center">
+            <p className="text-text-muted">
+              No tienes invitaciones para unirte a un grupo.
+            </p>
+          </div>
+        ) : (
+          <main className="mx-auto max-w-6xl">
+            <p className="mb-4 text-center text-text-muted">
+              Tienes las siguientes invitaciones para unirte a un grupo
+            </p>
+            <GrupalInvitationList
+              invitations={invitations}
+              onAccept={handleAccept}
+              onReject={handleReject}
+              hasActiveGroup={hasActiveGroup}
+            />
+          </main>
+        )}
+      </>
+    );
+  }
+
   const confirmTitle =
     pendingAction === "accept"
       ? "¿Estás seguro de aceptar la invitación?"
@@ -167,85 +254,7 @@ export default function ListGrupalInscription() {
 
         {/* ── Cuerpo ──────────────────────────────────────────── */}
         <div className="flex-1 space-y-8 overflow-y-auto pt-4 md:pb-30">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="flex items-center space-x-3 text-primary">
-                <Spinner size="sm" />
-                <span className="font-medium">Cargando invitaciones...</span>
-              </div>
-            </div>
-          ) : error ? (
-            <div className="mx-auto max-w-3xl rounded-xl border border-bg-border bg-bg-card p-6">
-              <p className="text-sm text-text-muted">{error}</p>
-              <button
-                onClick={() => void refetch()}
-                className="mt-4 rounded-md bg-primary px-4 py-2 text-text-inverse"
-              >
-                Reintentar
-              </button>
-            </div>
-          ) : (
-            <>
-              {/* Error de acción */}
-              {hasActionError && (
-                <div className="mx-auto max-w-3xl rounded-xl border border-bg-border bg-bg-card p-6">
-                  <p className="text-sm text-danger">{hasActionError}</p>
-                  <button
-                    onClick={() => {
-                      resetAccept();
-                      resetReject();
-                    }}
-                    className="mt-4 rounded-md bg-primary px-4 py-2 text-text-inverse"
-                  >
-                    Cerrar
-                  </button>
-                </div>
-              )}
-
-              {/* Spinner de procesamiento */}
-              {isProcessingAction && (
-                <div className="flex items-center justify-center py-4">
-                  <div className="flex items-center space-x-3 text-primary">
-                    <Spinner size="sm" />
-                    <span className="font-medium">
-                      Procesando invitación...
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {/* Aviso de grupo activo */}
-              {hasActiveGroup && (
-                <div className="mx-auto max-w-3xl rounded-xl border border-accent-green/30 bg-accent-green/10 p-4">
-                  <p className="text-sm text-accent-green font-medium">
-                    Ya perteneces a un grupo familiar. Las demás invitaciones no
-                    están disponibles para aceptar.
-                  </p>
-                </div>
-              )}
-
-              {/* Lista o estado vacío */}
-              {invitations.length === 0 ? (
-                <div className="mx-auto max-w-3xl rounded-xl border border-bg-border bg-bg-card p-6 text-center">
-                  <p className="text-text-muted">
-                    No tienes invitaciones para unirte a un grupo.
-                  </p>
-                </div>
-              ) : (
-                <main className="mx-auto max-w-6xl">
-                  <p className="mb-4 text-center text-text-muted">
-                    Tienes las siguientes invitaciones para unirte a un grupo
-                  </p>
-                  <GrupalInvitationList
-                    invitations={invitations}
-                    onAccept={handleAccept}
-                    onReject={handleReject}
-                    hasActiveGroup={hasActiveGroup}
-                  />
-                </main>
-              )}
-            </>
-          )}
+          {bodyContent}
 
           {/* ── Modal de confirmación ────────────────────────── */}
           <ConfirmModal
@@ -255,7 +264,7 @@ export default function ListGrupalInscription() {
             onConfirm={handleModalConfirm}
             onCancel={handleCloseModal}
             loading={isProcessingAction}
-            confirmLabel={pendingAction === "accept" ? "Confirmar" : "Confirmar"}
+            confirmLabel={"Confirmar"}
             cancelLabel="Cancelar"
           />
         </div>

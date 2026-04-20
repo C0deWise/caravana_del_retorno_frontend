@@ -5,10 +5,10 @@ import type { GrupalInvitation } from "../types/grupalInscription.types";
 import { GrupalInvitationCard } from "./grupalInvitationCard";
 
 interface GrupalInvitationListProps {
-  invitations: GrupalInvitation[];
-  onAccept: (invitationId: number) => void;
-  onReject: (invitationId: number) => void;
-  hasActiveGroup: boolean;
+  readonly invitations: GrupalInvitation[];
+  readonly onAccept: (invitationId: number) => void;
+  readonly onReject: (invitationId: number) => void;
+  readonly hasActiveGroup: boolean;
 }
 
 export function GrupalInvitationList({
