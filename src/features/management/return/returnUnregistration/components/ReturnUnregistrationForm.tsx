@@ -23,7 +23,7 @@ function ReturnUnregistrationFormContent() {
     useState<ReturnUnregistrationApi | null>(null);
 
   useEffect(() => {
-    if (!user || !user.codigo_colonia) {
+    if (!user?.codigo_colonia) {
       setEligibilityLoading(false);
       return;
     }
@@ -74,7 +74,7 @@ function ReturnUnregistrationFormContent() {
     }
   };
 
-  if (!user || !user.codigo_colonia) {
+  if (!user?.codigo_colonia) {
     return (
       <div className="flex items-center justify-center bg-white px-4 py-6">
         <div className="w-full max-w-xl rounded-2xl bg-bg-card p-8 shadow-md text-center">

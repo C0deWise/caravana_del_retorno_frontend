@@ -25,12 +25,12 @@ class ReturnUnregistrationService {
      */
     async getActiveReturn(): Promise<Retorno | null> {
         const response = await apiService.get<Retorno | Retorno[]>(this.retornosEndpoint);
-        const list = Array.isArray(response) ? response : response ? [response] : [];
+        const list = ([] as Retorno[]).concat(response ?? []);
         const activeReturns = list.filter((item) => hasActiveState(item.estado));
         if (activeReturns.length === 0) return null;
         return activeReturns.reduce((latest, current) =>
             current.anio > latest.anio ? current : latest,
-        );
+        activeReturns[0]);
     }
 
     /** Obtiene el retorno activo asociado al usuario
