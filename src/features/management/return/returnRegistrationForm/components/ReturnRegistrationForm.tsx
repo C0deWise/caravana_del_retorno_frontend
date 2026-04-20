@@ -7,6 +7,7 @@ import { ConfirmModal } from "@/components/confirmModal";
 import Spinner from "@/ui/animations/Spinner";
 import { useSendReturnRegistration } from "../hooks/useSendReturnRegistration";
 import { returnRegistrationService } from "../services/returnRegistration.service";
+import ReturnUnregistrationForm from "../../returnUnregistration/components/ReturnUnregistrationForm";
 import type {
   ReturnRegistrationAnswer,
   ReturnRegistrationApi,
@@ -283,17 +284,7 @@ function ReturnRegistrationFormContent() {
   }
 
   if (alreadyRegistered) {
-    return (
-      <div className="bg-white px-4 py-6 flex items-center justify-center">
-        <div className="w-full max-w-xl rounded-2xl bg-bg-card p-8 shadow-md text-center">
-          <h1 className="page-title mb-4">Registro de asistencia al retorno</h1>
-          <h2 className="section-title mb-4">Formulario ya registrado</h2>
-          <p className="text-text font-medium">
-            Ya has confirmado tu asistencia a este retorno.
-          </p>
-        </div>
-      </div>
-    );
+    return <ReturnUnregistrationForm />;
   }
 
   if (submittedRecord) {

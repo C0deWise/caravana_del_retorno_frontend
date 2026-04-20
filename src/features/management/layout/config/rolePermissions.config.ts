@@ -17,7 +17,6 @@ export const rolePermissions: Record<UserRole, string[]> = {
     "/gestion/usuario/parentesco",
     "/gestion/colonia/inscribir-colonia",
     "/gestion/colonia/miembros",
-    "/gestion/retorno/registro/inscripcion",
-    "/gestion/retorno/registro/cancelar",
+    "/gestion/retorno/registro",
   ],
 };
