@@ -39,11 +39,8 @@ function waitForImage(img: HTMLImageElement): Promise<void> {
   });
 }
 
-function waitForFonts(): Promise<void> {
-  if (!document.fonts.ready) {
-    return document.fonts.ready;
-  }
-  return Promise.resolve();
+async function waitForFonts(): Promise<void> {
+  await document.fonts.ready;
 }
 
 function handleResourcesLoaded(
@@ -104,7 +101,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
     abortControllerRef.current = new AbortController();
     startTimeRef.current = Date.now();
 
-    const requestIdleCallbackId = window.requestIdleCallback(
+    const requestIdleCallbackId = globalThis.requestIdleCallback(
       () => {
         checkResourcesLoaded();
       },
@@ -113,7 +110,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
 
     return () => {
       abortControllerRef.current?.abort();
-      window.cancelIdleCallback(requestIdleCallbackId);
+      globalThis.cancelIdleCallback(requestIdleCallbackId);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, [checkResourcesLoaded]);
