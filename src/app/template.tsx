@@ -3,60 +3,80 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import Spinner from "@/ui/animations/Spinner";
 
+const MIN_LOAD_TIME = 1000;
+
+function waitForImage(img: HTMLImageElement): Promise<void> {
+  return new Promise<void>((resolve) => {
+    if (img.complete && img.naturalWidth > 0) {
+      resolve();
+      return;
+    }
+
+    let loaded = false;
+
+    const cleanup = () => {
+      loaded = true;
+      img.removeEventListener("load", onLoad);
+      img.removeEventListener("error", onError);
+    };
+
+    const onLoad = () => {
+      if (!loaded) {
+        cleanup();
+        resolve();
+      }
+    };
+
+    const onError = () => {
+      if (!loaded) {
+        cleanup();
+        resolve();
+      }
+    };
+
+    img.addEventListener("load", onLoad, { once: true });
+    img.addEventListener("error", onError, { once: true });
+  });
+}
+
+function waitForFonts(): Promise<void> {
+  if (!document.fonts.ready) {
+    return document.fonts.ready;
+  }
+  return Promise.resolve();
+}
+
+function handleResourcesLoaded(
+  abortSignal: AbortSignal,
+  startTime: number,
+  onComplete: () => void,
+  timeoutRef: React.MutableRefObject<ReturnType<typeof setTimeout> | null>,
+) {
+  if (abortSignal.aborted) return;
+
+  const elapsedTime = Date.now() - startTime;
+  const remainingTime = Math.max(0, MIN_LOAD_TIME - elapsedTime);
+
+  if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+  if (remainingTime > 0) {
+    timeoutRef.current = setTimeout(onComplete, remainingTime);
+  } else {
+    onComplete();
+  }
+}
+
 export default function Template({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const startTimeRef = useRef<number>(0);
-  const MIN_LOAD_TIME = 1000; // Mínimo 1 segundo (puedes ajustar)
 
   const checkResourcesLoaded = useCallback(() => {
     if (!containerRef.current) return;
 
     const images = Array.from(containerRef.current.querySelectorAll("img"));
-    const fonts = document.fonts;
-
-    function waitForImage(img: HTMLImageElement) {
-      return new Promise<void>((resolve) => {
-        if (img.complete && img.naturalWidth > 0) {
-          resolve();
-          return;
-        }
-
-        let loaded = false;
-        const cleanup = () => {
-          loaded = true;
-          img.removeEventListener("load", onLoad);
-          img.removeEventListener("error", onError);
-        };
-
-        const onLoad = () => {
-          if (!loaded) {
-            cleanup();
-            resolve();
-          }
-        };
-
-        const onError = () => {
-          if (!loaded) {
-            cleanup();
-            resolve();
-          }
-        };
-
-        img.addEventListener("load", onLoad, { once: true });
-        img.addEventListener("error", onError, { once: true });
-      });
-    }
-
-    function waitForFonts() {
-      if (!fonts.ready) {
-        return fonts.ready;
-      }
-      return Promise.resolve();
-    }
-
     const imagePromise =
       images.length === 0
         ? Promise.resolve()
@@ -65,22 +85,12 @@ export default function Template({ children }: { children: React.ReactNode }) {
     const fontPromise = waitForFonts();
 
     Promise.all([imagePromise, fontPromise]).finally(() => {
-      if (!abortControllerRef.current?.signal.aborted) {
-        const elapsedTime = Date.now() - startTimeRef.current;
-        const remainingTime = Math.max(0, MIN_LOAD_TIME - elapsedTime);
-
-        if (remainingTime > 0) {
-          // Si no ha pasado el tiempo mínimo, esperar
-          if (timeoutRef.current) clearTimeout(timeoutRef.current);
-          timeoutRef.current = setTimeout(() => {
-            setLoading(false);
-          }, remainingTime);
-        } else {
-          // Si ya pasó el tiempo mínimo, mostrar inmediatamente
-          if (timeoutRef.current) clearTimeout(timeoutRef.current);
-          setLoading(false);
-        }
-      }
+      handleResourcesLoaded(
+        abortControllerRef.current!.signal,
+        startTimeRef.current,
+        () => setLoading(false),
+        timeoutRef,
+      );
     });
 
     timeoutRef.current = setTimeout(() => {
