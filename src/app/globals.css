@@ -144,6 +144,91 @@ body {
     cursor: not-allowed;
   }
 
+  .btn-action {
+    @apply flex-1 py-3 text-lg font-semibold rounded-lg transition-colors shadow-lg;
+    background-color: var(--color-secondary);
+    color: var(--color-text-inverse);
+  }
+
+  .btn-action:hover:not(:disabled) {
+    background-color: #d97a28;
+  }
+
+  .btn-action:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-success {
+    @apply px-6 py-3 text-sm font-semibold rounded-lg transition-colors;
+    background-color: var(--color-accent-green);
+    color: var(--color-text-inverse);
+  }
+
+  .btn-success:hover:not(:disabled) {
+    background-color: #026b38;
+  }
+
+  .btn-success:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-success-sm {
+    @apply px-4 py-2 text-sm font-semibold rounded-lg transition-colors;
+    background-color: var(--color-accent-green);
+    color: var(--color-text-inverse);
+  }
+
+  .btn-success-sm:hover:not(:disabled) {
+    background-color: #026b38;
+  }
+
+  .btn-success-sm:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-danger {
+    @apply px-6 py-3 text-sm font-semibold rounded-lg transition-colors;
+    background-color: var(--color-danger);
+    color: var(--color-text-inverse);
+  }
+
+  .btn-danger:hover:not(:disabled) {
+    background-color: #7a0b0b;
+  }
+
+  .btn-danger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-icon-danger {
+    @apply flex items-center justify-center w-8 h-8 rounded-lg transition-colors shrink-0;
+    background-color: var(--color-danger);
+    color: var(--color-text-inverse);
+  }
+
+  .btn-icon-danger:hover:not(:disabled) {
+    background-color: #7a0b0b;
+  }
+
+  .btn-icon-danger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-icon-close {
+    @apply flex items-center justify-center w-8 h-8 rounded-lg transition-colors shrink-0;
+    background-color: var(--color-bg-border);
+    color: var(--color-text);
+  }
+
+  .btn-icon-close:hover {
+    background-color: var(--color-bg-separator);
+  }
+
   /* Alertas */
   .alert-error {
     @apply mt-6 p-4 rounded border-l-4;
