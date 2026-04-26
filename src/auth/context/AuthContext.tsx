@@ -24,8 +24,8 @@ interface AuthContextType {
   setRoleOverride?: (role: UserRole | undefined) => void;
   mockColoniaId?: number | null;
   setMockColoniaId?: (id: number | null) => void;
-  mockUserId?: number;
-  setMockUserId?: (id: number) => void;
+  mockUserId?: number | null;
+  setMockUserId?: (id: number | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -36,10 +36,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isFetchingSession, setIsFetchingSession] = useState(false);
   const [sessionChecked, setSessionChecked] = useState(false);
   const [roleOverride, setRoleOverride] = useState<UserRole | undefined>(
-    undefined,
+    IS_DEV ? "usuario" : undefined,
   );
   const [mockColoniaId, setMockColoniaId] = useState<number | null>(null);
-  const [mockUserId, setMockUserId] = useState(999);
+  const [mockUserId, setMockUserId] = useState<number | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -47,6 +47,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!mounted) return;
+
+    if (IS_DEV) {
+      setSessionChecked(true);
+      return;
+    }
 
     const savedDocumento = localStorage.getItem(STORAGE_KEY);
 
@@ -59,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsFetchingSession(true);
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s máximo
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
 
       try {
         const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "";
@@ -103,7 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           ...buildMockUsers(mockColoniaId)[
             roleOverride as Exclude<UserRole, undefined>
           ]!,
-          id: mockUserId,
+          id: mockUserId ?? 999,
         }
       : user;
 

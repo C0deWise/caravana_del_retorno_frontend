@@ -9,3 +9,12 @@ export async function listColonyMembers(
   );
   return data;
 }
+
+export async function removeColonyMember(
+  colonyId: number,
+  memberId: number,
+): Promise<void> {
+  await apiService.delete<void>(
+    `/api/v1/usuario/colonia/${colonyId}/${memberId}`, // TODO: Cambiar a la api real cuando este disponible
+  );
+}

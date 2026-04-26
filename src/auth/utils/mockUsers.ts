@@ -1,14 +1,14 @@
 import { UserData, UserRole } from "@/types/user.types";
 
 const MOCK_USER_BASE: Omit<UserData, "role" | "codigo_colonia"> = {
-  documento: "123456789",
+  documento: "1234567890",
   tipo_doc: "CC",
-  nombre: "Carlos",
-  apellido: "Pérez",
+  nombre: "Pepito",
+  apellido: "Pérez MOCK",
   id: 999,
   fecha_creacion: "2026-04-08T00:00:00.000Z",
   celular: "0123456789",
-  correo: "example@email.com",
+  correo: "pepitoperezMOCK@email.com",
   genero: "M",
   fecha_nacimiento: "1969-07-20",
   pais: "Colombia",
@@ -27,7 +27,7 @@ export const buildMockUsers = (
   lider_colonia: {
     ...MOCK_USER_BASE,
     role: "lider_colonia",
-    codigo_colonia: coloniaId ?? 1,
+    codigo_colonia: coloniaId,
   },
   admin: {
     ...MOCK_USER_BASE,
