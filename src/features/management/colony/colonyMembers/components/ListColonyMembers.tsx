@@ -97,7 +97,7 @@ export default function ListColonyMembers({
   paramsId,
 }: ListColonyMembersProps) {
   return (
-    <RequireAuth>
+    <RequireAuth requireColony>
       <ColonyMembersFeature paramsId={paramsId} />
     </RequireAuth>
   );
