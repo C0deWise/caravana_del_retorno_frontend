@@ -6,7 +6,7 @@ import { RequireAuth } from "@/auth/components/RequireAuth";
 import Spinner from "@/ui/animations/Spinner";
 import { useActiveReturn } from "../hooks/useActiveReturn";
 import ReturnRegistrationForm from "../../returnRegistrationForm/components/ReturnRegistrationForm";
-import { GrupalReturnRegistrationForm } from "../../grupalReturnRegistrationForm/components/grupalReturnRegistrationForm";
+import { GrupalReturnRegistrationForm } from "../../grupalReturnRegistration/components/grupalReturnRegistrationForm";
 
 type RegistrationView = "individual" | "grupal";
 
