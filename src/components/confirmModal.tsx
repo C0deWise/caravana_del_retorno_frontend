@@ -72,11 +72,17 @@ export function ConfirmModal({
         </h2>
 
         {details.length > 0 && (
-          <ul className="mb-6 list-disc space-y-1 pl-5 text-base text-text">
-            {details.map((item, idx) => (
-              <li key={idx}>{item}</li>
-            ))}
-          </ul>
+          <div className="mb-6 text-center text-base text-text">
+            {details.length === 1 ? (
+              <p>{details[0]}</p>
+            ) : (
+              <ul className="list-disc space-y-1 pl-5 text-left">
+                {details.map((item, idx) => (
+                  <li key={idx}>{item}</li>
+                ))}
+              </ul>
+            )}
+          </div>
         )}
 
         <div className="flex gap-3">

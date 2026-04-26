@@ -76,7 +76,7 @@ export default function RoleSwitcher() {
               min="1"
               value={mockUserId ?? ""}
               onChange={(e) =>
-                setMockUserId(e.target.value ? Number(e.target.value) : 999)
+                setMockUserId(e.target.value ? Number(e.target.value) : null)
               }
               className="w-16 rounded border border-gray-400 bg-white px-1 py-0.5 font-mono text-[10px] focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
               placeholder="999"
@@ -98,7 +98,7 @@ export default function RoleSwitcher() {
                 setMockColoniaId(e.target.value ? Number(e.target.value) : null)
               }
               className="w-16 rounded border border-gray-400 bg-white px-1 py-0.5 font-mono text-[10px] focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
-              placeholder="ID"
+              placeholder="null"
               title="Código de colonia mock"
             />
             <button
@@ -124,13 +124,6 @@ export default function RoleSwitcher() {
               </div>
               <div>
                 Nombre: {user.nombre} {user.apellido}
-              </div>
-              <div>
-                ID: <span className="font-mono">{user.id}</span>
-              </div>
-              <div>Código colonia: {user.codigo_colonia ?? "null"}</div>
-              <div>
-                Rol: <span className="font-mono">{user.role}</span>
               </div>
             </>
           ) : (
