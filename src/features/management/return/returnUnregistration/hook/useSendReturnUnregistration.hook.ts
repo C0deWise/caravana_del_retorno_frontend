@@ -19,7 +19,7 @@ export const useSendReturnUnregistration = (): UseSendReturnUnregistration => {
         setError(null);
         setSuccess(false);
         try {
-            const response = await returnUnregistrationService.createReturnRegistration(data);
+            const response = await returnUnregistrationService.deleteReturnRegistration(data);
             setSuccess(true);
             return response;
         }

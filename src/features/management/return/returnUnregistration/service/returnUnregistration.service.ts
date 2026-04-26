@@ -50,8 +50,10 @@ class ReturnUnregistrationService {
      * @param data - Objeto que contiene el ID del usuario y el ID del retorno.
      * @returns Una promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
-    async createReturnRegistration(data: ReturnUnregistrationCreateRequest): Promise<ReturnUnregistrationApi> {
-        return apiService.post<ReturnUnregistrationApi>(this.registroEndpoint, data);
+    async deleteReturnRegistration(data: ReturnUnregistrationCreateRequest): Promise<ReturnUnregistrationApi> {
+        // Reemplazar mock cuando el endpoint esté disponible
+        // return apiService.post<ReturnUnregistrationApi>(this.registroEndpoint, data);
+        return ({ usuario: data.usuario, retorno: data.retorno });
     }
 }
 
