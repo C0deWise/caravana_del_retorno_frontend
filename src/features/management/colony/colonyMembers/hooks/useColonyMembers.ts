@@ -12,6 +12,7 @@ export function useColonyMembers(targetColonyId: number): {
   error: string | null;
   isAdminView: boolean;
   totalMembers: number;
+  removeMemberLocally: (memberId: number) => void;
 } {
   const { user } = useAuth();
   const [members, setMembers] = useState<ColonyMember[]>([]);
@@ -30,9 +31,9 @@ export function useColonyMembers(targetColonyId: number): {
   );
 
   const colonyLabel = colony
-    ? colony.ciudad && colony.departamento
-      ? `${colony.ciudad}, ${colony.departamento}`
-      : colony.pais
+    ? [colony.ciudad, colony.departamento, colony.pais]
+        .filter(Boolean)
+        .join(", ")
     : "Cargando...";
 
   const fetchMembers = useCallback(async () => {
@@ -74,6 +75,12 @@ export function useColonyMembers(targetColonyId: number): {
 
   const isAdminView = user?.role === "admin";
 
+  const removeMemberLocally = useCallback(
+    (memberId: number) =>
+      setMembers((prev) => prev.filter((m) => m.id !== memberId)),
+    [],
+  );
+
   return {
     members,
     colonyLabel,
@@ -81,5 +88,6 @@ export function useColonyMembers(targetColonyId: number): {
     error,
     isAdminView,
     totalMembers: members.length,
+    removeMemberLocally,
   };
 }
