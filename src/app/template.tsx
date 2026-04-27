@@ -1,56 +1,167 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Spinner from "@/ui/animations/Spinner";
+
+const MIN_LOAD_TIME = 1000;
+
+function waitForImage(img: HTMLImageElement): Promise<void> {
+  return new Promise<void>((resolve) => {
+    if (img.complete && img.naturalWidth > 0) {
+      resolve();
+      return;
+    }
+
+    let loaded = false;
+
+    const cleanup = () => {
+      loaded = true;
+      img.removeEventListener("load", onLoad);
+      img.removeEventListener("error", onError);
+    };
+
+    const onLoad = () => {
+      if (!loaded) {
+        cleanup();
+        resolve();
+      }
+    };
+
+    const onError = () => {
+      if (!loaded) {
+        cleanup();
+        resolve();
+      }
+    };
+
+    img.addEventListener("load", onLoad, { once: true });
+    img.addEventListener("error", onError, { once: true });
+  });
+}
+
+async function waitForFonts(): Promise<void> {
+  await document.fonts.ready;
+}
+
+function handleResourcesLoaded(
+  abortSignal: AbortSignal,
+  startTime: number,
+  onComplete: () => void,
+  timeoutRef: React.MutableRefObject<ReturnType<typeof setTimeout> | null>,
+) {
+  if (abortSignal.aborted) return;
+
+  const elapsedTime = Date.now() - startTime;
+  const remainingTime = Math.max(0, MIN_LOAD_TIME - elapsedTime);
+
+  if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+  if (remainingTime > 0) {
+    timeoutRef.current = setTimeout(onComplete, remainingTime);
+  } else {
+    onComplete();
+  }
+}
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const startTimeRef = useRef<number>(0);
 
-  useEffect(() => {
-    // Timeout de seguridad: si las imágenes tardan más de 2s, mostramos la página de todas formas
-    const timeout = setTimeout(() => setLoading(false), 2000);
-
-    if (!containerRef.current) {
-      return () => clearTimeout(timeout);
-    }
+  const checkResourcesLoaded = useCallback(() => {
+    if (!containerRef.current) return;
 
     const images = Array.from(containerRef.current.querySelectorAll("img"));
-
-    function waitForLoad(img: HTMLImageElement) {
-      return new Promise<void>((resolve) => {
-        if (img.complete && img.naturalWidth > 0) {
-          resolve();
-        } else {
-          img.onload = () => resolve();
-          img.onerror = () => resolve();
-        }
-      });
-    }
-
-    const promise =
+    const imagePromise =
       images.length === 0
         ? Promise.resolve()
-        : Promise.all(images.map(waitForLoad));
+        : Promise.all(images.map(waitForImage));
 
-    promise.finally(() => {
-      clearTimeout(timeout);
-      setLoading(false);
+    const fontPromise = waitForFonts();
+
+    Promise.all([imagePromise, fontPromise]).finally(() => {
+      handleResourcesLoaded(
+        abortControllerRef.current!.signal,
+        startTimeRef.current,
+        () => setLoading(false),
+        timeoutRef,
+      );
     });
 
-    return () => clearTimeout(timeout);
+    timeoutRef.current = setTimeout(() => {
+      if (!abortControllerRef.current?.signal.aborted) {
+        setLoading(false);
+      }
+    }, 3500);
   }, []);
+
+  useEffect(() => {
+    abortControllerRef.current = new AbortController();
+    startTimeRef.current = Date.now();
+
+    const requestIdleCallbackId = globalThis.requestIdleCallback(
+      () => {
+        checkResourcesLoaded();
+      },
+      { timeout: 100 },
+    );
+
+    return () => {
+      abortControllerRef.current?.abort();
+      globalThis.cancelIdleCallback(requestIdleCallbackId);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [checkResourcesLoaded]);
 
   return (
     <>
-      {loading && (
-        <div className="fixed inset-0 flex items-center justify-center bg-primary z-50">
-          <Spinner size="xl" />
-        </div>
-      )}
+      {/* Spinner + fondo con gradiente - se desvanecen suavemente */}
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 50,
+          background:
+            "linear-gradient(135deg, #024059 0%, #013548 50%, #02314d 100%)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          gap: "1rem",
+          opacity: loading ? 1 : 0,
+          filter: loading ? "blur(0px)" : "blur(8px)",
+          transition: "opacity 0.8s ease-out, filter 0.8s ease-out",
+          pointerEvents: loading ? "auto" : "none",
+        }}
+      >
+        <Spinner size="xl" />
+        <p
+          style={{
+            color: "white",
+            fontSize: "1.125rem",
+            fontWeight: 600,
+            letterSpacing: "0.025em",
+            fontFamily: "var(--font-inter), sans-serif",
+            animation: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+            opacity: loading ? 1 : 0,
+            transition: loading ? "opacity 0.6s ease-out 0.3s" : "none",
+          }}
+        >
+          Conectando con la Caravana del Retorno, Florencia, Cauca...
+        </p>
+      </div>
+
+      {/* Contenido - aparece conforme el spinner desaparece */}
       <div
         ref={containerRef}
-        style={{ visibility: loading ? "hidden" : "visible" }}
+        style={{
+          display: loading ? "none" : "block",
+          opacity: loading ? 0 : 1,
+          transition: loading ? "none" : "opacity 0.8s ease-out",
+          pointerEvents: loading ? "none" : "auto",
+        }}
       >
         {children}
       </div>

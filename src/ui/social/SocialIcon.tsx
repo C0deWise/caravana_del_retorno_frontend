@@ -28,6 +28,7 @@ export default function SocialIcon({
         src={src}
         alt=""
         fill
+        priority
         className="rounded-lg group-hover:scale-110 transition-all duration-200 object-contain"
         unoptimized
       />
