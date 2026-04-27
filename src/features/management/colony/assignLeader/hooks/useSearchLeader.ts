@@ -1,9 +1,7 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { ApiError } from "@/services/api.services";
 import { leaderService } from "../services/leader.service";
-import type { UserSearchResult } from "../types/leader.types";
-
-type SearchMode = "nombre" | "documento";
+import type { UserSearchResult, SearchMode } from "../types/leader.types";
 
 interface UseSearchLeaderReturn {
   searchUsers: (
@@ -20,7 +18,7 @@ export const useSearchLeader = (): UseSearchLeaderReturn => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const searchUsers = async (
+  const searchUsers = useCallback(async (
     mode: SearchMode,
     value: string,
   ): Promise<UserSearchResult[] | null> => {
@@ -66,7 +64,7 @@ export const useSearchLeader = (): UseSearchLeaderReturn => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   return {
     searchUsers,

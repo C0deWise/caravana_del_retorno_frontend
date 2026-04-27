@@ -17,3 +17,5 @@ export interface SetLeaderResponse {
   co_ciudad: string;
   lider: number;
 }
+
+export type SearchMode = "nombre" | "documento";

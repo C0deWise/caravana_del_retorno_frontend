@@ -13,7 +13,7 @@ import { RequireAuth } from "@/auth/components/RequireAuth";
 export default function GestionLayout({
   children,
 }: {
-  children: React.ReactNode;
+  readonly children: React.ReactNode;
 }) {
   const pathname = usePathname();
 
@@ -29,7 +29,7 @@ export default function GestionLayout({
 
           <div className="flex flex-col flex-1 md:gap-6 md:mr-8">
             <Breadcrumb />
-            <div className="flex-1 overflow-y-auto rounded-xl">
+            <div className="flex-1 overflow-y-scroll rounded-xl">
               <PageTransition key={pathname}>
                 <ErrorBoundary
                   fallback={

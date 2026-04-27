@@ -18,6 +18,10 @@ export const menuConfig: MenuItem[] = [
     icon: "home",
     subitems: [
       {
+        label: "Administrar Colonias",
+        href: "/gestion/colonia/administrar",
+      },
+      {
         label: "Crear Colonia",
         href: "/gestion/colonia/crear",
       },

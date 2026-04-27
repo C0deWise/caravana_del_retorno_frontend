@@ -5,6 +5,7 @@ import type { ColonyData, ColonyApi } from "@/types/colony.types";
 
 interface UseCreateColoniaReturn {
   createColonia: (data: ColonyData) => Promise<ColonyApi | null>;
+  resetError: () => void;
   loading: boolean;
   error: string | null;
   success: boolean;
@@ -14,6 +15,8 @@ export const useCreateColonia = (): UseCreateColoniaReturn => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  const resetError = () => setError(null);
 
   const createColonia = async (data: ColonyData): Promise<ColonyApi | null> => {
     const isColombia = data.pais === "Colombia";
@@ -56,6 +59,7 @@ export const useCreateColonia = (): UseCreateColoniaReturn => {
 
   return {
     createColonia,
+    resetError,
     loading,
     error,
     success,
