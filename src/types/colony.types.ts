@@ -19,5 +19,3 @@ export type ColonyData = Pick<ColonyApi, "lider"> & {
   departamento: string | null;
   ciudad: string | null;
 };
-
-export type ColonyItem = ColonyData;

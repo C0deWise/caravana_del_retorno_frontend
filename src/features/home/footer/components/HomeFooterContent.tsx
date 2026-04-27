@@ -1,9 +1,10 @@
-import FooterCurve from "@/ui/general/FooterCurve";
-import FlorenciaMap from "@/ui/social/FlorenciaMap";
-import VerticalSeparator from "@/ui/decorators/VerticalSeparator";
-import MainText from "@/ui/general/MainText";
-import SocialIcon from "@/ui/social/SocialIcon";
+import FooterCurve from "@/components/layout/FooterCurve";
+import FlorenciaMap from "@/components/common/FlorenciaMap";
+import VerticalSeparator from "@/components/layout/VerticalSeparator";
+import MainText from "@/components/common/MainText";
+import SocialIcon from "@/components/common/SocialIcon";
 import { PhotoIcon } from "@heroicons/react/24/outline";
+import CopyrightText from "@/components/common/CopyrightText";
 
 export default function HomeFooterContent() {
   return (
@@ -67,10 +68,8 @@ export default function HomeFooterContent() {
           />
         </div>
       </div>
-      <div className="absolute bottom-2 left-0 right-0 text-center text-text-inverse text-sm font-light">
-        © {new Date().getFullYear()} All rights reserved | Caravana del retorno,
-        Florencia, Cauca
-      </div>
+      <CopyrightText className="absolute bottom-2 left-0 right-0 text-center text-text-inverse text-sm font-light" />
     </div>
   );
 }
+

@@ -1,21 +1,22 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ApiError } from "@/services/api.services";
 import { coloniaService } from "../services/colony.service";
-import type { ColonyItem } from "@/types/colony.types";
+import type { ColonyData } from "@/types/colony.types";
 
 interface UseListColoniesReturn {
-  listColonies: () => Promise<ColonyItem[] | null>;
-  colonies: ColonyItem[];
+  listColonies: () => Promise<ColonyData[] | null>;
+  refetch: () => Promise<ColonyData[] | null>;
+  colonies: ColonyData[];
   loading: boolean;
   error: string | null;
 }
 
-export const useListColonies = (): UseListColoniesReturn => {
-  const [colonies, setColonies] = useState<ColonyItem[]>([]);
+export const useListColonies = (autoFetch = false): UseListColoniesReturn => {
+  const [colonies, setColonies] = useState<ColonyData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const listColonies = useCallback(async (): Promise<ColonyItem[] | null> => {
+  const listColonies = useCallback(async (): Promise<ColonyData[] | null> => {
     setLoading(true);
     setError(null);
 
@@ -27,7 +28,7 @@ export const useListColonies = (): UseListColoniesReturn => {
       if (err instanceof ApiError) {
         setError(err.message);
       } else {
-        setError("Error de conexión, intenta de nuevo");
+        setError("Error al cargar las colonias");
       }
       return null;
     } finally {
@@ -35,5 +36,11 @@ export const useListColonies = (): UseListColoniesReturn => {
     }
   }, []);
 
-  return { listColonies, colonies, loading, error };
+  useEffect(() => {
+    if (autoFetch) {
+      void listColonies();
+    }
+  }, [autoFetch, listColonies]);
+
+  return { listColonies, refetch: listColonies, colonies, loading, error };
 };

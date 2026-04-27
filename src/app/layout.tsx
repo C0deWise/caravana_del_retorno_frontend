@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import ErrorBoundary from "@/ui/general/ErrorBoundary";
+import ErrorBoundary from "@/components/feedback/ErrorBoundary";
 import AuthWrapper from "@/auth/providers/AuthWrapper";
 
 const inter = Inter({
@@ -48,3 +48,4 @@ export default function RootLayout({
     </html>
   );
 }
+

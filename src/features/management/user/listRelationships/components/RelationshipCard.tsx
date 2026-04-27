@@ -11,6 +11,8 @@ interface RelationshipCardProps {
   onReject?: (relationshipId: string) => void;
 }
 
+import { RelationshipStatusTag } from "./RelationshipStatusTag";
+
 export function RelationshipCard({
   relationship,
   index,
@@ -30,36 +32,6 @@ export function RelationshipCard({
   // Solo el destinatario ve los botones
   const isRecipient = relatedUser.id === targetUserId;
   const showActions = isPending && isRecipient;
-
-  const getStatusConfig = (currentStatus: string) => {
-    if (currentStatus === "aceptada") {
-      return {
-        label: "Aceptada",
-        badgeClass: "bg-accent-green/20 text-accent-green",
-      };
-    }
-
-    if (currentStatus === "rechazada") {
-      return {
-        label: "Rechazada",
-        badgeClass: "bg-accent-red/15 text-accent-red",
-      };
-    }
-
-    if (currentStatus === "expirada") {
-      return {
-        label: "Expirada",
-        badgeClass: "bg-text-muted/15 text-text-muted",
-      };
-    }
-
-    return {
-      label: "Pendiente",
-      badgeClass: "bg-secondary/15 text-secondary",
-    };
-  };
-
-  const { label, badgeClass } = getStatusConfig(normalizedStatus);
 
   return (
     <div className="rounded-4xl border border-gray-100 bg-bg py-3 px-4 shadow-sm">
@@ -85,12 +57,7 @@ export function RelationshipCard({
               </span>
 
               <span className="inline-flex items-center gap-1 text-text-muted">
-                Estado:{" "}
-                <span
-                  className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${badgeClass}`}
-                >
-                  {label}
-                </span>
+                Estado: <RelationshipStatusTag status={normalizedStatus} />
               </span>
             </div>
           </div>

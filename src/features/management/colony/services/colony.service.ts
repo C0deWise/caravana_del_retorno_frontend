@@ -1,7 +1,7 @@
 import { apiService } from "@/services/api.services";
-import type { ColonyApi, ColonyItem } from "@/types/colony.types";
+import type { ColonyApi, ColonyData } from "@/types/colony.types";
 
-const mapColonyApiToItem = (colony: ColonyApi): ColonyItem => ({
+const mapColonyApiToItem = (colony: ColonyApi): ColonyData => ({
   codigo: colony.co_codigo,
   pais: colony.co_pais,
   departamento: colony.co_departamento,
@@ -10,7 +10,7 @@ const mapColonyApiToItem = (colony: ColonyApi): ColonyItem => ({
 });
 
 export const coloniaService = {
-  getColonias: async (): Promise<ColonyItem[]> => {
+  getColonias: async (): Promise<ColonyData[]> => {
     const response = await apiService.get<ColonyApi[]>("/api/v1/colonias/");
     return response.map(mapColonyApiToItem);
   },

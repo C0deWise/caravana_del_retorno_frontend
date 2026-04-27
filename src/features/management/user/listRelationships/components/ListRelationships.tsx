@@ -5,7 +5,7 @@ import { useAuth } from "@/auth/context/AuthContext";
 import { useListRelationships } from "../hooks/useListRelationships";
 import { RelationshipList } from "./RelationshipList";
 import { RequestRelationshipModal } from "./RequestRelationshipModal";
-import Spinner from "@/ui/animations/Spinner";
+import Spinner from "@/components/feedback/Spinner";
 import { RequireAuth } from "@/auth/components/RequireAuth";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
@@ -134,3 +134,4 @@ export default function ListRelationships() {
     </RequireAuth>
   );
 }
+
