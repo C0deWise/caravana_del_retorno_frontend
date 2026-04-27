@@ -1,12 +1,12 @@
 "use client";
 import { UserGroupIcon } from "@heroicons/react/24/outline";
-import { Member } from "../types/member";
-import { LoggedUserRole } from "@/features/auth/types/roles";
+import { ColonyMember } from "../types/colony-members.types";
+import { UserRole } from "@/types/user.types";
 import { MemberCard } from "./MemberCard";
 
 interface MemberListProps {
-  members: Member[];
-  userRole: LoggedUserRole;
+  members: ColonyMember[];
+  userRole: UserRole;
 }
 
 export function MemberList({ members, userRole }: MemberListProps) {

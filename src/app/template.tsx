@@ -1,14 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Spinner from "@/ui/general/Spinner";
+import Spinner from "@/ui/animations/Spinner";
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    // Timeout de seguridad: si las imágenes tardan más de 2s, mostramos la página de todas formas
+    const timeout = setTimeout(() => setLoading(false), 2000);
+
+    if (!containerRef.current) {
+      return () => clearTimeout(timeout);
+    }
 
     const images = Array.from(containerRef.current.querySelectorAll("img"));
 
@@ -29,8 +34,11 @@ export default function Template({ children }: { children: React.ReactNode }) {
         : Promise.all(images.map(waitForLoad));
 
     promise.finally(() => {
+      clearTimeout(timeout);
       setLoading(false);
     });
+
+    return () => clearTimeout(timeout);
   }, []);
 
   return (

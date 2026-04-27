@@ -1,15 +1,23 @@
 "use client";
 
-import { menuConfig } from "../config/menuConfig";
 import { useSidebarContext } from "./SidebarContext";
 import SidebarMenuItem from "./SidebarMenuItem";
+import { getMenuByRole } from "../../utils/getMenuByRole";
+import { useAuth } from "@/auth/context/AuthContext";
 
 export default function SidebarMenu() {
   const { isCollapsed } = useSidebarContext();
+  const { user, isHydrating } = useAuth();
+
+  if (isHydrating) {
+    return null;
+  }
+
+  const filteredMenu = getMenuByRole(user);
 
   return (
     <nav className="flex-1 p-4 space-y-2 overflow-hidden">
-      {menuConfig.map((item) => (
+      {filteredMenu.map((item) => (
         <SidebarMenuItem
           key={item.href}
           item={item}

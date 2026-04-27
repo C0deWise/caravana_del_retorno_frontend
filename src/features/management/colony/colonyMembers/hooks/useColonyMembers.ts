@@ -1,56 +1,85 @@
-import { useCallback, useMemo, useState } from "react";
-import { useAuth } from "@/features/auth/context/AuthContext";
-import type { Member } from "../types/member";
-import { mockColonies, mockAllMembers } from "./mocks";
+import { useCallback, useEffect, useState, useMemo } from "react";
+import { useAuth } from "@/auth/context/AuthContext";
+import { ColonyMember } from "../types/colony-members.types";
+import { listColonyMembers } from "../services/colony-members.service";
+import { ApiError } from "@/services/api.services";
+import { useListColonies } from "../../hooks/useListColonies";
 
 export function useColonyMembers(targetColonyId: number): {
-  members: Member[];
+  members: ColonyMember[];
   colonyLabel: string;
-  hasMore: boolean;
-  loadMore: () => void;
+  isLoading: boolean;
+  error: string | null;
   isAdminView: boolean;
   totalMembers: number;
 } {
   const { user } = useAuth();
+  const [members, setMembers] = useState<ColonyMember[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredMembers = useMemo(
-    () => mockAllMembers.filter((m) => m.colonyId === targetColonyId),
-    [targetColonyId],
-  );
+  const { colonies, listColonies } = useListColonies();
+
+  useEffect(() => {
+    void listColonies();
+  }, [listColonies]);
 
   const colony = useMemo(
-    () => mockColonies.find((c) => c.id === targetColonyId),
-    [targetColonyId],
+    () => colonies.find((c) => c.codigo === targetColonyId),
+    [colonies, targetColonyId],
   );
-
-  const [page, setPage] = useState(1);
-  const limit = 20;
 
   const colonyLabel = colony
-    ? colony.city && colony.department
-      ? `${colony.city}, ${colony.department}`
-      : colony.country
-    : "Colony not found";
+    ? colony.ciudad && colony.departamento
+      ? `${colony.ciudad}, ${colony.departamento}`
+      : colony.pais
+    : "Cargando...";
 
-  const members = useMemo(
-    () => filteredMembers.slice(0, page * limit),
-    [filteredMembers, page],
-  );
+  const fetchMembers = useCallback(async () => {
+    if (!targetColonyId) {
+      setMembers([]);
+      setError(null);
+      return;
+    }
 
-  const hasMore = page * limit < filteredMembers.length;
+    setIsLoading(true);
+    setError(null);
 
-  const loadMore = useCallback(() => {
-    setPage((p) => p + 1);
-  }, []);
+    try {
+      const data = await listColonyMembers(targetColonyId);
+      setMembers(data);
+    } catch (err) {
+      const apiError = err as ApiError;
+      switch (apiError.status) {
+        case 422:
+          setError("Error de validación en la colonia solicitada");
+          setMembers([]);
+          break;
+        case 404:
+          setError("No se encontraron miembros en la colonia indicada");
+          setMembers([]);
+          break;
+        default:
+          setError(apiError.message || "Error cargando miembros");
+          setMembers([]);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [targetColonyId]);
+
+  useEffect(() => {
+    void fetchMembers();
+  }, [fetchMembers]);
 
   const isAdminView = user?.role === "admin";
 
   return {
     members,
     colonyLabel,
-    hasMore,
-    loadMore,
+    isLoading,
+    error,
     isAdminView,
-    totalMembers: filteredMembers.length,
+    totalMembers: members.length,
   };
 }

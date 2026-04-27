@@ -1,10 +1,8 @@
-import FooterCurve from "@/ui/footer/FooterCurve";
-import VerticalSeparator from "@/ui/general/VerticalSeparator";
-import HeaderText from "@/ui/header/HeaderText";
-import FooterFacebook from "@/ui/footer/FooterFacebook";
-import FooterInstagram from "@/ui/footer/FooterInstagram";
-import HomeMap from "./HomeMap";
-import { ArrowLeftCircleIcon } from "@heroicons/react/24/outline";
+import FooterCurve from "@/ui/general/FooterCurve";
+import FlorenciaMap from "@/ui/social/FlorenciaMap";
+import VerticalSeparator from "@/ui/decorators/VerticalSeparator";
+import MainText from "@/ui/general/MainText";
+import SocialIcon from "@/ui/social/SocialIcon";
 import { PhotoIcon } from "@heroicons/react/24/outline";
 
 export default function HomeFooterContent() {
@@ -13,13 +11,12 @@ export default function HomeFooterContent() {
       <FooterCurve />
       <div className="w-full h-11/12 flex">
         <div className="flex-none md:w-auto aspect-square md:pl-10 md:py-5">
-          <HomeMap />
+          <FlorenciaMap />
         </div>
         <div className="md:w-fit md:h-full justify-center">
           <div className="flex flex-col md:pl-10 md:pr-10 md:h-full md:py-5 md:w-300">
-            <div className="flex w-fit items-center space-x-10">
-              <ArrowLeftCircleIcon className="text-text-inverse md:w-16 md:h-16 flex-none" />
-              <span className="text-text-inverse font-semibold text-4xl text-shadow-lg">
+            <div className="flex w-fit items-center">
+              <span className="text-text-inverse font-semibold text-3xl md:text-2xl text-shadow-lg">
                 ¡Encuentranos en el mapa!
               </span>
             </div>
@@ -57,15 +54,23 @@ export default function HomeFooterContent() {
           <VerticalSeparator />
         </span>
         <div className="flex flex-1 flex-col md:mr-7 md:pb-4 justify-between items-center">
-          <HeaderText />
-          <FooterFacebook className="h-20" />
-          <FooterInstagram className="h-20" />
+          <MainText size={220} />
+          <SocialIcon
+            href="https://facebook.com"
+            src="/social/facebook.svg"
+            label="Facebook"
+          />
+          <SocialIcon
+            href="https://instagram.com"
+            src="/social/instagram.svg"
+            label="Instagram"
+          />
         </div>
       </div>
-      <span className="absolute bottom-2 right-2 text-text-inverse text-sm font-light">
+      <div className="absolute bottom-2 left-0 right-0 text-center text-text-inverse text-sm font-light">
         © {new Date().getFullYear()} All rights reserved | Caravana del retorno,
         Florencia, Cauca
-      </span>
+      </div>
     </div>
   );
 }

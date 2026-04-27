@@ -8,9 +8,5 @@ export default async function Page({ searchParams }: Props) {
   const params = await searchParams;
   const paramsId = params?.colonyId ? Number(params.colonyId) : undefined;
 
-  return (
-    <>
-      <ListColonyMembers paramsId={paramsId} />
-    </>
-  );
+  return <ListColonyMembers paramsId={paramsId} />;
 }
