@@ -5,11 +5,20 @@ import { UserRole } from "@/types/user.types";
 import { MemberCard } from "./MemberCard";
 
 interface MemberListProps {
-  members: ColonyMember[];
-  userRole: UserRole;
+  readonly members: ColonyMember[];
+  readonly userRole: UserRole;
+  readonly colonyName?: string;
+  readonly onRemove?: (memberId: number) => Promise<void>;
+  readonly isRemoving?: boolean;
 }
 
-export function MemberList({ members, userRole }: MemberListProps) {
+export function MemberList({
+  members,
+  userRole,
+  colonyName,
+  onRemove,
+  isRemoving,
+}: MemberListProps) {
   if (members.length === 0) {
     return (
       <div className="text-center py-20">
@@ -32,6 +41,9 @@ export function MemberList({ members, userRole }: MemberListProps) {
           member={member}
           userRole={userRole}
           index={index + 1}
+          colonyName={colonyName}
+          onRemove={onRemove}
+          isRemoving={isRemoving}
         />
       ))}
     </div>

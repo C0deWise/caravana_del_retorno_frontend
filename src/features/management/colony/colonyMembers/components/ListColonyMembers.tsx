@@ -1,13 +1,15 @@
 "use client";
+import { useCallback } from "react";
 import Spinner from "@/ui/animations/Spinner";
 import { useColonyMembers } from "../hooks/useColonyMembers";
+import { useRemoveColonyMember } from "../hooks/useRemoveColonyMember";
 import { useAuth } from "@/auth/context/AuthContext";
 import { RequireAuth } from "@/auth/components/RequireAuth";
 import { MemberList } from "./MemberList";
 import { UserRole } from "@/types/user.types";
 
 interface ListColonyMembersProps {
-  paramsId?: number;
+  readonly paramsId?: number;
 }
 
 function ColonyMembersFeature({ paramsId }: ListColonyMembersProps) {
@@ -18,8 +20,18 @@ function ColonyMembersFeature({ paramsId }: ListColonyMembersProps) {
       ? (paramsId ?? user?.codigo_colonia ?? 1)
       : (user?.codigo_colonia ?? 0);
 
-  const { members, colonyLabel, isLoading, error, totalMembers } =
+  const { members, colonyLabel, isLoading, error, totalMembers, removeMemberLocally } =
     useColonyMembers(targetColonyId);
+
+  const { removeMember, isRemoving } = useRemoveColonyMember();
+
+  const handleRemove = useCallback(
+    async (memberId: number) => {
+      await removeMember(targetColonyId, memberId);
+      removeMemberLocally(memberId);
+    },
+    [removeMember, removeMemberLocally, targetColonyId],
+  );
 
   return (
     <div className="w-full md:pb-30 space-y-8">
@@ -68,7 +80,13 @@ function ColonyMembersFeature({ paramsId }: ListColonyMembersProps) {
         )}
 
         {!isLoading && members.length > 0 && (
-          <MemberList members={members} userRole={user?.role as UserRole} />
+          <MemberList
+            members={members}
+            userRole={user?.role as UserRole}
+            colonyName={colonyLabel}
+            onRemove={user?.role === "lider_colonia" ? handleRemove : undefined}
+            isRemoving={isRemoving}
+          />
         )}
       </main>
     </div>
@@ -79,7 +97,7 @@ export default function ListColonyMembers({
   paramsId,
 }: ListColonyMembersProps) {
   return (
-    <RequireAuth>
+    <RequireAuth requireColony>
       <ColonyMembersFeature paramsId={paramsId} />
     </RequireAuth>
   );
