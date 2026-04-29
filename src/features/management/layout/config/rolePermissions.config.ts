@@ -10,7 +10,8 @@ export const rolePermissions: Record<UserRole, string[]> = {
     "/gestion/usuario/parentesco",
     "/gestion/colonia/miembros",
     "/gestion/colonia/solicitudes-ingreso",
-    "/gestion/retorno/registro",
+    "/gestion/retorno/registro/inscripcion",
+    "/gestion/retorno/registro/cancelar",
   ],
   usuario: [
     "/gestion/usuario/parentesco",

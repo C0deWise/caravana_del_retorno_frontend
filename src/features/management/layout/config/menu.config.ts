@@ -49,7 +49,7 @@ export const menuConfig: MenuItem[] = [
         href: "/gestion/retorno/crear",
       },
       {
-        label: "Registrar Formulario de inscripción",
+        label: "Formulario de inscripción",
         href: "/gestion/retorno/registro",
       },
     ],
