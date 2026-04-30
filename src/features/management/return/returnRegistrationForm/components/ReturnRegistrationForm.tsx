@@ -8,7 +8,6 @@ import Spinner from "@/ui/animations/Spinner";
 import { useSendReturnRegistration } from "../hooks/useSendReturnRegistration";
 import { returnRegistrationService } from "../services/returnRegistration.service";
 import type { UserData } from "@/types/user.types";
-import ReturnUnregistrationForm from "../../returnUnregistration/components/ReturnUnregistrationForm";
 import type {
   ReturnRegistrationAnswer,
   ReturnRegistrationApi,
