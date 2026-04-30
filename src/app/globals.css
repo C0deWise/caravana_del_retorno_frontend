@@ -62,6 +62,27 @@ body {
     color: var(--color-text-muted);
   }
 
+  /* Textarea estándar */
+  .textarea-base {
+    @apply w-full px-4 py-3 rounded-lg transition-colors resize-none;
+    background-color: var(--color-bg-card);
+    border: 1px solid transparent;
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+  }
+
+  .textarea-base:focus {
+    outline: none;
+    background-color: var(--color-bg);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(2, 64, 89, 0.1);
+  }
+
+  .textarea-base::placeholder {
+    color: var(--color-text-muted);
+  }
+
   /* Input con error */
   .input-error {
     background-color: #fee;

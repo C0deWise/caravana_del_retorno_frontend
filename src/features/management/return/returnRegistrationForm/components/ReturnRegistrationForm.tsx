@@ -7,6 +7,7 @@ import { ConfirmModal } from "@/components/confirmModal";
 import Spinner from "@/ui/animations/Spinner";
 import { useSendReturnRegistration } from "../hooks/useSendReturnRegistration";
 import { returnRegistrationService } from "../services/returnRegistration.service";
+import type { UserData } from "@/types/user.types";
 import ReturnUnregistrationForm from "../../returnUnregistration/components/ReturnUnregistrationForm";
 import type {
   ReturnRegistrationAnswer,
@@ -26,12 +27,155 @@ const initialForm: {
   transport: ReturnRegistrationAnswer | "";
   parking: ReturnRegistrationAnswer | "";
   people_in_charge: string;
+  note: string;
 } = {
   accomodation: "",
   transport: "",
   parking: "",
   people_in_charge: "0",
+  note: "",
 };
+
+function NoUserView() {
+  return (
+    <div className="bg-white px-4 py-6 flex items-center justify-center">
+      <div className="w-full max-w-xl rounded-2xl bg-bg-card p-8 shadow-md text-center">
+        <h1 className="page-title mb-4">Registro de asistencia al retorno</h1>
+        <p className="text-text text-lg font-medium">
+          Debes iniciar sesión para registrar tu asistencia al retorno.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function NoColonyView() {
+  return (
+    <div className="bg-white px-4 py-6 flex items-center justify-center">
+      <div className="w-full max-w-xl rounded-2xl bg-bg-card p-8 shadow-md text-center">
+        <h1 className="page-title mb-4">Registro de asistencia al retorno</h1>
+        <p className="text-text text-lg font-medium">No tienes colonia asignada.</p>
+        <p className="text-text-muted mt-2">
+          Para registrarte a un retorno debes solicitar acceso y hacer parte de una colonia.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function EligibilityLoadingView() {
+  return (
+    <div className="bg-white px-4 py-6 flex items-center justify-center">
+      <div className="text-center">
+        <Spinner size="lg" className="mx-auto" />
+        <p className="mt-4 text-text-muted">Cargando información de inscripción...</p>
+      </div>
+    </div>
+  );
+}
+
+function EligibilityErrorView({ error }: {readonly  error: string }) {
+  return (
+    <div className="bg-white px-4 py-6 flex items-center justify-center">
+      <div className="w-full max-w-xl rounded-2xl bg-bg-card p-8 shadow-md text-center">
+        <h1 className="page-title mb-4">Registro de asistencia al retorno</h1>
+        <div className="alert-error mb-0">
+          <p className="alert-error-text">{error}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function NoActiveReturnView() {
+  return (
+    <div className="bg-white px-4 py-6 flex items-center justify-center">
+      <div className="w-full max-w-xl rounded-2xl bg-bg-card p-8 shadow-md text-center">
+        <h1 className="page-title mb-4">Registro de asistencia al retorno</h1>
+        <h2 className="section-title mb-4">No hay un retorno activo habilitado</h2>
+        <p className="text-text-muted mt-2">
+          Cuando un retorno sea habilitado, podras completar este formulario.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function AlreadyRegisteredView() {
+  return (
+    <div className="bg-white px-4 py-6 flex items-center justify-center">
+      <div className="w-full max-w-xl rounded-2xl bg-bg-card p-8 shadow-md text-center">
+        <h1 className="page-title mb-4">Registro de asistencia al retorno</h1>
+        <h2 className="section-title mb-4">Formulario ya registrado</h2>
+        <p className="text-text font-medium">
+          Ya has confirmado tu asistencia a este retorno.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function SubmittedRecordView({
+  record,
+  onReset,
+}: {
+  readonly record: ReturnRegistrationApi;
+  readonly onReset: () => void;
+}) {
+  return (
+    <div className="bg-white px-4 py-6 flex items-center justify-center">
+      <div className="w-full max-w-2xl rounded-2xl bg-bg-card p-8 shadow-md">
+        <h1 className="page-title">Registro de asistencia al retorno</h1>
+        <h2 className="section-title">Inscripción exitosa</h2>
+        <div className="alert-success mt-0">
+          <p className="alert-success-text">Tu asistencia fue registrada correctamente.</p>
+        </div>
+        <ul className="mt-4 list-disc pl-6 text-text space-y-1">
+          <li>Tiene hospedaje: {record.num_hospedaje === 0 ? "Sí" : "No"}</li>
+          <li>Tiene transporte: {record.num_transporte === 0 ? "Sí" : "No"}</li>
+          {record.num_transporte === 0 && (
+            <li>Necesita parqueadero: {record.num_parqueadero === 1 ? "Sí" : "No"}</li>
+          )}
+          {record.note && <li>Nota: {record.note}</li>}
+        </ul>
+        <div className="mt-8 flex justify-center">
+          <button type="button" className="btn-primary" onClick={onReset}>
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type FormGuardProps = {
+  user: UserData | null;
+  eligibilityLoading: boolean;
+  eligibilityError: string | null;
+  activeReturnCode: number | null;
+  alreadyRegistered: boolean;
+  submittedRecord: ReturnRegistrationApi | null;
+  onReset: () => void;
+};
+
+function resolveFormGuard({
+  user,
+  eligibilityLoading,
+  eligibilityError,
+  activeReturnCode,
+  alreadyRegistered,
+  submittedRecord,
+  onReset,
+}: FormGuardProps): React.ReactNode {
+  if (!user) return <NoUserView />;
+  if (!user.codigo_colonia) return <NoColonyView />;
+  if (eligibilityLoading) return <EligibilityLoadingView />;
+  if (eligibilityError) return <EligibilityErrorView error={eligibilityError} />;
+  if (!activeReturnCode) return <NoActiveReturnView />;
+  if (alreadyRegistered) return <AlreadyRegisteredView />;
+  if (submittedRecord) return <SubmittedRecordView record={submittedRecord} onReset={onReset} />;
+  return null;
+}
 
 function ReturnRegistrationFormContent() {
   const { user } = useAuth();
@@ -50,7 +194,15 @@ function ReturnRegistrationFormContent() {
   const [activeReturnYear, setActiveReturnYear] = useState<number | null>(null);
 
   useEffect(() => {
-    if (!user || !user.codigo_colonia) {
+    if (!user) {
+      setEligibilityLoading(false);
+      setEligibilityError(null);
+      setAlreadyRegistered(false);
+      setActiveReturnCode(null);
+      return;
+    }
+
+    if (!user.codigo_colonia) {
       setEligibilityLoading(false);
       setEligibilityError(null);
       setAlreadyRegistered(false);
@@ -114,8 +266,9 @@ function ReturnRegistrationFormContent() {
       ...(formData.transport === 1
         ? [`Necesita parqueadero: ${formData.parking === 1 ? "Sí" : "No"}`]
         : []),
+      ...(formData.note ? [`Nota: ${formData.note}`] : []),
     ],
-    [formData.accomodation, formData.transport, formData.parking],
+    [formData.accomodation, formData.transport, formData.parking, formData.note],
   );
 
   const validateForm = (): boolean => {
@@ -157,7 +310,7 @@ function ReturnRegistrationFormContent() {
     });
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!validateForm()) return;
@@ -207,6 +360,7 @@ function ReturnRegistrationFormContent() {
       num_hospedaje: formData.accomodation === 1 ? 0 : 1,
       num_transporte: formData.transport === 1 ? 0 : 1,
       num_parqueadero: formData.transport === 0 ? 0 : (formData.parking as ReturnRegistrationAnswer),
+      note: formData.note || undefined,
     };
 
     const response = await sendReturnRegistration(payload);
@@ -224,103 +378,16 @@ function ReturnRegistrationFormContent() {
     setFieldErrors({});
   };
 
-  if (!user || !user.codigo_colonia) {
-    return (
-      <div className="bg-white px-4 py-6 flex items-center justify-center">
-        <div className="w-full max-w-xl rounded-2xl bg-bg-card p-8 shadow-md text-center">
-          <h1 className="page-title mb-4">Registro de asistencia al retorno</h1>
-          <p className="text-text text-lg font-medium">
-            No tienes colonia asignada.
-          </p>
-          <p className="text-text-muted mt-2">
-            Para registrarte a un retorno debes solicitar acceso y hacer parte
-            de una colonia.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (eligibilityLoading) {
-    return (
-      <div className="bg-white px-4 py-6 flex items-center justify-center">
-        <div className="text-center">
-          <Spinner size="lg" className="mx-auto" />
-          <p className="mt-4 text-text-muted">
-            Cargando información de inscripción...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (eligibilityError) {
-    return (
-      <div className="bg-white px-4 py-6 flex items-center justify-center">
-        <div className="w-full max-w-xl rounded-2xl bg-bg-card p-8 shadow-md text-center">
-          <h1 className="page-title mb-4">Registro de asistencia al retorno</h1>
-          <div className="alert-error mb-0">
-            <p className="alert-error-text">{eligibilityError}</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!activeReturnCode) {
-    return (
-      <div className="bg-white px-4 py-6 flex items-center justify-center">
-        <div className="w-full max-w-xl rounded-2xl bg-bg-card p-8 shadow-md text-center">
-          <h1 className="page-title mb-4">Registro de asistencia al retorno</h1>
-          <h2 className="section-title mb-4">
-            No hay un retorno activo habilitado
-          </h2>
-          <p className="text-text-muted mt-2">
-            Cuando un retorno sea habilitado, podras completar este formulario.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (alreadyRegistered) {
-    return <ReturnUnregistrationForm />;
-  }
-
-  if (submittedRecord) {
-    return (
-      <div className="bg-white px-4 py-6 flex items-center justify-center">
-        <div className="w-full max-w-2xl rounded-2xl bg-bg-card p-8 shadow-md">
-          <h1 className="page-title">Registro de asistencia al retorno</h1>
-          <h2 className="section-title">Inscripción exitosa</h2>
-
-          <div className="alert-success mt-0">
-            <p className="alert-success-text">
-              Tu asistencia fue registrada correctamente.
-            </p>
-          </div>
-
-          <ul className="mt-4 list-disc pl-6 text-text space-y-1">
-            <li>
-              Tiene hospedaje: {submittedRecord.num_hospedaje === 0 ? "Sí" : "No"}
-            </li>
-            <li>Tiene transporte: {submittedRecord.num_transporte === 0 ? "Sí" : "No"}</li>
-            {submittedRecord.num_transporte === 0 && (
-              <li>
-                Necesita parqueadero: {submittedRecord.num_parqueadero === 1 ? "Sí" : "No"}
-              </li>
-            )}
-          </ul>
-
-          <div className="mt-8 flex justify-center">
-            <button type="button" className="btn-primary" onClick={resetForm}>
-              Confirmar
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const guardView = resolveFormGuard({
+    user,
+    eligibilityLoading,
+    eligibilityError,
+    activeReturnCode,
+    alreadyRegistered,
+    submittedRecord,
+    onReset: resetForm,
+  });
+  if (guardView) return guardView;
 
   return (
     <div className="bg-white px-4 py-6">
@@ -353,9 +420,7 @@ function ReturnRegistrationFormContent() {
                     value="si"
                     checked={formData.accomodation === 1}
                     onChange={() => handleRadioChange("accomodation", 1)}
-                  />
-                  Sí
-                </label>
+                  />Sí</label>
                 <label className="inline-flex items-center gap-2 text-text">
                   <input
                     type="radio"
@@ -363,9 +428,7 @@ function ReturnRegistrationFormContent() {
                     value="no"
                     checked={formData.accomodation === 0}
                     onChange={() => handleRadioChange("accomodation", 0)}
-                  />
-                  No
-                </label>
+                  />No</label>
               </div>
             </div>
             {fieldErrors.accomodation && (
@@ -388,9 +451,7 @@ function ReturnRegistrationFormContent() {
                     value="si"
                     checked={formData.transport === 1}
                     onChange={() => handleRadioChange("transport", 1)}
-                  />
-                  Sí
-                </label>
+                  />Sí</label>
                 <label className="inline-flex items-center gap-2 text-text">
                   <input
                     type="radio"
@@ -398,9 +459,7 @@ function ReturnRegistrationFormContent() {
                     value="no"
                     checked={formData.transport === 0}
                     onChange={() => handleRadioChange("transport", 0)}
-                  />
-                  No
-                </label>
+                  />No</label>
               </div>
             </div>
             {fieldErrors.transport && (
@@ -411,43 +470,60 @@ function ReturnRegistrationFormContent() {
           </fieldset>
 
           {formData.transport === 1 && (
-          <fieldset>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <legend className="label-primary mb-0">
-                ¿Necesita parqueadero?
-              </legend>
-              <div
-                className={`inline-flex items-center gap-5 rounded-lg px-3 py-2 ${fieldErrors.parking ? "border border-danger" : "border border-transparent"}`}
-              >
-                <label className="inline-flex items-center gap-2 text-text">
-                  <input
-                    type="radio"
-                    name="parking"
-                    value="si"
-                    checked={formData.parking === 1}
-                    onChange={() => handleRadioChange("parking", 1)}
-                  />
-                  Sí
-                </label>
-                <label className="inline-flex items-center gap-2 text-text">
-                  <input
-                    type="radio"
-                    name="parking"
-                    value="no"
-                    checked={formData.parking === 0}
-                    onChange={() => handleRadioChange("parking", 0)}
-                  />
-                  No
-                </label>
+            <fieldset>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <legend className="label-primary mb-0">
+                  ¿Necesita parqueadero?
+                </legend>
+                <div
+                  className={`inline-flex items-center gap-5 rounded-lg px-3 py-2 ${fieldErrors.parking ? "border border-danger" : "border border-transparent"}`}
+                >
+                  <label className="inline-flex items-center gap-2 text-text">
+                    <input
+                      type="radio"
+                      name="parking"
+                      value="si"
+                      checked={formData.parking === 1}
+                      onChange={() => handleRadioChange("parking", 1)}
+                    />Sí</label>
+                  <label className="inline-flex items-center gap-2 text-text">
+                    <input
+                      type="radio"
+                      name="parking"
+                      value="no"
+                      checked={formData.parking === 0}
+                      onChange={() => handleRadioChange("parking", 0)}
+                    />No</label>
+                </div>
               </div>
-            </div>
-            {fieldErrors.parking && (
-              <p className="validation-message validation-error">
-                {fieldErrors.parking}
-              </p>
-            )}
-          </fieldset>
+              {fieldErrors.parking && (
+                <p className="validation-message validation-error">
+                  {fieldErrors.parking}
+                </p>
+              )}
+            </fieldset>
           )}
+
+          <div>
+            <label htmlFor="note" className="label-primary mb-0">
+              Notas adicionales
+            </label>
+            <p className="validation-message validation-info mt-1">
+              Opcional. Puedes indicar información adicional relevante para tu asistencia.
+            </p>
+            <textarea
+              id="note"
+              name="note"
+              className="textarea-base mt-2"
+              rows={3}
+              maxLength={500}
+              placeholder="Escribe aquí cualquier información adicional..."
+              value={formData.note}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, note: e.target.value }))
+              }
+            />
+          </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>

@@ -26,28 +26,40 @@ class ReturnRegistrationService {
     async getActiveReturn(): Promise<Retorno | null> {
         const response = await apiService.get<Retorno | Retorno[]>(this.retornosEndpoint);
 
-        const list = Array.isArray(response) ? response : response ? [response] : [];
+        const list = [];
+
+        if (Array.isArray(response)) {
+            list.push(...response);
+        } else if (response) {
+            list.push(response);
+        }
+
         const activeReturns = list.filter((item) => hasActiveState(item.estado));
 
         if (activeReturns.length === 0) return null;
 
-        return activeReturns.reduce((latest, current) =>
+        return activeReturns.reduce((latest, current) => 
             current.anio > latest.anio ? current : latest,
+            activeReturns[0]
         );
     }
 
     /**
      * Valida si un usuario ya registró el formulario para un retorno específico.
-     * TODO: implementar cuando el endpoint esté disponible en el back.
+     * Implementar cuando el endpoint esté disponible en el back.
      */
     async hasUserRegistrationInReturn(_userCode: number, _returnCode: number): Promise<boolean> {
-        return false;
-
-        // const response = await apiService.get<ReturnRegistrationApi | ReturnRegistrationApi[]>(
-        //     `${this.registroEndpoint}?usuario=${_userCode}&retorno=${_returnCode}`,
-        // );
-        // if (Array.isArray(response)) return response.length > 0;
-        // return !!response;
+        return false; // Placeholder hasta que el endpoint esté disponible
+        /*
+         * Implementación futura:
+         * Se espera que el endpoint retorne un objeto o una lista. Si es una lista, se considera que el usuario tiene registro si la lista no está vacía.
+         * Si es un objeto, se considera que el usuario tiene registro si el objeto no es null/undefined.
+         */
+        /* const response = await apiService.get<ReturnRegistrationApi | ReturnRegistrationApi[]>(
+            `${this.registroEndpoint}?usuario=${_userCode}&retorno=${_returnCode}`,
+        );
+        if (Array.isArray(response)) return response.length > 0;
+        return !!response; */
     }
 
     /**
