@@ -3,15 +3,17 @@
 import { RequireAuth } from "@/auth/components/RequireAuth";
 import dynamic from "next/dynamic";
 
-const LoadContent = dynamic(
-  () => import("@/features/management/multimedia/components/LoadContent"),
+const LoadContentButton = dynamic(
+  () => import("@/features/management/multimedia/components/LoadContentButton"),
   { ssr: false },
 );
 
 export default function Page() {
   return (
     <RequireAuth roles={["lider_colonia", "admin"]}>
-      <LoadContent />
+      <div className="p-6">
+        <LoadContentButton />
+      </div>
     </RequireAuth>
   );
 }
