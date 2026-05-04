@@ -2,9 +2,9 @@
 
 import { useAuth } from "@/auth/context/AuthContext";
 import { useRouter } from "next/navigation";
-import MainIcon from "@/ui/general/MainIcon";
-import MainText from "@/ui/general/MainText";
-import HeaderCurve from "@/ui/general/HeaderCurve";
+import MainIcon from "@/components/common/MainIcon";
+import MainText from "@/components/common/MainText";
+import HeaderCurve from "@/components/layout/HeaderCurve";
 import Link from "next/link";
 import { ArrowLeftEndOnRectangleIcon } from "@heroicons/react/24/outline";
 
@@ -61,3 +61,4 @@ export default function ManagementHeaderContent() {
     </div>
   );
 }
+

@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { RequireAuth } from "@/auth/components/RequireAuth";
 import { useAuth } from "@/auth/context/AuthContext";
-import { ConfirmModal } from "@/components/confirmModal";
-import Spinner from "@/ui/animations/Spinner";
+import { ConfirmModal } from "@/components/feedback/confirmModal";
+import Spinner from "@/components/feedback/Spinner";
 import { useSendReturnRegistration } from "../hooks/useSendReturnRegistration";
 import { returnRegistrationService } from "../services/returnRegistration.service";
 import ReturnUnregistrationForm from "../../returnUnregistration/components/ReturnUnregistrationForm";
@@ -507,3 +507,4 @@ export default function ReturnRegistrationForm() {
     </RequireAuth>
   );
 }
+

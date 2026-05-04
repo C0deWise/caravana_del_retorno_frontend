@@ -34,3 +34,8 @@ export interface UserApi {
 }
 
 export type UserData = Omit<UserApi, "codigo_rol"> & { role: UserRole };
+
+// Search Types
+export type UserSearchResult = UserApi;
+export const USER_SEARCH_MODES = ["nombre", "documento"] as const;
+export type UserSearchMode = (typeof USER_SEARCH_MODES)[number];

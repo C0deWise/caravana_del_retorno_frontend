@@ -7,7 +7,7 @@ import {
   getCitiesByDepartmentName,
 } from "@/constants/countries";
 import type { City } from "@/constants/countries";
-import CountrySelect from "@/components/CountrySelect";
+import CountrySelect from "@/components/forms/CountrySelect";
 
 interface LocationModalProps {
   onClose: () => void;
@@ -196,3 +196,4 @@ export default function LocationModal({
     </div>
   );
 }
+

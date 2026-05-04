@@ -1,6 +1,6 @@
-import MainIcon from "@/ui/general/MainIcon";
-import MainText from "@/ui/general/MainText";
-import HeaderCurve from "@/ui/general/HeaderCurve";
+import MainIcon from "@/components/common/MainIcon";
+import MainText from "@/components/common/MainText";
+import HeaderCurve from "@/components/layout/HeaderCurve";
 import HomeNavbar from "../navbar/components/HomeNavbar";
 import Link from "next/link";
 
@@ -23,3 +23,4 @@ export default function HomeHeaderContent() {
     </div>
   );
 }
+
