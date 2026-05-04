@@ -38,7 +38,7 @@ export const menuConfig: MenuItem[] = [
   {
     label: "Gestión Retorno",
     href: "/gestion/retorno",
-    icon: "arrowTurnLeft",
+    icon: "userGroup",
     subitems: [
       {
         label: "Crear Retorno",

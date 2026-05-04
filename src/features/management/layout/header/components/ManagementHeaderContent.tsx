@@ -32,7 +32,7 @@ export default function ManagementHeaderContent() {
         <MainText className="mt-2 -ml-2" size={120} />
       </Link>
       <span className="text-text-inverse text-2xl font-semibold tracking-widest uppercase ml-10">
-        Panel de gestión
+        {user?.role === "usuario" ? "Panel de usuario" : "Panel de gestión"}
       </span>
 
       {/* Info del usuario + logout */}

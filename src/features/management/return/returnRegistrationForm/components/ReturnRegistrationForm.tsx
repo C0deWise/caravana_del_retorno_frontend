@@ -411,42 +411,42 @@ function ReturnRegistrationFormContent() {
           </fieldset>
 
           {formData.transport === 1 && (
-          <fieldset>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <legend className="label-primary mb-0">
-                ¿Necesita parqueadero?
-              </legend>
-              <div
-                className={`inline-flex items-center gap-5 rounded-lg px-3 py-2 ${fieldErrors.parking ? "border border-danger" : "border border-transparent"}`}
-              >
-                <label className="inline-flex items-center gap-2 text-text">
-                  <input
-                    type="radio"
-                    name="parking"
-                    value="si"
-                    checked={formData.parking === 1}
-                    onChange={() => handleRadioChange("parking", 1)}
-                  />
-                  Sí
-                </label>
-                <label className="inline-flex items-center gap-2 text-text">
-                  <input
-                    type="radio"
-                    name="parking"
-                    value="no"
-                    checked={formData.parking === 0}
-                    onChange={() => handleRadioChange("parking", 0)}
-                  />
-                  No
-                </label>
+            <fieldset>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <legend className="label-primary mb-0">
+                  ¿Necesita parqueadero?
+                </legend>
+                <div
+                  className={`inline-flex items-center gap-5 rounded-lg px-3 py-2 ${fieldErrors.parking ? "border border-danger" : "border border-transparent"}`}
+                >
+                  <label className="inline-flex items-center gap-2 text-text">
+                    <input
+                      type="radio"
+                      name="parking"
+                      value="si"
+                      checked={formData.parking === 1}
+                      onChange={() => handleRadioChange("parking", 1)}
+                    />
+                    Sí
+                  </label>
+                  <label className="inline-flex items-center gap-2 text-text">
+                    <input
+                      type="radio"
+                      name="parking"
+                      value="no"
+                      checked={formData.parking === 0}
+                      onChange={() => handleRadioChange("parking", 0)}
+                    />
+                    No
+                  </label>
+                </div>
               </div>
-            </div>
-            {fieldErrors.parking && (
-              <p className="validation-message validation-error">
-                {fieldErrors.parking}
-              </p>
-            )}
-          </fieldset>
+              {fieldErrors.parking && (
+                <p className="validation-message validation-error">
+                  {fieldErrors.parking}
+                </p>
+              )}
+            </fieldset>
           )}
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">

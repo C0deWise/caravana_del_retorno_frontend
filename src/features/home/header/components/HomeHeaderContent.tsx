@@ -7,15 +7,15 @@ import Link from "next/link";
 export default function HomeHeaderContent() {
   return (
     <div className="bg-primary md:h-24 relative">
-      <div className="h-full flex">
+      <div className="h-full flex md:px-10 justify-evenly items-center gap-8 flex-wrap md:flex-nowrap overflow-hidden">
         <Link href="/">
-          <MainIcon className="md:w-22 md:h-22 md:ml-9 md:mt-1 shrink-0" />
+          <MainIcon className="md:w-22 md:h-22 md:mt-1 shrink-0 flex-none" />
         </Link>
-        <span className="self-stretch w-1.5 rounded-4xl bg-bg ml-4 mr-1 my-2"></span>
+        <span className="self-stretch w-1.5 rounded-4xl bg-bg md:my-2 flex-none"></span>
         <Link href="/">
-          <MainText className="mt-1.5 md:mr-20 shrink-0" size={220} />
+          <MainText className="md:mt-1.5 shrink-0 flex-none" size={220} />
         </Link>
-        <div className="flex-1 md:px-4">
+        <div className="flex-1 md:flex-shrink md:min-w-0">
           <HomeNavbar />
         </div>
       </div>
@@ -23,4 +23,3 @@ export default function HomeHeaderContent() {
     </div>
   );
 }
-
