@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
+import { createPortal } from "react-dom";
 
 interface AnimatedModalProps {
   readonly isOpen: boolean;
@@ -13,7 +14,9 @@ export function AnimatedModal({
   children,
   onBackdropClick,
 }: AnimatedModalProps) {
-  return (
+  if (typeof document === "undefined") return null;
+
+  const modalContent = (
     <AnimatePresence mode="wait">
       {isOpen && (
         <motion.div
@@ -41,4 +44,6 @@ export function AnimatedModal({
       )}
     </AnimatePresence>
   );
+
+  return createPortal(modalContent, document.body);
 }
