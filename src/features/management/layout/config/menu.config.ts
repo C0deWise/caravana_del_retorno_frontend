@@ -48,6 +48,10 @@ export const menuConfig: MenuItem[] = [
         label: "Formulario de inscripción",
         href: "/gestion/retorno/registro",
       },
+      {
+        label: "Grupos de Retorno",
+        href: "/gestion/retorno/grupos",
+      }
     ],
   },
 ];
