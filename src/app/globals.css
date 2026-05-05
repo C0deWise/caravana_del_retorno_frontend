@@ -291,3 +291,43 @@ body {
   color: var(--color-accent-green);
   font-size: 0.875rem;
 }
+
+/* ===== MARCHING ANTS ANIMATION ===== */
+@keyframes marching-ants {
+  to {
+    background-position:
+      16px 0,
+      -16px 100%,
+      0 -16px,
+      100% 16px;
+  }
+}
+
+.marching-ants {
+  --ants-color: rgb(14 116 144);
+  --ants-size: 16px;
+  --ants-stroke: 2px;
+
+  background:
+    linear-gradient(90deg, var(--ants-color) 50%, transparent 50%) repeat-x,
+    linear-gradient(90deg, var(--ants-color) 50%, transparent 50%) repeat-x,
+    linear-gradient(0deg, var(--ants-color) 50%, transparent 50%) repeat-y,
+    linear-gradient(0deg, var(--ants-color) 50%, transparent 50%) repeat-y,
+    rgba(14, 116, 144, 0.1);
+
+  background-size:
+    var(--ants-size) var(--ants-stroke),
+    var(--ants-size) var(--ants-stroke),
+    var(--ants-stroke) var(--ants-size),
+    var(--ants-stroke) var(--ants-size),
+    auto;
+
+  background-position:
+    0 0,
+    0 100%,
+    0 0,
+    100% 0,
+    0 0;
+
+  animation: marching-ants 0.8s linear infinite;
+}
