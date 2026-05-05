@@ -214,7 +214,7 @@ export default function LoadContentModalForm({
           onClick={handleUpload}
           disabled={isSaving || items.length === 0}
         >
-          {isSaving ? "Subiendo..." : "Cargar a servidor"}
+          {isSaving ? "Subiendo..." : "Subir archivos"}
         </button>
         <button
           className="px-4 py-3.5 rounded-xl bg-accent-red text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"

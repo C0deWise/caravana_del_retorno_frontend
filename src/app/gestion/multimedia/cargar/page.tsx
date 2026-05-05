@@ -1,12 +1,7 @@
 "use client";
 
 import { RequireAuth } from "@/auth/components/RequireAuth";
-import dynamic from "next/dynamic";
-
-const LoadContentButton = dynamic(
-  () => import("@/features/management/multimedia/components/LoadContentButton"),
-  { ssr: false },
-);
+import LoadContentButton from "@/features/management/multimedia/components/LoadContentButton";
 
 export default function Page() {
   return (

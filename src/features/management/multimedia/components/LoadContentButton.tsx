@@ -17,7 +17,7 @@ export default function LoadContentButton() {
         onClick={() => setIsOpen(true)}
         className="px-4 py-3.5 rounded-xl bg-primary text-white font-bold hover:opacity-90 transition-opacity"
       >
-        Subir archivos
+        Añadir archivos
       </button>
 
       <AnimatedModal isOpen={isOpen} onBackdropClick={() => setIsOpen(false)}>
