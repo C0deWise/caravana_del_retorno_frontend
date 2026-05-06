@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import ErrorBoundary from "@/components/feedback/ErrorBoundary";
 import AuthWrapper from "@/auth/providers/AuthWrapper";
+import AccessibilityWrapper from "@/features/accessibility/providers/AccessibilityWrapper";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -41,7 +42,7 @@ export default function RootLayout({
               </div>
             }
           >
-            {children}
+            <AccessibilityWrapper>{children}</AccessibilityWrapper>
           </ErrorBoundary>
         </AuthWrapper>
       </body>
