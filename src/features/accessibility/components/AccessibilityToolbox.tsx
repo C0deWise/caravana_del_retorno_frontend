@@ -1,7 +1,7 @@
 "use client";
 
 import { useAccessibility } from "../context/AccessibilityContext";
-import { modulesRegistry } from "../config/modulesRegistry";
+import { modulesRegistry } from "../config/registry";
 
 export default function AccessibilityToolbox() {
   const { resetSettings, isOpen, togglePanel } = useAccessibility();
@@ -44,9 +44,7 @@ export default function AccessibilityToolbox() {
           <div className="space-y-4">
             {modulesRegistry.map((module) => (
               <div key={module.id}>
-                {typeof module.component === "function" && (
-                  <module.component />
-                )}
+                {typeof module.component === "function" && <module.component />}
               </div>
             ))}
 
@@ -62,7 +60,8 @@ export default function AccessibilityToolbox() {
                 e.currentTarget.style.color = "var(--color-text-inverse)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "var(--color-bg-border)";
+                e.currentTarget.style.backgroundColor =
+                  "var(--color-bg-border)";
                 e.currentTarget.style.color = "var(--color-text)";
               }}
               aria-label="Restaurar configuración de accesibilidad predeterminada"
