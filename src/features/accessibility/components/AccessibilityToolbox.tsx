@@ -1,76 +1,97 @@
 "use client";
 
+import { Accessibility } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useAccessibility } from "../context/AccessibilityContext";
 import { modulesRegistry } from "../config/registry";
+import { useDraggableAccessibility } from "../hooks/useDraggableAccessibility";
+import { getButtonStyle, getPanelStyle } from "./AccessibilityToolbox.styles";
 
 export default function AccessibilityToolbox() {
-  const { resetSettings, isOpen, togglePanel } = useAccessibility();
+  const {
+    resetSettings,
+    isOpen,
+    togglePanel,
+    buttonPosition,
+    updateButtonPosition,
+  } = useAccessibility();
+  const { ref, pos, corner, hasMoved, isDragging, isReady } =
+    useDraggableAccessibility(updateButtonPosition, buttonPosition);
+  const wasOpenRef = useRef(false);
+  const prevDraggingRef = useRef(false);
+
+  useEffect(() => {
+    if (isDragging && !prevDraggingRef.current) {
+      wasOpenRef.current = isOpen;
+      if (isOpen) {
+        togglePanel();
+      }
+    } else if (!isDragging && prevDraggingRef.current && wasOpenRef.current) {
+      togglePanel();
+    }
+    prevDraggingRef.current = isDragging;
+  }, [isDragging, isOpen, togglePanel]);
+
+  const handleButtonClick = () => {
+    if (!hasMoved.current) {
+      togglePanel();
+    }
+  };
 
   return (
     <>
-      <button
-        onClick={togglePanel}
-        className="fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full shadow-lg transition-all hover:scale-110 active:scale-95"
-        style={{
-          backgroundColor: "var(--color-primary)",
-          color: "var(--color-text-inverse)",
-        }}
-        aria-label="Abrir panel de accesibilidad"
-        aria-expanded={isOpen}
-        aria-controls="accessibility-panel"
+      <div
+        ref={ref}
+        style={{ ...getButtonStyle(pos, isDragging), visibility: isReady ? "visible" : "hidden" }}
       >
-        <span className="text-lg">♿</span>
-      </button>
-
-      {isOpen && (
-        <section
-          id="accessibility-panel"
-          aria-label="Controles de accesibilidad"
-          className="fixed bottom-20 right-6 z-40 w-72 rounded-lg shadow-xl p-6 space-y-6 max-h-96 overflow-y-auto"
-          style={{
-            backgroundColor: "var(--color-bg-card)",
-            border: "1px solid var(--color-bg-border)",
-          }}
+        <button
+          onClick={handleButtonClick}
+          className="w-12 h-12 rounded-full shadow-lg transition-all hover:scale-110 active:scale-95 flex items-center justify-center bg-secondary text-text-inverse"
+          aria-label="Abrir panel de accesibilidad"
+          aria-expanded={isOpen}
+          aria-controls="accessibility-panel"
         >
-          <div>
-            <h2
-              className="text-lg font-semibold mb-4"
-              style={{ color: "var(--color-primary)" }}
-            >
-              Accesibilidad
-            </h2>
-          </div>
+          <Accessibility size={24} />
+        </button>
+      </div>
 
-          <div className="space-y-4">
-            {modulesRegistry.map((module) => (
-              <div key={module.id}>
-                {typeof module.component === "function" && <module.component />}
-              </div>
-            ))}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.section
+            id="accessibility-panel"
+            aria-label="Controles de accesibilidad"
+            style={getPanelStyle(pos, corner)}
+            className="w-72 rounded-lg shadow-xl p-6 space-y-6 max-h-96 overflow-y-auto bg-bg-card border border-bg-border pointer-events-auto"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div>
+              <h2 className="text-lg font-semibold mb-4 text-secondary">
+                Accesibilidad
+              </h2>
+            </div>
 
-            <button
-              onClick={resetSettings}
-              className="w-full px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-              style={{
-                backgroundColor: "var(--color-bg-border)",
-                color: "var(--color-text)",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "var(--color-primary)";
-                e.currentTarget.style.color = "var(--color-text-inverse)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor =
-                  "var(--color-bg-border)";
-                e.currentTarget.style.color = "var(--color-text)";
-              }}
-              aria-label="Restaurar configuración de accesibilidad predeterminada"
-            >
-              Restaurar predeterminados
-            </button>
-          </div>
-        </section>
-      )}
+            <div className="space-y-4">
+              {modulesRegistry.map((module) => (
+                <div key={module.id}>
+                  {typeof module.component === "function" && <module.component />}
+                </div>
+              ))}
+
+              <button
+                onClick={resetSettings}
+                className="w-full px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-bg-border text-text hover:bg-secondary hover:text-text-inverse"
+                aria-label="Restaurar configuración de accesibilidad predeterminada"
+              >
+                Restaurar predeterminados
+              </button>
+            </div>
+          </motion.section>
+        )}
+      </AnimatePresence>
     </>
   );
 }

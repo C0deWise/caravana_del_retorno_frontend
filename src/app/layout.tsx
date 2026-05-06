@@ -4,7 +4,6 @@ import "./globals.css";
 import ErrorBoundary from "@/components/feedback/ErrorBoundary";
 import AuthWrapper from "@/auth/providers/AuthWrapper";
 import AccessibilityWrapper from "@/features/accessibility/providers/AccessibilityWrapper";
-import AccessibilityToolbox from "@/features/accessibility/components/AccessibilityToolbox";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -43,10 +42,7 @@ export default function RootLayout({
               </div>
             }
           >
-            <AccessibilityWrapper>
-              {children}
-              <AccessibilityToolbox />
-            </AccessibilityWrapper>
+            <AccessibilityWrapper>{children}</AccessibilityWrapper>
           </ErrorBoundary>
         </AuthWrapper>
       </body>

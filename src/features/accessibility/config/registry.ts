@@ -1,8 +1,6 @@
 import FontScalerControl from "../modules/fontScaler/components/FontScalerControl";
 import { AccessibilityModule } from "../types/accessibility.types";
 
-export * from "../modules/fontScaler/types/fontScaler.types";
-
 const fontScalerModule: AccessibilityModule = {
   id: "fontScaler",
   label: "Tamaño de letra",
