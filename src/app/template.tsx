@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import Spinner from "@/ui/animations/Spinner";
+import Spinner from "@/components/feedback/Spinner";
 
 const MIN_LOAD_TIME = 1000;
 
@@ -168,3 +168,4 @@ export default function Template({ children }: { children: React.ReactNode }) {
     </>
   );
 }
+

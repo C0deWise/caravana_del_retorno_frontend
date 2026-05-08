@@ -2,7 +2,7 @@
 
 import { useAuth } from "../context/AuthContext";
 import { UserRole } from "@/types/user.types";
-import { Draggable } from "@/utils/Draggable/components/Draggable";
+import { Draggable } from "@/components/common/Draggable";
 
 const ROLES: {
   role: UserRole | undefined;
@@ -134,3 +134,4 @@ export default function RoleSwitcher() {
     </Draggable>
   );
 }
+

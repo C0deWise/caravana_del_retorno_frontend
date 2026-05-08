@@ -4,8 +4,8 @@ import Breadcrumb from "@/features/management/layout/breadcrumb/components/Bread
 import Sidebar from "@/features/management/layout/sidebar/components/Sidebar";
 import ManagementHeader from "@/features/management/layout/header/components/ManagementHeader";
 import ManagementFooter from "@/features/management/layout/footer/components/ManagementFooter";
-import PageTransition from "@/ui/animations/PageTransition";
-import ErrorBoundary from "@/ui/general/ErrorBoundary";
+import PageTransition from "@/components/layout/PageTransition";
+import ErrorBoundary from "@/components/feedback/ErrorBoundary";
 import { usePathname } from "next/navigation";
 import { RoleSwitcherClient } from "@/auth/utils/RoleSwitcherClient-DEVTOOL";
 import { RequireAuth } from "@/auth/components/RequireAuth";
@@ -13,7 +13,7 @@ import { RequireAuth } from "@/auth/components/RequireAuth";
 export default function GestionLayout({
   children,
 }: {
-  children: React.ReactNode;
+  readonly children: React.ReactNode;
 }) {
   const pathname = usePathname();
 
@@ -29,7 +29,7 @@ export default function GestionLayout({
 
           <div className="flex flex-col flex-1 md:gap-6 md:mr-8">
             <Breadcrumb />
-            <div className="flex-1 overflow-y-auto rounded-xl">
+            <div className="flex-1 overflow-y-scroll rounded-xl">
               <PageTransition key={pathname}>
                 <ErrorBoundary
                   fallback={
@@ -53,3 +53,4 @@ export default function GestionLayout({
     </RequireAuth>
   );
 }
+

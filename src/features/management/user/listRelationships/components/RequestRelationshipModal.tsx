@@ -5,7 +5,7 @@ import { XMarkIcon, PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import { UserByIdResponse, KINSHIP_TYPE_OPTIONS, KinshipType } from "../types/relationship.type";
 import { listUsersService } from "../services/relationship.service";
 import { useRequestRelationship } from "../hooks/useRequestRelationship";
-import Spinner from "@/ui/animations/Spinner";
+import Spinner from "@/components/feedback/Spinner";
 
 interface RequestRelationshipModalProps {
   isOpen: boolean;
@@ -249,3 +249,4 @@ export function RequestRelationshipModal({
     </div>
   );
 }
+

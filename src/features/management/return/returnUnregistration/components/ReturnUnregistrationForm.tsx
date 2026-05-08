@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { RequireAuth } from "@/auth/components/RequireAuth";
 import { useAuth } from "@/auth/context/AuthContext";
-import { ConfirmModal } from "@/components/confirmModal";
-import Spinner from "@/ui/animations/Spinner";
+import { ConfirmModal } from "@/components/feedback/confirmModal";
+import Spinner from "@/components/feedback/Spinner";
 import { useSendReturnUnregistration } from "../hook/useSendReturnUnregistration.hook";
 import { returnUnregistrationService } from "../service/returnUnregistration.service";
 import type { ReturnUnregistrationApi } from "../types/returnUnregistration.types";

@@ -1,5 +1,5 @@
 "use client";
-import Spinner from "@/ui/animations/Spinner";
+import Spinner from "@/components/feedback/Spinner";
 import { useColonyMembers } from "../hooks/useColonyMembers";
 import { useAuth } from "@/auth/context/AuthContext";
 import { RequireAuth } from "@/auth/components/RequireAuth";
@@ -84,3 +84,4 @@ export default function ListColonyMembers({
     </RequireAuth>
   );
 }
+

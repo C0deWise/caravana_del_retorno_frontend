@@ -7,10 +7,10 @@ export default function InicioLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <div className="flex flex-col">
       <HomeHeader />
       <main>{children}</main>
       <HomeFooter />
-    </>
+    </div>
   );
 }

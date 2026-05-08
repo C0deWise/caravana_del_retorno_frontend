@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { RequireAuth } from "@/auth/components/RequireAuth";
 import { useAuth } from "@/auth/context/AuthContext";
-import { ConfirmModal } from "@/components/confirmModal";
-import Spinner from "@/ui/animations/Spinner";
+import { ConfirmModal } from "@/components/feedback/confirmModal";
+import Spinner from "@/components/feedback/Spinner";
 import { useSendReturnRegistration } from "../hooks/useSendReturnRegistration";
 import { returnRegistrationService } from "../services/returnRegistration.service";
 import type { UserData } from "@/types/user.types";
@@ -485,7 +485,9 @@ function ReturnRegistrationFormContent() {
                       value="si"
                       checked={formData.parking === 1}
                       onChange={() => handleRadioChange("parking", 1)}
-                    />Sí</label>
+                    />
+                    Sí
+                  </label>
                   <label className="inline-flex items-center gap-2 text-text">
                     <input
                       type="radio"
@@ -493,7 +495,9 @@ function ReturnRegistrationFormContent() {
                       value="no"
                       checked={formData.parking === 0}
                       onChange={() => handleRadioChange("parking", 0)}
-                    />No</label>
+                    />
+                    No
+                  </label>
                 </div>
               </div>
               {fieldErrors.parking && (
@@ -587,3 +591,4 @@ export default function ReturnRegistrationForm() {
     </RequireAuth>
   );
 }
+
