@@ -1,4 +1,4 @@
-import { HomeIcon, UserGroupIcon, UserIcon } from "@heroicons/react/24/solid";
+import { HomeIcon, UserGroupIcon, UserIcon, NewspaperIcon } from "@heroicons/react/24/solid";
 
 export const iconMap: Record<
   string,
@@ -7,4 +7,5 @@ export const iconMap: Record<
   home: HomeIcon,
   userGroup: UserGroupIcon,
   user: UserIcon,
+  newspaper: NewspaperIcon,
 };

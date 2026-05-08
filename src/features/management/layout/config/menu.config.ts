@@ -50,4 +50,15 @@ export const menuConfig: MenuItem[] = [
       },
     ],
   },
+  {
+    label: "Gestión Publicaciones",
+    href: "/gestion/publicaciones",
+    icon: "newspaper",
+    subitems: [
+      {
+        label: "Crear Publicación",
+        href: "/gestion/publicaciones/crear",
+      },
+    ],
+  },
 ];
