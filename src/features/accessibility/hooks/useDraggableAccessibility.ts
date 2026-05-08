@@ -98,6 +98,18 @@ export function useDraggableAccessibility(
   }, [corner, getCornerPositions]);
 
   useEffect(() => {
+    const handleResize = () => {
+      const corners = getCornerPositions();
+      if (corners[corner]) {
+        setPos(corners[corner]);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [corner, getCornerPositions]);
+
+  useEffect(() => {
     if (!isDragging) return;
 
     const animate = () => {
