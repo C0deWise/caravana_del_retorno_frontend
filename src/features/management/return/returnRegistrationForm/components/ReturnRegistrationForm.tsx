@@ -73,7 +73,7 @@ function EligibilityLoadingView() {
   );
 }
 
-function EligibilityErrorView({ error }: {readonly  error: string }) {
+function EligibilityErrorView({ error }: { readonly error: string }) {
   return (
     <div className="bg-white px-4 py-6 flex items-center justify-center">
       <div className="w-full max-w-xl rounded-2xl bg-bg-card p-8 shadow-md text-center">
@@ -191,6 +191,7 @@ function ReturnRegistrationFormContent() {
   const [alreadyRegistered, setAlreadyRegistered] = useState(false);
   const [activeReturnCode, setActiveReturnCode] = useState<number | null>(null);
   const [activeReturnYear, setActiveReturnYear] = useState<number | null>(null);
+  const maxLength = 150;
 
   useEffect(() => {
     if (!user) {
@@ -515,13 +516,17 @@ function ReturnRegistrationFormContent() {
               name="note"
               className="textarea-base mt-2"
               rows={3}
-              maxLength={500}
-              placeholder="Escribe aquí cualquier información adicional..."
+              maxLength={maxLength}
+              placeholder={`Escribe aquí cualquier información adicional (max ${maxLength})`}
               value={formData.note}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, note: e.target.value }))
               }
             />
+
+            <p style={{ textAlign: 'right', fontSize: '0.8rem' }}>
+              {formData.note.length} / {maxLength} caracteres
+            </p>
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
