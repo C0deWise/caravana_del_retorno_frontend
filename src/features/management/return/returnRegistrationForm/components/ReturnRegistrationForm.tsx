@@ -517,14 +517,14 @@ function ReturnRegistrationFormContent() {
               className="textarea-base mt-2"
               rows={3}
               maxLength={maxLength}
-              placeholder={`Escribe aquí cualquier información adicional (max ${maxLength})`}
+              placeholder={`Escribe aquí cualquier información adicional (máximo ${maxLength} caracteres)...`}
               value={formData.note}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, note: e.target.value }))
               }
             />
 
-            <p style={{ textAlign: 'right', fontSize: '0.8rem' }}>
+            <p className="validation-message validation-info mt-1 text-right">
               {formData.note.length} / {maxLength} caracteres
             </p>
           </div>
