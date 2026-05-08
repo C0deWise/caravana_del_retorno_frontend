@@ -1,14 +1,12 @@
 @import "tailwindcss";
 
-:root {
-  --font-scale: 1;
-}
-
-@theme inline {
-  --font-sans: var(--font-inter);
-}
-
 @theme {
+  /* Tipografía */
+  --font-sans: var(--font-inter);
+
+  /* Escala de fuente para accesibilidad */
+  --font-scale: 1;
+
   /* Colores principales */
   --color-primary: #024059;
   --color-secondary: #f28f38;
@@ -262,62 +260,4 @@ body {
     color: var(--color-text-muted);
   }
 }
-/* Clases para formularios */
-.input-base {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--color-bg-border);
-  border-radius: 0.5rem;
-  background-color: var(--color-bg-card);
-  color: var(--color-text);
-  font-size: 1rem;
-}
 
-.label-base {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: var(--color-text);
-}
-
-.page-title {
-  font-size: 1.875rem;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 1.5rem;
-  color: var(--color-primary);
-}
-
-.section-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  text-align: center;
-  margin-bottom: 1.5rem;
-  color: var(--color-text-muted);
-}
-
-.alert-error {
-  padding: 0.75rem;
-  background-color: #fee2e2;
-  border: 1px solid #fca5a5;
-  border-radius: 0.375rem;
-  margin-bottom: 1rem;
-}
-
-.alert-error-text {
-  color: var(--color-danger);
-  font-size: 0.875rem;
-}
-
-.alert-success {
-  padding: 0.75rem;
-  background-color: #d1fae5;
-  border: 1px solid #6ee7b7;
-  border-radius: 0.375rem;
-  margin-bottom: 1rem;
-}
-
-.alert-success-text {
-  color: var(--color-accent-green);
-  font-size: 0.875rem;
-}
