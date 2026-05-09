@@ -1,4 +1,10 @@
-import { HomeIcon, UserGroupIcon, UserIcon, DocumentTextIcon } from "@heroicons/react/24/solid";
+import {
+  HomeIcon,
+  UserGroupIcon,
+  UserIcon,
+  PhotoIcon,
+  DocumentTextIcon
+} from "@heroicons/react/24/solid";
 
 export const iconMap: Record<
   string,
@@ -8,4 +14,5 @@ export const iconMap: Record<
   userGroup: UserGroupIcon,
   user: UserIcon,
   report: DocumentTextIcon,
+  photo: PhotoIcon,
 };

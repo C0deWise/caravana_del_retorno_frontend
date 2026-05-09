@@ -183,6 +183,57 @@ class ApiService {
     }
 
     return response.blob();
+  public async postWithProgress<T>(
+    endpoint: string,
+    data: unknown,
+    onProgress?: (percentage: number) => void,
+  ): Promise<T> {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", `${this.baseURL}${endpoint}`);
+      xhr.setRequestHeader("Content-Type", "application/json");
+
+      if (xhr.upload && onProgress) {
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const percentage = Math.round((event.loaded * 100) / event.total);
+            onProgress(percentage);
+          }
+        };
+      }
+
+      xhr.onload = async () => {
+        if (xhr.status === 0) {
+          return reject(new Error("Error de conexión"));
+        }
+
+        const headers = new Headers();
+        const contentType = xhr.getResponseHeader("content-type");
+        const contentLength = xhr.getResponseHeader("content-length");
+
+        if (contentType) headers.set("content-type", contentType);
+        if (contentLength) headers.set("content-length", contentLength);
+
+        const response = new Response(xhr.responseText || null, {
+          status: xhr.status,
+          statusText: xhr.statusText,
+          headers: headers,
+        });
+
+        try {
+          const result = await this.handleResponse<T>(response);
+          resolve(result);
+        } catch (error) {
+          reject(error);
+        }
+      };
+
+      xhr.onerror = () => {
+        reject(new Error("Error de conexión"));
+      };
+
+      xhr.send(JSON.stringify(data));
+    });
   }
 }
 
