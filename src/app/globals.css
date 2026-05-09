@@ -98,7 +98,7 @@ body {
 
   /* Select estándar */
   .select-base {
-    @apply px-3 py-3 rounded-lg transition-colors;
+    @apply px-3 py-3 rounded-lg transition-colors cursor-pointer;
     background-color: var(--color-bg-card);
     border: 1px solid transparent;
   }
@@ -197,6 +197,12 @@ body {
   .alert-warning-text {
     @apply text-sm;
     color: #856404;
+  }
+
+  .alert-info {
+    @apply mt-6 p-4 rounded border-l-4;
+    background-color: #e0e0e0;
+    border-color: #e0e0e0a3;
   }
 
   /* Barra de colores colombiana */
