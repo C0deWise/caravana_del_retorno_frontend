@@ -1,13 +1,14 @@
 import { UserRole } from "@/types/user.types";
 
 export const rolePermissions: Record<UserRole, string[]> = {
-  admin: ["/gestion/colonia/administrar", "/gestion/retorno/crear"],
+  admin: ["/gestion/colonia/administrar", "/gestion/retorno/crear", "/gestion/reportes"],
   lider_colonia: [
     "/gestion/usuario/parentesco",
     "/gestion/colonia/miembros",
     "/gestion/colonia/solicitudes-ingreso",
     "/gestion/retorno/registro/inscripcion",
     "/gestion/retorno/registro/cancelar",
+    "/gestion/reportes"
   ],
   usuario: [
     "/gestion/usuario/parentesco",
