@@ -214,18 +214,20 @@ export default function ListGrupalInscription() {
               </p>
             </div>
 
-            <div className="text-right">
-              <span className="text-sm font-medium text-text-muted uppercase tracking-wide mb-1 block">
-                Invitaciones
-              </span>
-              <p className="text-3xl font-bold text-secondary leading-none block">
-                {isLoading ? "—" : totalInvitations}
-              </p>
-            </div>
+            {!hasActiveGroup && (
+              <div className="text-right">
+                <span className="text-sm font-medium text-text-muted uppercase tracking-wide mb-1 block">
+                  Invitaciones
+                </span>
+                <p className="text-3xl font-bold text-secondary leading-none block">
+                  {isLoading ? "—" : totalInvitations}
+                </p>
+              </div>
+            )}
           </div>
         </header>
 
-         <div className="flex-1 space-y-8 overflow-y-auto pt-4 md:pb-30">
+        <div className="flex-1 space-y-8 overflow-y-auto pt-4 md:pb-30">
           {bodyContent}
 
           <ConfirmModal
