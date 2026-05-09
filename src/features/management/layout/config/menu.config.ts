@@ -58,6 +58,10 @@ export const menuConfig: MenuItem[] = [
       {
         label: "Generar reportes",
         href: "/gestion/reportes",
+      }
+    ],
+  },
+  {
     label: "Gestión Multimedia",
     href: "/gestion/multimedia",
     icon: "photo",
@@ -68,4 +72,4 @@ export const menuConfig: MenuItem[] = [
       },
     ],
   },
-];
+]

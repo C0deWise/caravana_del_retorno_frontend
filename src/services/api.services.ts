@@ -183,6 +183,8 @@ class ApiService {
     }
 
     return response.blob();
+  }
+  
   public async postWithProgress<T>(
     endpoint: string,
     data: unknown,
