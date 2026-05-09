@@ -47,6 +47,14 @@ export default function ListGrupalInscription() {
     [invitations],
   );
 
+  const filteredInvitations = useMemo(
+    () =>
+      hasActiveGroup
+        ? invitations.filter((inv) => inv.status === "aprobada")
+        : invitations.filter((inv) => inv.isPending || inv.isExpired),
+    [invitations, hasActiveGroup],
+  );
+
   const handleAccept = useCallback(
     (invitationId: number) => {
       const invitation = invitations.find((inv) => inv.id === invitationId);
@@ -173,7 +181,7 @@ export default function ListGrupalInscription() {
         )}
 
         {/* Lista o estado vacío */}
-        {invitations.length === 0 ? (
+        {filteredInvitations.length === 0 ? (
           <div className="mx-auto max-w-3xl rounded-xl border border-bg-border bg-bg-card p-6 text-center">
             <p className="text-text-muted">
               No tienes invitaciones para unirte a un grupo.
@@ -182,7 +190,7 @@ export default function ListGrupalInscription() {
         ) : (
           <main className="mx-auto max-w-6xl">
             <GrupalInvitationList
-              invitations={invitations}
+              invitations={filteredInvitations}
               onAccept={handleAccept}
               onReject={handleReject}
               hasActiveGroup={hasActiveGroup}
