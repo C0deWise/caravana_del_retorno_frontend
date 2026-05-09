@@ -18,7 +18,7 @@ function CrearRetornoFeature() {
   const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     resetState();
     const value = e.target.value;
-    setSelectedYear(value ? parseInt(value) : null);
+    setSelectedYear(value ? Number.parseInt(value) : null);
   };
 
   const handleCreateClick = () => {
