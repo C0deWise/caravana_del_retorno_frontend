@@ -50,4 +50,15 @@ export const menuConfig: MenuItem[] = [
       },
     ],
   },
+  {
+    label: "Gestión Multimedia",
+    href: "/gestion/multimedia",
+    icon: "photo",
+    subitems: [
+      {
+        label: "Cargar Contenido",
+        href: "/gestion/multimedia/cargar",
+      },
+    ],
+  },
 ];
