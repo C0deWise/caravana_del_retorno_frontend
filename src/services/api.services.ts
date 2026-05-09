@@ -169,6 +169,21 @@ class ApiService {
 
     return this.handleResponse<T>(response);
   }
+
+  public async getBlob(endpoint: string): Promise<Blob> {
+    const response = await fetch(
+      `${this.baseURL}${endpoint}`,
+      this.buildRequestOptions("GET"),
+    );
+
+    if (!response.ok) {
+      const error = await this.parseErrorResponse(response);
+      const message = this.buildErrorMessage(error, response);
+      throw new ApiError(response.status, message);
+    }
+
+    return response.blob();
+  }
 }
 
 export const apiService = new ApiService();
