@@ -43,7 +43,7 @@ const MOCK_STORE: GrupalInvitationDto[] = [
   {
     codigo: 3,
     grupo: 12,
-    estado: "expirado",
+    estado: "expirada",
     fecha_solicitud: "2026-03-01T09:00:00Z",
     nombre_lider: "Pedro",
     apellido_lider: "Torres",
@@ -81,12 +81,12 @@ export async function acceptGrupalInvitation(
     const index = MOCK_STORE.findIndex((i) => i.codigo === invitationId);
     if (index === -1) throw new Error("Invitación no encontrada");
 
-    MOCK_STORE[index] = { ...MOCK_STORE[index], estado: "aprobado" };
+    MOCK_STORE[index] = { ...MOCK_STORE[index], estado: "aprobada" };
 
     // Rechazar automáticamente las demás invitaciones pendientes (regla de negocio)
     MOCK_STORE.forEach((inv, i) => {
       if (i !== index && inv.estado === "pendiente") {
-        MOCK_STORE[i] = { ...inv, estado: "rechazado" };
+        MOCK_STORE[i] = { ...inv, estado: "rechazada" };
       }
     });
 
@@ -108,7 +108,7 @@ export async function rejectGrupalInvitation(
     const index = MOCK_STORE.findIndex((i) => i.codigo === invitationId);
     if (index === -1) throw new Error("Invitación no encontrada");
 
-    MOCK_STORE[index] = { ...MOCK_STORE[index], estado: "rechazado" };
+    MOCK_STORE[index] = { ...MOCK_STORE[index], estado: "rechazada" };
 
     return mapGrupalInvitationDtoToModel(MOCK_STORE[index]);
   }

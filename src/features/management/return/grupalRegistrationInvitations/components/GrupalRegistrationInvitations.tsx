@@ -2,8 +2,8 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { RequireAuth } from "@/auth/components/RequireAuth";
-import { ConfirmModal } from "@/components/confirmModal";
-import Spinner from "@/ui/animations/Spinner";
+import { ConfirmModal } from "@/components/feedback/confirmModal";
+import Spinner from "@/components/feedback/Spinner";
 import { useGrupalInscriptionList } from "../hooks/useGrupalInscriptionList.hook";
 import { useAcceptGrupalInvitation } from "../hooks/useAcceptGrupalInvitation.hook";
 import { useRejectGrupalInvitation } from "../hooks/useRejectGrupalInvitation.hook";
@@ -43,7 +43,7 @@ export default function ListGrupalInscription() {
 
   // El usuario ya pertenece a un grupo si tiene al menos una invitación aceptada
   const hasActiveGroup = useMemo(
-    () => invitations.some((inv) => inv.status === "aprobado"),
+    () => invitations.some((inv) => inv.status === "aprobada"),
     [invitations],
   );
 
@@ -93,7 +93,7 @@ export default function ListGrupalInscription() {
       setSelectedInvitation(null);
       setPendingAction(null);
     } catch {
-      // El error ya queda en acceptError / rejectError para mostrarlo en UI
+      // El error se maneja con los estados de error de cada hook
     }
   }, [
     selectedInvitation,
@@ -105,12 +105,6 @@ export default function ListGrupalInscription() {
     resetReject,
     refetch,
   ]);
-
-  const handleCloseModal = useCallback(() => {
-    setShowConfirmModal(false);
-    setSelectedInvitation(null);
-    setPendingAction(null);
-  }, []);
 
   const hasActionError = acceptError ?? rejectError;
   const isProcessingAction = isAccepting || isRejecting;
@@ -187,9 +181,6 @@ export default function ListGrupalInscription() {
           </div>
         ) : (
           <main className="mx-auto max-w-6xl">
-            <p className="mb-4 text-center text-text-muted">
-              Tienes las siguientes invitaciones para unirte a un grupo
-            </p>
             <GrupalInvitationList
               invitations={invitations}
               onAccept={handleAccept}
@@ -201,70 +192,54 @@ export default function ListGrupalInscription() {
       </>
     );
   }
-
-  const confirmTitle =
-    pendingAction === "accept"
-      ? "¿Estás seguro de aceptar la invitación?"
-      : "¿Estás seguro de rechazar la invitación?";
-
-  const confirmDetails: React.ReactNode[] =
-    pendingAction === "accept"
-      ? [
-          <>
-            <span className="font-bold">Líder del grupo:</span>{" "}
-            {selectedInvitation?.leaderFullName}
-          </>,
-          <>
-            Esto rechazará las otras invitaciones y no podrás inscribirte de
-            manera individual al retorno a menos que dejes el grupo.
-          </>,
-        ]
-      : [
-          <>
-            <span className="font-bold">Líder del grupo:</span>{" "}
-            {selectedInvitation?.leaderFullName}
-          </>,
-        ];
-
   return (
     <RequireAuth roles={["usuario"]}>
       <div className="flex w-full min-h-screen flex-col">
-        {/* ── Encabezado ──────────────────────────────────────── */}
         <header className="sticky top-0 z-10 mx-10 rounded-xl bg-bg-card px-8 py-4 shadow-xl">
           <div className="flex items-end justify-between gap-6">
             <div>
-              <span className="text-md uppercase tracking-wide text-text-muted">
+              <span className="text-sm font-medium text-text-muted uppercase tracking-wide mb-1 block">
                 Retorno grupal
               </span>
-              <p className="text-3xl font-bold text-secondary">
+              <p className="text-3xl font-bold text-primary leading-none">
                 Invitaciones grupales
               </p>
             </div>
 
             <div className="text-right">
-              <span className="text-sm uppercase tracking-wide text-text-muted">
+              <span className="text-sm font-medium text-text-muted uppercase tracking-wide mb-1 block">
                 Invitaciones
               </span>
-              <p className="text-4xl font-bold text-secondary">
+              <p className="text-3xl font-bold text-secondary leading-none block">
                 {isLoading ? "—" : totalInvitations}
               </p>
             </div>
           </div>
         </header>
 
-        {/* ── Cuerpo ──────────────────────────────────────────── */}
-        <div className="flex-1 space-y-8 overflow-y-auto pt-4 md:pb-30">
+         <div className="flex-1 space-y-8 overflow-y-auto pt-4 md:pb-30">
           {bodyContent}
 
-          {/* ── Modal de confirmación ────────────────────────── */}
           <ConfirmModal
             isOpen={showConfirmModal}
-            title={confirmTitle}
-            details={confirmDetails}
+            title={pendingAction === "accept" ? "Aceptar invitación" : "Rechazar invitación"}
+            details={selectedInvitation ? [
+              <>
+                {pendingAction === "accept" ? "¿Estás seguro de que deseas aceptar la invitación de " : "¿Estás seguro de que deseas rechazar la invitación de "}
+                <strong>{selectedInvitation.leaderFullName}</strong>?
+                <br />
+                <span className="text-sm text-text-muted">{pendingAction === "accept" ? "Esto rechazará las otras invitaciones y no podrás inscribirte de manera individual al retorno a menos que dejes el grupo." : null}</span>
+              </>,
+
+            ] : [<span key="accept">Confirma la acción</span>]}
             onConfirm={handleModalConfirm}
-            onCancel={handleCloseModal}
+            onCancel={() => {
+              setShowConfirmModal(false);
+              setSelectedInvitation(null);
+              setPendingAction(null);
+            }}
             loading={isProcessingAction}
-            confirmLabel={"Confirmar"}
+            confirmLabel={pendingAction === "accept" ? "Aceptar" : "Rechazar"}
             cancelLabel="Cancelar"
           />
         </div>

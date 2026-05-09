@@ -1,9 +1,9 @@
 // ── Status ────────────────────────────────────────────────────────────────────
 export type GrupalInvitationStatus =
   | "pendiente"
-  | "aprobado"
-  | "rechazado"
-  | "expirado";
+  | "aprobada"
+  | "rechazada"
+  | "expirada";
 
 // ── DTOs (forma que devuelve la API) ──────────────────────────────────────────
 export interface ParticipantDto {
@@ -35,7 +35,7 @@ export interface GrupalInvitation {
   id: number;
   groupId: number;
   status: GrupalInvitationStatus;
-  timestamp: string;
+  createdAt: string;
   leaderFullName: string;
   returnDate: string;
   confirmedParticipants: Participant[];
@@ -47,9 +47,9 @@ export interface GrupalInvitation {
 // ── Mapper ────────────────────────────────────────────────────────────────────
 const STATUS_MAP: Record<string, GrupalInvitationStatus> = {
   pendiente: "pendiente",
-  aprobado: "aprobado",
-  rechazado: "rechazado",
-  expirado: "expirado",
+  aprobada: "aprobada",
+  rechazada: "rechazada",
+  expirada: "expirada",
 };
 
 const normalizeStatus = (raw: string): GrupalInvitationStatus =>
@@ -64,7 +64,7 @@ export const mapGrupalInvitationDtoToModel = (
     id: dto.codigo,
     groupId: dto.grupo,
     status,
-    timestamp: dto.fecha_solicitud,
+    createdAt: dto.fecha_solicitud,
     leaderFullName: `${dto.nombre_lider} ${dto.apellido_lider}`.trim(),
     returnDate: dto.fecha_retorno,
     confirmedParticipants: dto.participantes_confirmados.map((p) => ({
@@ -72,7 +72,7 @@ export const mapGrupalInvitationDtoToModel = (
       fullName: `${p.nombre} ${p.apellido}`.trim(),
     })),
     isPending: status === "pendiente",
-    isExpired: status === "expirado",
+    isExpired: status === "expirada",
     isActionable: status === "pendiente",
   };
 };

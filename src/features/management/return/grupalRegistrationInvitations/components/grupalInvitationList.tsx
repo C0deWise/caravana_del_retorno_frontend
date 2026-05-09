@@ -1,41 +1,45 @@
 "use client";
 
-import { useMemo } from "react";
 import type { GrupalInvitation } from "../types/grupalInscription.types";
+import { AnimatedList } from "@/components/common/AnimatedList";
 import { GrupalInvitationCard } from "./grupalInvitationCard";
 
 interface GrupalInvitationListProps {
-  readonly invitations: GrupalInvitation[];
   readonly onAccept: (invitationId: number) => void;
   readonly onReject: (invitationId: number) => void;
+  readonly invitations: GrupalInvitation[];
   readonly hasActiveGroup: boolean;
 }
 
 export function GrupalInvitationList({
-  invitations,
   onAccept,
   onReject,
+  invitations,
   hasActiveGroup,
 }: GrupalInvitationListProps) {
-  // Pendientes primero, luego por timestamp descendente
-  const sorted = useMemo(() => {
-    return [...invitations].sort((a, b) => {
-      if (a.isPending !== b.isPending) return a.isPending ? -1 : 1;
-      return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-    });
-  }, [invitations]);
+
+  const sortedInvitations = [ ...invitations].sort((a, b) => {
+    if (a.isPending === b.isPending) {
+      return 0;
+    }
+    return a.isPending ? -1 : 1;
+  });
 
   return (
-    <div className="space-y-4">
-      {sorted.map((invitation) => (
+    <AnimatedList
+      items={sortedInvitations}
+      keyExtractor={(invitation) => invitation.id}
+      renderItem={(invitation, index) => (
         <GrupalInvitationCard
-          key={invitation.id}
+          index={index}
           invitation={invitation}
           onAccept={onAccept}
           onReject={onReject}
           hasActiveGroup={hasActiveGroup}
         />
-      ))}
-    </div>
+      )}
+      emptyMessage={"No tienes invitaciones pendientes para inscribirte en un grupo."}
+    />
   );
 }
+    
