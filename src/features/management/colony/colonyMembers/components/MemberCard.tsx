@@ -9,7 +9,7 @@ import {
 import { ColonyMember } from "../types/colony-members.types";
 import { UserRole, CODE_TO_ROLE } from "@/types/user.types";
 import { getVisibleMemberData } from "../utils/rolePermissions";
-import calculateAge from "@/utils/calculateAge";
+import { calculateAge } from "@/utils/formatting";
 
 interface MemberCardProps {
   member: ColonyMember;
@@ -17,32 +17,10 @@ interface MemberCardProps {
   index: number;
 }
 
-function getRoleConfig(roleId: number) {
-  const roleCode = CODE_TO_ROLE[roleId as keyof typeof CODE_TO_ROLE];
-
-  if (roleCode === "admin")
-    return { label: "Admin", badgeClass: "bg-accent-red text-text-inverse" };
-  if (roleCode === "lider_colonia")
-    return {
-      label: "Líder de colonia",
-      badgeClass: "bg-secondary/85 text-text-inverse",
-    };
-  if (roleCode === "usuario") {
-    return {
-      label: "Usuario",
-      badgeClass: "bg-accent-green/20 text-accent-green",
-    };
-  }
-
-  return {
-    label: "Invitado",
-    badgeClass: "bg-gray-200 text-text-muted",
-  };
-}
+import { RoleTag } from "./RoleTag";
 
 export function MemberCard({ member, userRole, index }: MemberCardProps) {
   const visibleData = getVisibleMemberData(member, userRole);
-  const { label, badgeClass } = getRoleConfig(member.role);
 
   return (
     <div className="bg-bg border border-gray-100 rounded-4xl px-5 py-4 shadow-sm">
@@ -65,11 +43,9 @@ export function MemberCard({ member, userRole, index }: MemberCardProps) {
             <h3 className="font-bold text-xl text-text">
               {visibleData.nombre} {visibleData.apellido}
             </h3>
-            <span
-              className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full mt-1 ${badgeClass}`}
-            >
-              {label}
-            </span>
+            <div className="mt-1">
+              <RoleTag roleId={member.role} />
+            </div>
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-4 text-sm text-text-muted">
@@ -122,3 +98,4 @@ export function MemberCard({ member, userRole, index }: MemberCardProps) {
     </div>
   );
 }
+

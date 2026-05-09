@@ -9,7 +9,7 @@ export class ApiError extends Error {
 }
 
 class ApiService {
-  private baseURL: string;
+  private readonly baseURL: string;
 
   constructor() {
     const baseURL = process.env.NEXT_PUBLIC_API_URL;

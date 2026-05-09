@@ -4,16 +4,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useListColonies } from "../../hooks/useListColonies";
 import { useSignupColony } from "../hooks/useSignupColony";
 import { useAuth } from "@/auth/context/AuthContext";
-import type { ColonyItem } from "@/types/colony.types";
-import { ConfirmModal } from "@/components/confirmModal";
+import type { ColonyData } from "@/types/colony.types";
+import { ConfirmModal } from "@/components/feedback/confirmModal";
 import { RequireAuth } from "@/auth/components/RequireAuth";
 import { Search } from "lucide-react";
-
-const normalizarTexto = (valor: string): string =>
-  valor
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
+import { normalizeText } from "@/utils/formatting";
 
 function InscripcionColoniaFormFeature() {
   const { user } = useAuth();
@@ -30,7 +25,7 @@ function InscripcionColoniaFormFeature() {
   } = useSignupColony();
 
   const [busqueda, setBusqueda] = useState("");
-  const [seleccionada, setSeleccionada] = useState<ColonyItem | null>(null);
+  const [seleccionada, setSeleccionada] = useState<ColonyData | null>(null);
   const [mostrarLista, setMostrarLista] = useState(false);
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
   const [mostrarMensajeEspera, setMostrarMensajeEspera] = useState(false);
@@ -46,19 +41,19 @@ function InscripcionColoniaFormFeature() {
   }, [listColonies, yaPertenecAColonia]);
 
   const coloniasFiltradas = useMemo(() => {
-    const termino = normalizarTexto(busqueda.trim());
+    const termino = normalizeText(busqueda.trim());
     if (!termino) return colonies;
     return colonies.filter((colonia) => {
       const etiqueta = colonia.departamento
         ? `${colonia.pais} ${colonia.departamento} ${colonia.ciudad}`
         : colonia.pais;
-      return normalizarTexto(etiqueta).includes(termino);
+      return normalizeText(etiqueta).includes(termino);
     });
   }, [busqueda, colonies]);
 
   const sinColoniasDisponibles = !loading && !error && colonies.length === 0;
 
-  const seleccionarColonia = (colonia: ColonyItem) => {
+  const seleccionarColonia = (colonia: ColonyData) => {
     setSeleccionada(colonia);
     setBusqueda(
       colonia.departamento
@@ -221,3 +216,4 @@ export default function InscripcionColoniaForm() {
     </RequireAuth>
   );
 }
+

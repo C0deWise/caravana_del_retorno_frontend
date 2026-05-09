@@ -1,5 +1,5 @@
-import CrearColonia from "@/features/management/colony/createColony/components/CreateColonyForm";
+import { CreateColonyModalForm } from "@/features/management/colony/administration/createColony/components/CreateColonyModalForm";
 
 export default function RegistroPage() {
-  return <CrearColonia />;
+  return <CreateColonyModalForm />;
 }

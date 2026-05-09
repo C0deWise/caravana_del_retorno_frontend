@@ -1,5 +1,5 @@
-import ListAccessRequest from "@/features/management/colony/listAccessRequestToColony/components/ListAccessRequest";
+import AccessRequests from "@/features/management/colony/colonyAccessRequests/components/AccessRequests";
 
 export default function NotificationsPage() {
-  return <ListAccessRequest />;
+  return <AccessRequests />;
 }

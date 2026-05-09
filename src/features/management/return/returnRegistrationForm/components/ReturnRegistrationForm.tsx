@@ -3,10 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { RequireAuth } from "@/auth/components/RequireAuth";
 import { useAuth } from "@/auth/context/AuthContext";
-import { ConfirmModal } from "@/components/confirmModal";
-import Spinner from "@/ui/animations/Spinner";
+import { ConfirmModal } from "@/components/feedback/confirmModal";
+import Spinner from "@/components/feedback/Spinner";
 import { useSendReturnRegistration } from "../hooks/useSendReturnRegistration";
 import { returnRegistrationService } from "../services/returnRegistration.service";
+import ReturnUnregistrationForm from "../../returnUnregistration/components/ReturnUnregistrationForm";
 import type {
   ReturnRegistrationAnswer,
   ReturnRegistrationApi,
@@ -283,17 +284,7 @@ function ReturnRegistrationFormContent() {
   }
 
   if (alreadyRegistered) {
-    return (
-      <div className="bg-white px-4 py-6 flex items-center justify-center">
-        <div className="w-full max-w-xl rounded-2xl bg-bg-card p-8 shadow-md text-center">
-          <h1 className="page-title mb-4">Registro de asistencia al retorno</h1>
-          <h2 className="section-title mb-4">Formulario ya registrado</h2>
-          <p className="text-text font-medium">
-            Ya has confirmado tu asistencia a este retorno.
-          </p>
-        </div>
-      </div>
-    );
+    return <ReturnUnregistrationForm />;
   }
 
   if (submittedRecord) {
@@ -420,42 +411,42 @@ function ReturnRegistrationFormContent() {
           </fieldset>
 
           {formData.transport === 1 && (
-          <fieldset>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <legend className="label-primary mb-0">
-                ¿Necesita parqueadero?
-              </legend>
-              <div
-                className={`inline-flex items-center gap-5 rounded-lg px-3 py-2 ${fieldErrors.parking ? "border border-danger" : "border border-transparent"}`}
-              >
-                <label className="inline-flex items-center gap-2 text-text">
-                  <input
-                    type="radio"
-                    name="parking"
-                    value="si"
-                    checked={formData.parking === 1}
-                    onChange={() => handleRadioChange("parking", 1)}
-                  />
-                  Sí
-                </label>
-                <label className="inline-flex items-center gap-2 text-text">
-                  <input
-                    type="radio"
-                    name="parking"
-                    value="no"
-                    checked={formData.parking === 0}
-                    onChange={() => handleRadioChange("parking", 0)}
-                  />
-                  No
-                </label>
+            <fieldset>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <legend className="label-primary mb-0">
+                  ¿Necesita parqueadero?
+                </legend>
+                <div
+                  className={`inline-flex items-center gap-5 rounded-lg px-3 py-2 ${fieldErrors.parking ? "border border-danger" : "border border-transparent"}`}
+                >
+                  <label className="inline-flex items-center gap-2 text-text">
+                    <input
+                      type="radio"
+                      name="parking"
+                      value="si"
+                      checked={formData.parking === 1}
+                      onChange={() => handleRadioChange("parking", 1)}
+                    />
+                    Sí
+                  </label>
+                  <label className="inline-flex items-center gap-2 text-text">
+                    <input
+                      type="radio"
+                      name="parking"
+                      value="no"
+                      checked={formData.parking === 0}
+                      onChange={() => handleRadioChange("parking", 0)}
+                    />
+                    No
+                  </label>
+                </div>
               </div>
-            </div>
-            {fieldErrors.parking && (
-              <p className="validation-message validation-error">
-                {fieldErrors.parking}
-              </p>
-            )}
-          </fieldset>
+              {fieldErrors.parking && (
+                <p className="validation-message validation-error">
+                  {fieldErrors.parking}
+                </p>
+              )}
+            </fieldset>
           )}
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -516,3 +507,4 @@ export default function ReturnRegistrationForm() {
     </RequireAuth>
   );
 }
+

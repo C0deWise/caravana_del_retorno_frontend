@@ -1,21 +1,21 @@
-import MainIcon from "@/ui/general/MainIcon";
-import MainText from "@/ui/general/MainText";
-import HeaderCurve from "@/ui/general/HeaderCurve";
+import MainIcon from "@/components/common/MainIcon";
+import MainText from "@/components/common/MainText";
+import HeaderCurve from "@/components/layout/HeaderCurve";
 import HomeNavbar from "../navbar/components/HomeNavbar";
 import Link from "next/link";
 
 export default function HomeHeaderContent() {
   return (
     <div className="bg-primary md:h-24 relative">
-      <div className="h-full flex">
+      <div className="h-full flex md:px-10 justify-evenly items-center gap-8 flex-wrap md:flex-nowrap overflow-hidden">
         <Link href="/">
-          <MainIcon className="md:w-22 md:h-22 md:ml-9 md:mt-1 shrink-0" />
+          <MainIcon className="md:w-22 md:h-22 md:mt-1 shrink-0 flex-none" />
         </Link>
-        <span className="self-stretch w-1.5 rounded-4xl bg-bg ml-4 mr-1 my-2"></span>
+        <span className="self-stretch w-1.5 rounded-4xl bg-bg md:my-2 flex-none"></span>
         <Link href="/">
-          <MainText className="mt-1.5 md:mr-20 shrink-0" size={220} />
+          <MainText className="md:mt-1.5 shrink-0 flex-none" size={220} />
         </Link>
-        <div className="flex-1 md:px-4">
+        <div className="flex-1 md:flex-shrink md:min-w-0">
           <HomeNavbar />
         </div>
       </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import AnimatedLink from "@/ui/animations/AnimatedLink";
+import AnimatedLink from "@/components/layout/AnimatedLink";
 import { useBreadcrumb } from "../hooks/useBreadcrumb";
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
 
@@ -39,3 +39,4 @@ export default function Breadcrumb() {
     </nav>
   );
 }
+
