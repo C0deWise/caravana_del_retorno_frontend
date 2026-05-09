@@ -1,16 +1,26 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import {
+  FILE_SIZE_LIMITS,
+  MediaCategory,
+  formatSize,
+} from "../config/multimedia.constants";
 
 export type LocalMultimediaItem = {
   id: string;
   name: string;
   size: number;
   type: string;
-  blobUrl?: string;
+  dataUrl?: string;
 };
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
+function getMediaCategory(mimeType: string): MediaCategory | null {
+  if (mimeType.startsWith("image/")) return "image";
+  if (mimeType.startsWith("audio/")) return "audio";
+  if (mimeType.startsWith("video/")) return "video";
+  return null;
+}
 
 export function useLocalMultimedia() {
   const [items, setItems] = useState<LocalMultimediaItem[]>([]);
@@ -26,29 +36,34 @@ export function useLocalMultimedia() {
 
     try {
       const fileArray = Array.from(files as File[]);
+
       for (const f of fileArray) {
-        if (f.size > MAX_FILE_SIZE) {
-          setErrorCode(413);
-          setError(
-            `El archivo ${f.name} excede el tamaño máximo de ${Math.round(MAX_FILE_SIZE / 1024)} KB`,
-          );
-          return;
-        }
-        if (!/^(image|video|audio)\//.test(f.type)) {
+        const category = getMediaCategory(f.type);
+
+        if (!category) {
           setErrorCode(415);
           setError(`Tipo de archivo no soportado: ${f.name}`);
+          return;
+        }
+
+        const limit = FILE_SIZE_LIMITS[category];
+        if (f.size > limit) {
+          setErrorCode(413);
+          setError(
+            `El archivo "${f.name}" excede el tamaño máximo para ${category} (${formatSize(limit)})`,
+          );
           return;
         }
       }
 
       const mapped = fileArray.map((f) => {
-        const blobUrl = URL.createObjectURL(f);
+        const dataUrl = URL.createObjectURL(f);
         return {
           id: crypto.randomUUID(),
           name: f.name,
           size: f.size,
           type: f.type,
-          blobUrl,
+          dataUrl,
         };
       });
 
@@ -64,9 +79,7 @@ export function useLocalMultimedia() {
   const remove = useCallback((id: string) => {
     setItems((s) => {
       const item = s.find((i) => i.id === id);
-      if (item?.blobUrl) {
-        URL.revokeObjectURL(item.blobUrl);
-      }
+      if (item?.dataUrl) URL.revokeObjectURL(item.dataUrl);
       return s.filter((i) => i.id !== id);
     });
   }, []);
@@ -74,9 +87,7 @@ export function useLocalMultimedia() {
   const clear = useCallback(() => {
     setItems((s) => {
       s.forEach((item) => {
-        if (item.blobUrl) {
-          URL.revokeObjectURL(item.blobUrl);
-        }
+        if (item.dataUrl) URL.revokeObjectURL(item.dataUrl);
       });
       return [];
     });
@@ -90,5 +101,6 @@ export function useLocalMultimedia() {
     isSaving,
     error,
     errorCode,
+    limits: FILE_SIZE_LIMITS,
   } as const;
 }

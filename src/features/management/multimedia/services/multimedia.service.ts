@@ -8,12 +8,17 @@ export type UploadResult = {
 };
 
 class MultimediaService {
-  private readonly endpoint = "/api/v1/multimedia";
+  private readonly endpoint = "/api/v1/multimedia"; //TODO: ajustar endpoint real
 
-  async uploadBulk(
-    files: { name: string; dataUrl?: string }[],
-  ): Promise<UploadResult[]> {
-    return apiService.post<UploadResult[]>(`${this.endpoint}/bulk`, files);
+  async uploadFile(
+    file: { name: string; dataUrl?: string },
+    onProgress?: (percentage: number) => void,
+  ): Promise<UploadResult> {
+    return apiService.postWithProgress<UploadResult>(
+      this.endpoint,
+      file,
+      onProgress,
+    );
   }
 }
 

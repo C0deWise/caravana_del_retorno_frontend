@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useRef, useState } from "react";
-import Image from "next/image";
-import { XMarkIcon } from "@heroicons/react/24/solid";
 import { ExpandableContent } from "@/components/layout/ExpandableContent";
 import { useLocalMultimedia } from "../hooks/useLocalMultimedia";
-import { multimediaService } from "../services/multimedia.service";
+import { useUploadMultimedia } from "../hooks/useUploadMultimedia";
+import { MultimediaCard } from "./MultimediaCard";
+import { MarqueeText } from "@/components/common/MarqueeText";
+import { FILE_SIZE_LIMITS, formatSize } from "../config/multimedia.constants";
 
 interface LoadContentModalFormProps {
   readonly onSuccess: () => void;
@@ -16,19 +17,70 @@ export default function LoadContentModalForm({
   onSuccess,
   onCancel,
 }: LoadContentModalFormProps) {
-  const { items, addFiles, remove, clear, isSaving, error } =
-    useLocalMultimedia();
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const [messages, setMessages] = useState<Array<{ id: string; text: string }>>(
-    [],
-  );
-  const [deletedItems, setDeletedItems] = useState<Set<string>>(new Set());
+  const {
+    items,
+    addFiles,
+    remove,
+    clear,
+    error: localError,
+  } = useLocalMultimedia();
+  const {
+    uploadStates,
+    isUploading,
+    uploadAllFiles,
+    retryFile,
+    resetStates,
+    removeState,
+  } = useUploadMultimedia();
 
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const [deletedItems, setDeletedItems] = useState<Set<string>>(new Set());
   const [isDragging, setIsDragging] = useState(false);
+
+  const [warningData, setWarningData] = useState<{
+    count: number;
+    names: string;
+  } | null>(null);
+  const warningTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const onFilesSelected = (files: FileList | null) => {
     if (!files) return;
-    addFiles(files);
+
+    const newFilesArray = Array.from(files);
+    const duplicates: string[] = [];
+
+    const uniqueFiles = newFilesArray.filter((newFile) => {
+      const isDuplicate = items.some(
+        (existingItem) =>
+          existingItem.name === newFile.name &&
+          existingItem.size === newFile.size,
+      );
+
+      if (isDuplicate) duplicates.push(newFile.name);
+      return !isDuplicate;
+    });
+
+    if (duplicates.length > 0) {
+      if (warningTimeoutRef.current) clearTimeout(warningTimeoutRef.current);
+
+      setWarningData({
+        count: duplicates.length,
+        names: duplicates.join(", "),
+      });
+
+      warningTimeoutRef.current = setTimeout(() => {
+        setWarningData(null);
+      }, 10000);
+    } else {
+      setWarningData(null);
+    }
+
+    if (uniqueFiles.length > 0) {
+      const dataTransfer = new DataTransfer();
+      uniqueFiles.forEach((file) => dataTransfer.items.add(file));
+      addFiles(dataTransfer.files);
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -37,70 +89,40 @@ export default function LoadContentModalForm({
     onFilesSelected(e.dataTransfer.files);
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
-
   const openFileDialog = () => inputRef.current?.click();
-
-  const getMediaTypeColor = (type: string) => {
-    if (type.startsWith("image/")) return "bg-blue-100 text-blue-700";
-    if (type.startsWith("audio/")) return "bg-purple-100 text-purple-700";
-    if (type.startsWith("video/")) return "bg-pink-100 text-pink-700";
-    return "bg-gray-100 text-gray-700";
-  };
 
   const handleRemove = (id: string) => {
     setDeletedItems((prev) => new Set(prev).add(id));
     setTimeout(() => {
       remove(id);
+      removeState(id);
     }, 500);
   };
 
   const handleClear = () => {
     setDeletedItems(new Set(items.map((it) => it.id)));
+    setWarningData(null);
+    if (warningTimeoutRef.current) clearTimeout(warningTimeoutRef.current);
+
     setTimeout(() => {
       clear();
+      resetStates();
     }, 500);
   };
 
-  const handleUpload = async () => {
-    if (!items.length) return;
-    setMessages([]);
-
-    const payload = items.map((it) => ({ name: it.name, blobUrl: it.blobUrl }));
-
-    try {
-      const results = await multimediaService.uploadBulk(payload);
-      const successCount = results.filter((r) => r.success).length;
-      const newMessages = results.map((r, idx) => ({
-        id: `msg-${idx}-${Date.now()}`,
-        text: formatUploadResult(r),
-      }));
-      setMessages(newMessages);
-
-      if (successCount === results.length) {
-        clear();
-        setTimeout(onSuccess, 800);
-      }
-    } catch {
-      setMessages([{ id: "error", text: "Error subiendo archivos" }]);
-    }
+  const onCompleteSuccess = () => {
+    clear();
+    resetStates();
+    onSuccess();
   };
 
-  const formatUploadResult = (r: {
-    name: string;
-    success: boolean;
-    message?: string;
-  }) => {
-    const status = r.success ? "OK" : "FAIL";
-    const message = r.message ? ` (${r.message})` : "";
-    return `${r.name}: ${status}${message}`;
+  const handleUpload = () => uploadAllFiles(items, onCompleteSuccess);
+
+  const handleRetry = (id: string) => {
+    const itemToRetry = items.find((it) => it.id === id);
+    if (itemToRetry) {
+      retryFile(itemToRetry, items, onCompleteSuccess);
+    }
   };
 
   return (
@@ -113,8 +135,11 @@ export default function LoadContentModalForm({
 
       <section
         onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDragging(true);
+        }}
+        onDragLeave={() => setIsDragging(false)}
         aria-label="Zona de arrastre para cargar archivos multimedia"
         className={`rounded-lg p-8 flex flex-col items-center justify-center relative border-2 ${
           isDragging
@@ -132,100 +157,105 @@ export default function LoadContentModalForm({
           multiple
           accept="image/*,video/*,audio/*"
           className="hidden"
-          onChange={(e) => onFilesSelected(e.target.files)}
+          onChange={(e) => {
+            onFilesSelected(e.target.files);
+            if (e.target) e.target.value = "";
+          }}
         />
 
         <button
-          className="w-full px-4 py-3.5 rounded-xl bg-accent-green text-white font-bold hover:opacity-90 transition-opacity border-2 border-dashed border-accent-green/30"
+          type="button"
+          className="w-full px-4 py-3.5 rounded-xl bg-accent-green text-white font-bold hover:opacity-90 transition-opacity border-2 border-dashed border-accent-green/30 disabled:opacity-50"
           onClick={openFileDialog}
+          disabled={isUploading}
         >
           Seleccionar archivos
         </button>
       </section>
 
-      {error && (
-        <div className="p-3 rounded-lg bg-accent-red/10 text-accent-red border border-accent-red/20">
-          {error}
+      <div className="flex flex-wrap justify-center gap-4 text-xs text-text-muted mt-2">
+        <span>Imágenes: hasta {formatSize(FILE_SIZE_LIMITS.image)}</span>
+        <span>•</span>
+        <span>Audios: hasta {formatSize(FILE_SIZE_LIMITS.audio)}</span>
+        <span>•</span>
+        <span>Videos: hasta {formatSize(FILE_SIZE_LIMITS.video)}</span>
+      </div>
+
+      {localError && (
+        <div className="p-3 rounded-lg bg-accent-red/10 text-accent-red border border-accent-red/20 text-sm font-medium">
+          {localError}
+        </div>
+      )}
+
+      {warningData && (
+        <div className="flex flex-col text-center p-3 rounded-lg bg-secondary/10 text-secondary border border-secondary/20 text-sm font-medium">
+          {warningData.count === 1 ? (
+            <>
+              <span>El archivo</span>
+              <div className="w-full min-w-0 italic overflow-hidden my-0.5">
+                <MarqueeText text={`"${warningData.names}"`} speed={30} />
+              </div>
+              <span>ya estaba seleccionado.</span>
+            </>
+          ) : (
+            <>
+              <span>Se omitieron {warningData.count} archivos:</span>
+              <div className="w-full min-w-0 italic overflow-hidden my-0.5">
+                <MarqueeText text={warningData.names} speed={30} />
+              </div>
+              <span>que ya estaban seleccionados.</span>
+            </>
+          )}
         </div>
       )}
 
       <div>
         <h2 className="font-semibold text-text mb-3">
-          Archivos en local ({items.length})
+          Archivos seleccionados ({items.length})
         </h2>
-        <div className="space-y-2">
+        <div className="space-y-2 max-h-75 overflow-y-auto pr-2">
           {items.map((it) => (
-            <ExpandableContent key={it.id} isOpen={!deletedItems.has(it.id)}>
-              <li className="flex items-center justify-between p-3 bg-bg-hover rounded-lg border border-bg-border hover:border-bg-active transition-colors list-none">
-                <div className="flex items-center gap-3 flex-1">
-                  {it.blobUrl && it.type.startsWith("image/") ? (
-                    <Image
-                      src={it.blobUrl}
-                      alt={it.name}
-                      width={48}
-                      height={48}
-                      className="w-12 h-12 object-cover rounded-lg"
-                      unoptimized
-                    />
-                  ) : (
-                    <div
-                      className={`w-12 h-12 rounded-lg flex items-center justify-center font-semibold text-sm ${getMediaTypeColor(it.type)}`}
-                    >
-                      {it.name.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-text-primary truncate">
-                      {it.name}
-                    </div>
-                    <div className="text-sm text-text-muted">
-                      {(it.size / 1024).toFixed(2)} KB
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => handleRemove(it.id)}
-                  className="flex items-center justify-center p-2 text-text-inverse bg-accent-red hover:opacity-90 rounded-xl transition-all shadow-md active:scale-95 cursor-pointer shrink-0 ml-2"
-                  title="Eliminar archivo"
-                >
-                  <XMarkIcon className="w-5 h-5" />
-                </button>
-              </li>
+            <ExpandableContent
+              key={it.id}
+              isOpen={!deletedItems.has(it.id)}
+              className="-mt-2"
+            >
+              <MultimediaCard
+                id={it.id}
+                name={it.name}
+                size={it.size}
+                type={it.type}
+                dataUrl={it.dataUrl}
+                upload={uploadStates[it.id] || { status: "idle", progress: 0 }}
+                isLeaving={deletedItems.has(it.id)}
+                allowRetry={false}
+                onRemove={handleRemove}
+                onRetry={handleRetry}
+              />
             </ExpandableContent>
           ))}
         </div>
       </div>
 
-      {messages.length > 0 && (
-        <div className="space-y-1 p-4 rounded-lg bg-bg-hover border border-bg-border">
-          {messages.map((m) => (
-            <div key={m.id} className="text-sm text-text-muted">
-              {m.text}
-            </div>
-          ))}
-        </div>
-      )}
-
       <div className="flex items-center gap-3 pt-2">
         <button
           className="flex-1 px-4 py-3.5 rounded-xl bg-secondary text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
           onClick={handleUpload}
-          disabled={isSaving || items.length === 0}
+          disabled={isUploading || items.length === 0}
         >
-          {isSaving ? "Subiendo..." : "Subir archivos"}
+          {isUploading ? "Subiendo..." : "Subir archivos"}
         </button>
         <button
           className="px-4 py-3.5 rounded-xl bg-accent-red text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
           onClick={handleClear}
-          disabled={items.length === 0}
+          disabled={items.length === 0 || isUploading}
         >
           Limpiar
         </button>
         <button
-          className="px-4 py-3.5 rounded-xl bg-bg-hover border border-bg-border text-text font-bold hover:bg-bg-active transition-colors"
+          className="px-4 py-3.5 rounded-xl bg-bg-hover border border-bg-border text-text font-bold hover:bg-bg-active transition-colors disabled:opacity-50"
           onClick={onCancel}
+          disabled={isUploading}
         >
           Cancelar
         </button>

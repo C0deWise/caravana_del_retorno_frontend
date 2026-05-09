@@ -331,3 +331,22 @@ body {
 
   animation: marching-ants 0.8s linear infinite;
 }
+
+@layer utilities {
+  .animate-marquee {
+    display: inline-block;
+    white-space: nowrap;
+    animation: marquee var(--marquee-duration, 5s) linear infinite alternate;
+  }
+
+  @keyframes marquee {
+    0%,
+    10% {
+      transform: translateX(0);
+    }
+    90%,
+    100% {
+      transform: translateX(var(--marquee-dist, -10px));
+    }
+  }
+}

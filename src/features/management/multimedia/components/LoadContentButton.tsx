@@ -20,8 +20,12 @@ export default function LoadContentButton() {
         Añadir archivos
       </button>
 
-      <AnimatedModal isOpen={isOpen} onBackdropClick={() => setIsOpen(false)}>
-        <div className="w-full max-w-2xl bg-bg rounded-2xl shadow-2xl border border-bg-border">
+      <AnimatedModal
+        isOpen={isOpen}
+        onBackdropClick={() => setIsOpen(false)}
+        maxWidth="max-w-xl"
+      >
+        <div className="w-full bg-bg rounded-2xl shadow-2xl border border-bg-border">
           <div className="p-1">
             <LoadContentModalForm
               onSuccess={handleSuccess}
