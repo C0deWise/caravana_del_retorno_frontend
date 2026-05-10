@@ -4,14 +4,14 @@ import React, { useEffect, useId, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface ConfirmModalProps {
-  isOpen: boolean;
-  title: string;
-  details?: React.ReactNode[] | string[];
-  onConfirm: () => void | Promise<void>;
-  onCancel: () => void;
-  confirmLabel?: string;
-  cancelLabel?: string;
-  loading?: boolean;
+  readonly isOpen: boolean;
+  readonly title: string;
+  readonly details?: React.ReactNode[] | string[];
+  readonly onConfirm: () => void | Promise<void>;
+  readonly onCancel: () => void;
+  readonly confirmLabel?: string;
+  readonly cancelLabel?: string;
+  readonly loading?: boolean;
 }
 
 export function ConfirmModal({
@@ -75,20 +75,28 @@ export function ConfirmModal({
           >
             <h2
               id={titleId}
-              className="mb-4 text-center text-xl font-bold text-primary"
+              className="mb-4 text-center text-xl font-bold text-primary wrap-break-word"
             >
               {title}
             </h2>
 
             {details.length > 0 && (
-              <div className="mb-6 text-center text-base text-text">
+              <div className="mb-6 text-center text-base text-text wrap-break-word max-h-[60vh] overflow-y-auto px-2">
                 {details.length === 1 ? (
-                  <p>{details[0]}</p>
+                  <p className="whitespace-pre-wrap">{details[0]}</p>
                 ) : (
                   <ul className="list-disc space-y-1 pl-5 text-left">
-                    {details.map((item, idx) => (
-                      <li key={idx}>{item}</li>
-                    ))}
+                    {details.map((item, idx) => {
+                      const key =
+                        typeof item === "string"
+                          ? item
+                          : (React.isValidElement(item) && item.key) || idx;
+                      return (
+                        <li key={key} className="whitespace-pre-wrap">
+                          {item}
+                        </li>
+                      );
+                    })}
                   </ul>
                 )}
               </div>
