@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-  /* Fuente */
+  /* Tipografía */
   --font-sans: var(--font-inter);
+
+  /* Escala de fuente para accesibilidad */
+  --font-scale: 1;
 
   /* Colores principales */
   --color-primary: #024059;
@@ -23,6 +26,31 @@
   --color-text: #343434;
   --color-text-muted: #707070;
   --color-text-inverse: #ffffff;
+
+  /* Tipografía escalable */
+  --text-xs: calc(0.75rem * var(--font-scale));
+  --text-xs--line-height: 1rem;
+
+  --text-sm: calc(0.875rem * var(--font-scale));
+  --text-sm--line-height: 1.25rem;
+
+  --text-base: calc(1rem * var(--font-scale));
+  --text-base--line-height: 1.5rem;
+
+  --text-lg: calc(1.125rem * var(--font-scale));
+  --text-lg--line-height: 1.75rem;
+
+  --text-xl: calc(1.25rem * var(--font-scale));
+  --text-xl--line-height: 1.75rem;
+
+  --text-2xl: calc(1.5rem * var(--font-scale));
+  --text-2xl--line-height: 2rem;
+
+  --text-3xl: calc(1.875rem * var(--font-scale));
+  --text-3xl--line-height: 2.25rem;
+
+  --text-4xl: calc(2.25rem * var(--font-scale));
+  --text-4xl--line-height: 2.5rem;
 }
 
 body {
@@ -59,12 +87,15 @@ body {
 
 .sidebar-expanded {
   width: auto;
-  min-width: 20rem; /* 320px */
-  max-width: 30rem; /* 384px */
+  min-width: 20rem;
+  /* 320px */
+  max-width: 30rem;
+  /* 384px */
 }
 
 /* ===== ESTILOS COMPARTIDOS DE FORMULARIOS ===== */
 @layer components {
+
   /* Inputs de texto estándar */
   .input-base {
     @apply w-full px-4 py-3 rounded-lg transition-colors;
@@ -232,6 +263,7 @@ body {
     color: var(--color-text-muted);
   }
 }
+
 /* Clases para formularios */
 .input-base {
   width: 100%;
@@ -340,10 +372,12 @@ body {
   }
 
   @keyframes marquee {
+
     0%,
     10% {
       transform: translateX(0);
     }
+
     90%,
     100% {
       transform: translateX(var(--marquee-dist, -10px));
