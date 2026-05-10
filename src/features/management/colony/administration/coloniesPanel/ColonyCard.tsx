@@ -4,6 +4,7 @@ import { MapPinIcon } from "@heroicons/react/24/solid";
 import type { ColonyData } from "@/types/colony.types";
 import { DeleteColonyButton } from "../deleteColony/components/DeleteColonyButton";
 import { AssignLeaderButton } from "../assignLeader/components/AssignLeaderButton";
+import { ColonyMembersButton } from "../colonyMembers/ColonyMembersButton";
 import ListCard from "@/components/common/ListCard";
 
 interface ColonyCardProps {
@@ -35,6 +36,7 @@ export function ColonyCard({ colony, index, onRefresh }: ColonyCardProps) {
       actions={
         <>
           <AssignLeaderButton colony={colony} onRefresh={onRefresh} />
+          <ColonyMembersButton colony={colony} />
           <DeleteColonyButton
             colonyId={colony.codigo}
             fullLocation={fullLocation}

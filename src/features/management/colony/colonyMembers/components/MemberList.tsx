@@ -1,6 +1,6 @@
 "use client";
 import { AnimatedList } from "@/components/common/AnimatedList";
-import { ColonyMember } from "../types/colony-members.types";
+import { ColonyMember } from "../../types/colony-members.types";
 import { UserRole } from "@/types/user.types";
 import { MemberCard } from "./MemberCard";
 

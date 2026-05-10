@@ -1,6 +1,6 @@
 "use client";
 import Spinner from "@/components/feedback/Spinner";
-import { useColonyMembers } from "../hooks/useColonyMembers";
+import { useColonyMembers } from "../../hooks/useColonyMembers";
 import { useAuth } from "@/auth/context/AuthContext";
 import { RequireAuth } from "@/auth/components/RequireAuth";
 import { MemberList } from "./MemberList";

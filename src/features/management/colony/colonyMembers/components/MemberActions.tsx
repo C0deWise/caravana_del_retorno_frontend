@@ -7,7 +7,7 @@ import {
   EnvelopeIcon,
 } from "@heroicons/react/24/solid";
 import { UserRole } from "@/types/user.types";
-import { ColonyMember } from "../types/colony-members.types";
+import { ColonyMember } from "../../types/colony-members.types";
 import { calculateAge } from "@/utils/formatting";
 import { CopyableAction } from "@/components/common/CopyableAction";
 

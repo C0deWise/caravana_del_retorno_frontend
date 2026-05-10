@@ -3,7 +3,7 @@ import { useAuth } from "@/auth/context/AuthContext";
 import { ColonyMember } from "../types/colony-members.types";
 import { listColonyMembers } from "../services/colony-members.service";
 import { ApiError } from "@/services/api.services";
-import { useListColonies } from "../../hooks/useListColonies";
+import { useListColonies } from "./useListColonies";
 
 export function useColonyMembers(targetColonyId: number): {
   members: ColonyMember[];
@@ -29,11 +29,15 @@ export function useColonyMembers(targetColonyId: number): {
     [colonies, targetColonyId],
   );
 
-  const colonyLabel = colony
-    ? colony.ciudad && colony.departamento
-      ? `${colony.ciudad}, ${colony.departamento}`
-      : colony.pais
-    : "Cargando...";
+  const colonyLabel = useMemo(() => {
+    if (!colony) return "Cargando...";
+
+    if (colony.ciudad && colony.departamento) {
+      return `${colony.ciudad}, ${colony.departamento}`;
+    }
+
+    return colony.pais;
+  }, [colony]);
 
   const fetchMembers = useCallback(async () => {
     if (!targetColonyId) {

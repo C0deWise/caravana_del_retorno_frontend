@@ -3,10 +3,10 @@
 import { UserIcon } from "@heroicons/react/24/solid";
 import ListCard from "@/components/common/ListCard";
 import { MarqueeText } from "@/components/common/MarqueeText";
-import { ColonyMember } from "../types/colony-members.types";
+import { ColonyMember } from "../../types/colony-members.types";
 import { UserRole } from "@/types/user.types";
 import { getVisibleMemberData } from "../utils/rolePermissions";
-import { RoleTag } from "./RoleTag";
+import { RoleTag } from "@/components/common/RoleTag";
 import { MemberActions } from "./MemberActions";
 
 interface MemberCardProps {
