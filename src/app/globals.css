@@ -87,12 +87,15 @@ body {
 
 .sidebar-expanded {
   width: auto;
-  min-width: 20rem; /* 320px */
-  max-width: 30rem; /* 384px */
+  min-width: 20rem;
+  /* 320px */
+  max-width: 30rem;
+  /* 384px */
 }
 
 /* ===== ESTILOS COMPARTIDOS DE FORMULARIOS ===== */
 @layer components {
+
   /* Inputs de texto estándar */
   .input-base {
     @apply w-full px-4 py-3 rounded-lg transition-colors;
@@ -261,3 +264,123 @@ body {
   }
 }
 
+/* Clases para formularios */
+.input-base {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-bg-border);
+  border-radius: 0.5rem;
+  background-color: var(--color-bg-card);
+  color: var(--color-text);
+  font-size: 1rem;
+}
+
+.label-base {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--color-text);
+}
+
+.page-title {
+  font-size: 1.875rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--color-primary);
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--color-text-muted);
+}
+
+.alert-error {
+  padding: 0.75rem;
+  background-color: #fee2e2;
+  border: 1px solid #fca5a5;
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+}
+
+.alert-error-text {
+  color: var(--color-danger);
+  font-size: 0.875rem;
+}
+
+.alert-success {
+  padding: 0.75rem;
+  background-color: #d1fae5;
+  border: 1px solid #6ee7b7;
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+}
+
+.alert-success-text {
+  color: var(--color-accent-green);
+  font-size: 0.875rem;
+}
+
+/* ===== MARCHING ANTS ANIMATION ===== */
+@keyframes marching-ants {
+  to {
+    background-position:
+      16px 0,
+      -16px 100%,
+      0 -16px,
+      100% 16px;
+  }
+}
+
+.marching-ants {
+  --ants-color: rgb(14 116 144);
+  --ants-size: 16px;
+  --ants-stroke: 2px;
+
+  background:
+    linear-gradient(90deg, var(--ants-color) 50%, transparent 50%) repeat-x,
+    linear-gradient(90deg, var(--ants-color) 50%, transparent 50%) repeat-x,
+    linear-gradient(0deg, var(--ants-color) 50%, transparent 50%) repeat-y,
+    linear-gradient(0deg, var(--ants-color) 50%, transparent 50%) repeat-y,
+    rgba(14, 116, 144, 0.1);
+
+  background-size:
+    var(--ants-size) var(--ants-stroke),
+    var(--ants-size) var(--ants-stroke),
+    var(--ants-stroke) var(--ants-size),
+    var(--ants-stroke) var(--ants-size),
+    auto;
+
+  background-position:
+    0 0,
+    0 100%,
+    0 0,
+    100% 0,
+    0 0;
+
+  animation: marching-ants 0.8s linear infinite;
+}
+
+@layer utilities {
+  .animate-marquee {
+    display: inline-block;
+    white-space: nowrap;
+    animation: marquee var(--marquee-duration, 5s) linear infinite alternate;
+  }
+
+  @keyframes marquee {
+
+    0%,
+    10% {
+      transform: translateX(0);
+    }
+
+    90%,
+    100% {
+      transform: translateX(var(--marquee-dist, -10px));
+    }
+  }
+}
