@@ -7,12 +7,14 @@ interface AnimatedModalProps {
   readonly isOpen: boolean;
   readonly children: React.ReactNode;
   readonly onBackdropClick?: () => void;
+  readonly maxWidth?: string;
 }
 
 export function AnimatedModal({
   isOpen,
   children,
   onBackdropClick,
+  maxWidth = "max-w-lg",
 }: AnimatedModalProps) {
   if (typeof document === "undefined") return null;
 
@@ -36,7 +38,7 @@ export function AnimatedModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="w-full max-w-lg"
+            className={`w-full ${maxWidth}`}
           >
             {children}
           </motion.div>
