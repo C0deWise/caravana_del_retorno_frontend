@@ -1,3 +1,5 @@
+"use client";
+
 import { ReactNode } from "react";
 
 export interface ListCardProps {
@@ -23,48 +25,54 @@ export default function ListCard({
   subtitle,
   actions,
 }: ListCardProps) {
-  const finalBadge = iconBadge ?? (badgeConfig?.show ? (
-    <span
-      className="absolute -top-1.5 -right-1.5 flex h-4 w-4"
-      title={badgeConfig.title}
-    >
-      <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${badgeConfig.color ?? "bg-secondary"} opacity-75`}></span>
-      <span className={`relative inline-flex rounded-full h-4 w-4 ${badgeConfig.color ?? "bg-secondary"} border-2 border-bg`}></span>
-    </span>
-  ) : undefined);
+  const finalBadge =
+    iconBadge ??
+    (badgeConfig?.show ? (
+      <span
+        className="absolute -top-1.5 -right-1.5 flex h-4 w-4"
+        title={badgeConfig.title}
+      >
+        <span
+          className={`absolute inline-flex h-full w-full animate-ping rounded-full ${badgeConfig.color ?? "bg-secondary"} opacity-75`}
+        />
+        <span
+          className={`relative inline-flex h-4 w-4 rounded-full border-2 border-bg ${badgeConfig.color ?? "bg-secondary"}`}
+        />
+      </span>
+    ) : undefined);
 
   return (
-    <div className="bg-bg border border-bg-border rounded-2xl shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-row items-stretch">
-      {/* Columna de Índice Estructural */}
-      <div className="flex items-center justify-center w-14 md:w-16 bg-primary/5 border-r border-primary/20 shrink-0">
-        <span className="text-xl font-bold text-primary/80 select-none">
+    <div className="flex items-stretch overflow-hidden rounded-2xl border border-bg-border bg-bg shadow-sm transition-shadow hover:shadow-md">
+      <div className="flex w-14 shrink-0 items-center justify-center border-r border-primary/20 bg-primary/5 md:w-16">
+        <span className="select-none text-xl font-bold text-primary/80">
           {index + 1}
         </span>
       </div>
 
-      {/* Contenido Principal */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between flex-1 p-3 md:px-5 gap-4">
-        <div className="flex items-center gap-4">
-          <div className="relative w-14 h-14 bg-linear-to-tl from-primary/90 to-secondary/90 rounded-xl flex items-center justify-center shadow-md shrink-0">
-            {icon}
-            {finalBadge}
+      <div className="flex min-w-0 flex-1 items-center gap-4 p-3 md:px-5">
+        <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-linear-to-tl from-primary/90 to-secondary/90 shadow-md">
+          {icon}
+          {finalBadge}
+        </div>
+
+        <div className="flex min-w-0 flex-1 flex-col justify-center">
+          <div className="min-w-0">
+            <h3 className="text-xl font-bold text-text">{title}</h3>
           </div>
-          <div>
-            <h3 className="font-bold text-xl text-text">{title}</h3>
-            {subtitle && (
-              <div className="flex items-center text-sm text-text-muted mt-1">
-                {typeof subtitle === "string" ? (
-                  <span className="font-medium text-secondary">{subtitle}</span>
-                ) : (
-                  subtitle
-                )}
-              </div>
-            )}
-          </div>
+
+          {subtitle && (
+            <div className="mt-1 shrink-0 text-sm text-text-muted">
+              {typeof subtitle === "string" ? (
+                <span className="font-medium text-secondary">{subtitle}</span>
+              ) : (
+                subtitle
+              )}
+            </div>
+          )}
         </div>
 
         {actions && (
-          <div className="flex items-center justify-end gap-3 w-full md:w-auto mt-4 md:mt-0 border-t md:border-none pt-4 md:pt-0 border-bg-border">
+          <div className="ml-auto flex shrink-0 items-center justify-end gap-3 whitespace-nowrap">
             {actions}
           </div>
         )}

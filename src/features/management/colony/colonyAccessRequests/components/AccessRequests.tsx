@@ -20,37 +20,66 @@ export default function AccessRequests() {
   const targetColonyId = user?.codigo_colonia ?? null;
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<AccessRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<AccessRequest | null>(
+    null,
+  );
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
 
-  const { listColonies, colonies, loading: isLoadingColonies } = useListColonies();
-  const { requests, isLoading, error, refetch, removeRequestLocally, totalRequests } = useListAccessRequests(targetColonyId);
-  const { acceptRequest, isAccepting, error: acceptError, reset: resetAccept } = useAcceptAccessRequest();
-  const { rejectRequest, isRejecting, error: rejectError, reset: resetReject } = useRejectAccessRequest();
+  const {
+    listColonies,
+    colonies,
+    loading: isLoadingColonies,
+  } = useListColonies();
+  const {
+    requests,
+    isLoading,
+    error,
+    refetch,
+    removeRequestLocally,
+    totalRequests,
+  } = useListAccessRequests(targetColonyId);
+  const {
+    acceptRequest,
+    isAccepting,
+    error: acceptError,
+    reset: resetAccept,
+  } = useAcceptAccessRequest();
+  const {
+    rejectRequest,
+    isRejecting,
+    error: rejectError,
+    reset: resetReject,
+  } = useRejectAccessRequest();
 
   useEffect(() => {
     void listColonies();
   }, [listColonies]);
 
   const leaderColony = user?.codigo_colonia
-    ? colonies.find((item) => item.codigo === user.codigo_colonia) ?? null
+    ? (colonies.find((item) => item.codigo === user.codigo_colonia) ?? null)
     : null;
 
-  const handleApprove = useCallback((requestId: number) => {
-    const request = requests.find((item) => item.id === requestId);
-    if (!request) return;
-    setSelectedRequest(request);
-    setPendingAction("approve");
-    setShowConfirmModal(true);
-  }, [requests]);
+  const handleApprove = useCallback(
+    (requestId: number) => {
+      const request = requests.find((item) => item.id === requestId);
+      if (!request) return;
+      setSelectedRequest(request);
+      setPendingAction("approve");
+      setShowConfirmModal(true);
+    },
+    [requests],
+  );
 
-  const handleReject = useCallback((requestId: number) => {
-    const request = requests.find((item) => item.id === requestId);
-    if (!request) return;
-    setSelectedRequest(request);
-    setPendingAction("reject");
-    setShowConfirmModal(true);
-  }, [requests]);
+  const handleReject = useCallback(
+    (requestId: number) => {
+      const request = requests.find((item) => item.id === requestId);
+      if (!request) return;
+      setSelectedRequest(request);
+      setPendingAction("reject");
+      setShowConfirmModal(true);
+    },
+    [requests],
+  );
 
   const handleModalConfirm = useCallback(async () => {
     if (!selectedRequest || !pendingAction) return;
@@ -65,9 +94,19 @@ export default function AccessRequests() {
     setShowConfirmModal(false);
     setSelectedRequest(null);
     setPendingAction(null);
-  }, [selectedRequest, pendingAction, acceptRequest, rejectRequest, removeRequestLocally, resetAccept, resetReject]);
+  }, [
+    selectedRequest,
+    pendingAction,
+    acceptRequest,
+    rejectRequest,
+    removeRequestLocally,
+    resetAccept,
+    resetReject,
+  ]);
 
-  const colonyLabel = leaderColony ? formatColonyLabel(leaderColony) : `Colonia ${targetColonyId}`;
+  const colonyLabel = leaderColony
+    ? formatColonyLabel(leaderColony)
+    : `Colonia ${targetColonyId}`;
   const hasActionError = acceptError || rejectError;
   const isProcessingAction = isAccepting || isRejecting;
 
@@ -78,10 +117,12 @@ export default function AccessRequests() {
           <div className="flex items-end justify-between gap-6">
             <div>
               <span className="text-sm font-medium text-text-muted uppercase tracking-wide mb-1 block">
-                Solicitudes de ingreso
+                Colonia
               </span>
               <h1 className="text-3xl font-bold text-primary leading-none">
-                {isLoadingColonies && targetColonyId ? "Cargando ubicación..." : colonyLabel}
+                {isLoadingColonies && targetColonyId
+                  ? "Cargando ubicación..."
+                  : colonyLabel}
               </h1>
             </div>
 
@@ -135,7 +176,11 @@ export default function AccessRequests() {
                 </div>
               )}
               <main className="mx-auto max-w-6xl">
-                <RequestList requests={requests} onApprove={handleApprove} onReject={handleReject} />
+                <RequestList
+                  requests={requests}
+                  onApprove={handleApprove}
+                  onReject={handleReject}
+                />
               </main>
             </>
           )}
@@ -143,15 +188,25 @@ export default function AccessRequests() {
 
         <ConfirmModal
           isOpen={showConfirmModal}
-          title={pendingAction === "approve" ? "Aprobar solicitud" : "Rechazar solicitud"}
-          details={selectedRequest ? [
-            <>
-              {pendingAction === "approve" ? "¿Estás seguro de que deseas aprobar a " : "¿Estás seguro de que deseas rechazar a "}
-              <strong>{selectedRequest.fullName}</strong>
-              {pendingAction === "approve" ? " en " : " de "}
-              la colonia <strong>{colonyLabel}</strong>?
-            </>,
-          ] : [<span key="confirm">Confirma la acción</span>]}
+          title={
+            pendingAction === "approve"
+              ? "Aprobar solicitud"
+              : "Rechazar solicitud"
+          }
+          details={
+            selectedRequest
+              ? [
+                  <>
+                    {pendingAction === "approve"
+                      ? "¿Estás seguro de que deseas aprobar a "
+                      : "¿Estás seguro de que deseas rechazar a "}
+                    <strong>{selectedRequest.fullName}</strong>
+                    {pendingAction === "approve" ? " en " : " de "}
+                    la colonia <strong>{colonyLabel}</strong>?
+                  </>,
+                ]
+              : [<span key="confirm">Confirma la acción</span>]
+          }
           onConfirm={handleModalConfirm}
           onCancel={() => {
             setShowConfirmModal(false);
@@ -166,4 +221,3 @@ export default function AccessRequests() {
     </RequireAuth>
   );
 }
-
