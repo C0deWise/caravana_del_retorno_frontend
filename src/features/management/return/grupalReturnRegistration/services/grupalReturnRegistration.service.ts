@@ -37,6 +37,10 @@ class GrupalReturnRegistrationService {
     async getMiembros(grupo: number): Promise<MiembroGrupo[]> {
         return apiService.get<MiembroGrupo[]>(`${this.endpoint}/${grupo}/miembros`)
     }
+
+    async getSolicitudes(grupo: number): Promise<SolicitudMiembro[]> {
+        return apiService.get<SolicitudMiembro[]>(`${this.endpoint}/solicitudes/grupo/${grupo}`)
+    }
 }
 
 export const grupalReturnRegistrationService = new GrupalReturnRegistrationService();
