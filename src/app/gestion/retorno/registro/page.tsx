@@ -1,5 +1,5 @@
-import ReturnRegistrationForm from "@/features/management/return/returnRegistrationForm/components/ReturnRegistrationForm";
+import RegistrationSelector from "@/features/management/return/registrationSelector/components/RegistrationSelector";
 
 export default function RegistroIndividualPage() {
-  return <ReturnRegistrationForm />;
+  return <RegistrationSelector />;
 }
