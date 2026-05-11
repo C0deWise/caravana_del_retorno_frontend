@@ -6,12 +6,49 @@ import { AnimatedList } from "@/components/common/AnimatedList";
 import { SearchInput } from "@/components/forms/SearchInput";
 import { CreatePublicationButton } from "@/features/management/publication/administration/createPublication/components/CreatePublicationButton";
 import { PublicationCard } from "./PublicationCard";
-import { usePublications } from "../hooks/usePublications";
 import { PublicationData } from "@/types/publication.types";
 
+const mockPublications: PublicationData[] = [
+  {
+    codigo: 1,
+    codigo_retorno: 101,
+    codigo_colonia: 1,
+    codigo_autor: 10,
+    titulo: "Historia de nuestra comunidad",
+    resena:
+      "Un recuento detallado de cómo nació nuestra colonia y sus primeros pobladores.",
+    fecha_creacion: "2024-01-15T10:30:00Z",
+  },
+  {
+    codigo: 2,
+    codigo_retorno: 102,
+    codigo_colonia: 1,
+    codigo_autor: 11,
+    titulo: "Tradiciones y celebraciones",
+    resena:
+      "Exploramos las tradiciones más importantes que caracterizan a nuestra comunidad.",
+    fecha_creacion: "2024-02-20T14:45:00Z",
+  },
+  {
+    codigo: 3,
+    codigo_retorno: 103,
+    codigo_colonia: 2,
+    codigo_autor: 12,
+    titulo: "Proyectos comunitarios 2024",
+    resena:
+      "Iniciativas y proyectos que estamos desarrollando para mejorar la calidad de vida.",
+    fecha_creacion: "2024-03-10T09:15:00Z",
+  },
+];
+
 export function PublicationsPanel() {
-  const { publications, loading, error, refetch } = usePublications();
-  const [filteredPublications, setFilteredPublications] = useState<PublicationData[]>([]);
+  const [publications] = useState<PublicationData[]>(mockPublications);
+  const loading = false;
+  const error = null;
+  const refetch = () => {};
+  const [filteredPublications, setFilteredPublications] = useState<
+    PublicationData[]
+  >([]);
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
@@ -29,7 +66,7 @@ export function PublicationsPanel() {
       const filtered = publications.filter(
         (p) =>
           p.titulo?.toLowerCase().includes(lowerQuery) ||
-          p.resena?.toLowerCase().includes(lowerQuery)
+          p.resena?.toLowerCase().includes(lowerQuery),
       );
       setFilteredPublications(filtered);
     },
@@ -121,15 +158,16 @@ export function PublicationsPanel() {
                   ? "No se encontraron publicaciones que coincidan con tu búsqueda."
                   : "No hay publicaciones registradas actualmente."
               }
-              onEmptyActionClick={publications.length > 0 ? resetSearch : undefined}
+              onEmptyActionClick={
+                publications.length > 0 ? resetSearch : undefined
+              }
               emptyActionLabel={
-                publications.length > 0 ? "Ver todas las publicaciones" : undefined
+                publications.length > 0
+                  ? "Ver todas las publicaciones"
+                  : undefined
               }
               renderItem={(pub, index) => (
-                <PublicationCard
-                  publication={pub}
-                  index={index}
-                />
+                <PublicationCard publication={pub} index={index} />
               )}
             />
           </div>
