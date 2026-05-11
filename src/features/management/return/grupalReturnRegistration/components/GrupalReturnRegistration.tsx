@@ -108,7 +108,7 @@ function GrupalReturnRegistrationFeature() {
         <h1 className="page-title">Registro grupal</h1>
         <button
           type="button"
-          className="btn-ghost text-accent-red text-sm"
+          className="btn-ca text-accent-red text-sm"
           onClick={() => setShowCancelConfirm(true)}
           disabled={cancelling}
         >

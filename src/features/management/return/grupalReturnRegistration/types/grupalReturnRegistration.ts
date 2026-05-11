@@ -12,17 +12,17 @@ export interface GruposRetorno {
 export type SolicitudEstado = "Pendiente" | "Aceptada" | "Rechazada";
 
 export interface SolicitudMiembroRequest {
-    usuarioId: number;
-    grupoId: number;
+    us_codigo: number;
+    gr_codigo: number;
 }
 
 export interface SolicitudMiembro {
     id: number;
-    usuarioId: number;
-    grupoId: number;
-    estado: SolicitudEstado;
-    nombreUsuario?: string;
-    apellidoUsuario?: string;
+    usuario_id: number;
+    correo_usuario: string;
+    grupo_id: number;
+    estado: string;
+    timestamp: string;
 }
 
 export interface RegistroGrupoRetornoRequest {

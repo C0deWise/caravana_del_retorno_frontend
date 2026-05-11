@@ -23,8 +23,8 @@ export interface Persona {
 }
 
 export interface PersonaGrupoAsociarRequest {
-    personaId: number;
-    grupoId: number;
+    pe_codigo: number;
+    gr_codigo: number;
 }
 
 export interface PersonaGrupo {

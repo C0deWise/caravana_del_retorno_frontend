@@ -87,7 +87,7 @@ export function useExternedPerson(): UseExternalPersonReturn {
         setError(null);
 
         try {
-            await personaService.asociarGrupo({ personaId: foundPersona.pe_codigo, grupoId });
+            await personaService.asociarGrupo({ pe_codigo: foundPersona.pe_codigo, gr_codigo: grupoId });
             setStep("success");
         } catch (err) {
             setError(err instanceof ApiError ? err.message : "Error al buscar a la persona")
@@ -104,7 +104,7 @@ export function useExternedPerson(): UseExternalPersonReturn {
             console.log("Creando persona con data:", data);
             const nueva = await personaService.create(data);
             console.log("Creando persona con data:", data);
-            await personaService.asociarGrupo({ personaId: nueva.pe_codigo, grupoId });
+            await personaService.asociarGrupo({ pe_codigo: nueva.pe_codigo, gr_codigo: grupoId });
             setStep("success");
         } catch (err) {
             setError(err instanceof ApiError ? err.message : "Error al buscar a la persona")

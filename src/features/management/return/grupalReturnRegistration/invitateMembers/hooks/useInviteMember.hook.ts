@@ -26,7 +26,7 @@ export function useInviteMember(currentMembers: MiembroGrupo[]): UseInviteMember
         setErrorMessage(null);
     }, []);
 
-    const inviteMember = useCallback( async (
+    const inviteMember = useCallback(async (
         user: UserSearchResult,
         grupoId: number,
         activeReturnCode: number | null,
@@ -35,6 +35,9 @@ export function useInviteMember(currentMembers: MiembroGrupo[]): UseInviteMember
         reset();
         try {
             const alreadyInGroup = currentMembers.some((m) => m.id === user.id);
+            console.log("currentMembers:", currentMembers);
+            console.log("user.id buscado:", user.id);
+            console.log("alreadyInGroup:", alreadyInGroup);
             if (alreadyInGroup) {
                 setError("already_in_group");
                 setErrorMessage("Este usuario ya pertenece a un grupo");
@@ -42,7 +45,7 @@ export function useInviteMember(currentMembers: MiembroGrupo[]): UseInviteMember
             }
 
             if (activeReturnCode) {
-                const hasIndividualRegistration = await returnRegistrationService.hasUserRegistrationInReturn (user.id, activeReturnCode);
+                const hasIndividualRegistration = await returnRegistrationService.hasUserRegistrationInReturn(user.id, activeReturnCode);
                 if (hasIndividualRegistration) {
                     setError("already_registered_individually");
                     setErrorMessage("Este usuario ya tiene un registro individual para este retorno");
@@ -50,7 +53,8 @@ export function useInviteMember(currentMembers: MiembroGrupo[]): UseInviteMember
                 }
             }
 
-            await grupalReturnRegistrationService.solicitarMiembro({ usuarioId: user.id, grupoId });
+            console.log("Registrando miembro con: ", user.id, grupoId)
+            await grupalReturnRegistrationService.solicitarMiembro({ us_codigo: user.id, gr_codigo: grupoId });
             return true;
         } catch (err) {
             setError("invite_failed");

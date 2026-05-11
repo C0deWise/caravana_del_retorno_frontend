@@ -56,8 +56,11 @@ export function ExternalPersonModal({
         onClose();
     };
 
-    const handleSearch = (query: string) => {
-        if (query.trim().length >= 5) void searchByDocumento(query.trim());
+    const handleSearch = () => {
+        if (documento.trim().length >= 5) {
+            handleFieldChange("pe_documento", documento.trim());
+            void searchByDocumento(documento.trim());
+        }
     };
 
     const handleAddFound = async () => {
@@ -66,7 +69,8 @@ export function ExternalPersonModal({
     };
 
     const handleCreateAndAdd = async () => {
-        await createAndAdd({ ...form, pe_documento: documento }, grupoId);
+        console.log("Form final enviado:", form);
+        await createAndAdd(form, grupoId);
         onPersonaAdded();
     };
 
@@ -91,7 +95,10 @@ export function ExternalPersonModal({
                             onSearch={handleSearch}
                             loading={isLoading && step === "search"}
                             minLength={5}
-                            onChange={setDocumento}
+                            onChange={(val) => {
+                                setDocumento(val);
+                                handleFieldChange("pe_documento", val);
+                            }}
                         />
                     </div>
                 )}
@@ -128,20 +135,57 @@ export function ExternalPersonModal({
                             ))}
                         </div>
 
-                        {(["pe_nombre", "pe_apellido", "pe_correo", "pe_fecha_nacimiento"] as const).map((field) => (
-                            <div key={field}>
-                                <label className="block text-sm text-text-muted mb-1 capitalize">
-                                    {field === "pe_fecha_nacimiento" ? "Fecha de nacimiento" : field.replace("pe_", "")}
-                                    {field !== "pe_correo" && <span className="text-error ml-1">*</span>}
-                                </label>
-                                <input
-                                    type={field === "pe_fecha_nacimiento" ? "date" : field === "pe_correo" ? "email" : "text"}
-                                    value={form[field] ?? ""}
-                                    onChange={(e) => handleFieldChange(field, e.target.value)}
-                                    className="input-base w-full"
-                                />
-                            </div>
-                        ))}
+                        <div>
+                            <label className="block text-sm text-text-muted mb-1 capitalize">
+                                nombre <span className="text-error ml-1">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={form.pe_nombre ?? ""}
+                                onChange={(e) => handleFieldChange("pe_nombre", e.target.value)}
+                                className="input-base w-full"
+                            >
+                            </input>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm text-text-muted mb-1 capitalize">
+                                apellido <span className="text-error ml-1">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={form.pe_apellido ?? ""}
+                                onChange={(e) => handleFieldChange("pe_apellido", e.target.value)}
+                                className="input-base w-full"
+                            >
+                            </input>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm text-text-muted mb-1 capitalize">
+                                correo <span className="text-error ml-1">*</span>
+                            </label>
+                            <input
+                                type="email"
+                                value={form.pe_correo ?? ""}
+                                onChange={(e) => handleFieldChange("pe_correo", e.target.value)}
+                                className="input-base w-full"
+                            >
+                            </input>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm text-text-muted mb-1 capitalize">
+                                Fecha de nacimiento <span className="text-error ml-1">*</span>
+                            </label>
+                            <input
+                                type="date"
+                                value={form.pe_fecha_nacimiento ?? ""}
+                                onChange={(e) => handleFieldChange("pe_fecha_nacimiento", e.target.value)}
+                                className="input-base w-full"
+                            >
+                            </input>
+                        </div>
 
                         <div>
                             <p className="block text-sm text-text-muted mb-1">
@@ -154,8 +198,8 @@ export function ExternalPersonModal({
                                         type="button"
                                         onClick={() => handleFieldChange("pe_genero", value)}
                                         className={`flex-1 rounded-lg border py-2 text-sm font-medium transition-colors ${form.pe_genero === value
-                                                ? "border-primary bg-primary text-white"
-                                                : "border-bg-border text-text-muted hover:text-text"
+                                            ? "border-primary bg-primary text-white"
+                                            : "border-bg-border text-text-muted hover:text-text"
                                             }`}
                                     >
                                         {label}
@@ -204,8 +248,8 @@ export function ExternalPersonModal({
                             {isLoading ? <Spinner size="sm" /> : "Registrar y añadir"}
                         </button>
                     )}
-                </div>
 
+                </div>
             </div>
         </AnimatedModal>
     )
