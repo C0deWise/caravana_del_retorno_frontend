@@ -12,7 +12,7 @@ export const sortColonies = (colonies: ColonyData[]): ColonyData[] => {
     if (!isAColombia && isBColombia) return 1;
 
     if (!isAColombia && !isBColombia) {
-      const countryCompare = a.pais.localeCompare(b.pais);
+      const countryCompare = (a.pais ?? "").localeCompare(b.pais ?? "");
       if (countryCompare !== 0) return countryCompare;
     }
 

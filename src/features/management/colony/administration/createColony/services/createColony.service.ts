@@ -7,7 +7,6 @@ export const coloniaService = {
       pais: data.pais,
       departamento: data.departamento,
       ciudad: data.ciudad,
-      lider: 0,
     });
     return response;
   },

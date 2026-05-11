@@ -4,7 +4,7 @@ export const rolePermissions: Record<UserRole, string[]> = {
   admin: [
     "/gestion/colonia/administrar",
     "/gestion/retorno/crear",
-    "/gestion/multimedia/cargar",
+    "/gestion/publicaciones/administrar",
     "/gestion/reportes",
   ],
   lider_colonia: [
@@ -14,7 +14,7 @@ export const rolePermissions: Record<UserRole, string[]> = {
     "/gestion/retorno/registro/inscripcion",
     "/gestion/retorno/registro/cancelar",
     "/gestion/reportes",
-    "/gestion/multimedia/cargar",
+    "/gestion/publicaciones/administrar",
   ],
   usuario: [
     "/gestion/usuario/parentesco",

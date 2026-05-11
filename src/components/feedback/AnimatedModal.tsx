@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
+import { useEffect } from "react";
 
 interface AnimatedModalProps {
   readonly isOpen: boolean;
@@ -16,6 +17,26 @@ export function AnimatedModal({
   onBackdropClick,
   maxWidth = "max-w-lg",
 }: AnimatedModalProps) {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onBackdropClick?.();
+      }
+    };
+
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+      globalThis.addEventListener("keydown", handleKeyDown);
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+      globalThis.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onBackdropClick]);
+
   if (typeof document === "undefined") return null;
 
   const modalContent = (

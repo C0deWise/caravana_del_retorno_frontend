@@ -14,6 +14,14 @@ export const leaderService = {
       data,
     );
   },
+
+  changeLeader: async (
+    coloniaCodigo: number,
+    data: SetLeaderRequest,
+  ): Promise<SetLeaderResponse> => {
+    return apiService.patch(
+      `/api/v1/colonias/cambiar-lider/${coloniaCodigo}/`,
+      data,
+    );
+  },
 };
-
-
