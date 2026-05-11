@@ -16,12 +16,12 @@ export function SentInvitationCard({ invitation, index, onRemove, isRemoving }: 
             index={index}
             icon={<UserIcon className="h-6 w-6 text-primary" />}
             badgeConfig={{
-                show: invitation.estado === "Pendiente",
+                show: invitation.estado === "pendiente",
                 color: "bg-secondary",
                 title: "Invitación pendiente",
             }}
             title={
-                <span className="text-text font-medium">{invitation.nombreUsuario} {invitation.apellidoUsuario}</span>
+                <span className="text-text font-medium">{invitation.correo_usuario}</span>
             }
             actions={
                 <div className="flex items-center gap-2">
@@ -29,7 +29,7 @@ export function SentInvitationCard({ invitation, index, onRemove, isRemoving }: 
                     <button
                         type="button"
                         className="btn-ghost text-accent-red hover:text-accent-red/80"
-                        onClick={() => onRemove(invitation.usuarioId)}
+                        onClick={() => onRemove(invitation.usuario_id)}
                         disabled={isRemoving}
                         title="Eliminar del grupo"
                     >

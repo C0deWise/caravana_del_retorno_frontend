@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { SolicitudMiembro } from "../../types/grupalReturnRegistration"
 import { ApiError } from "@/services/api.services";
+import { grupalReturnRegistrationService } from "../../services/grupalReturnRegistration.service";
 
 interface UseSentInvitationsReturn {
     invitations: SolicitudMiembro[];
@@ -11,37 +12,6 @@ interface UseSentInvitationsReturn {
     hasPending: boolean;
     refetch: () => Promise<void>;
 }
-
-// ── MOCK ──────────────────────────────────────────────────────────────────────
-const USE_MOCK = true;
-
-const MOCK_INVITATIONS: SolicitudMiembro[] = [
-    {
-        id: 1,
-        usuarioId: 101,
-        grupoId: 1,
-        estado: "Pendiente",
-        nombreUsuario: "Carlos",
-        apellidoUsuario: "Ramírez",
-    },
-    {
-        id: 2,
-        usuarioId: 102,
-        grupoId: 1,
-        estado: "Aceptada",
-        nombreUsuario: "Ana",
-        apellidoUsuario: "Torres",
-    },
-    {
-        id: 3,
-        usuarioId: 103,
-        grupoId: 1,
-        estado: "Rechazada",   // ← no debe aparecer en la lista
-        nombreUsuario: "Luis",
-        apellidoUsuario: "Gómez",
-    },
-];
-// ─────────────────────────────────────────────────────────────────────────────
 
 export function useSentInvitations(grupoId: number | undefined): UseSentInvitationsReturn {
     const [invitations, setInvitations] = useState<SolicitudMiembro[]>([]);
@@ -55,19 +25,8 @@ export function useSentInvitations(grupoId: number | undefined): UseSentInvitati
         setError(null);
 
         try {
-
-            if (USE_MOCK) {
-                await new Promise((r) => setTimeout(r, 500));
-                setInvitations(MOCK_INVITATIONS);
-                return;
-            }
-
-            //TODO: Conectar cuando el endpoint esté disponible
-            // const data = await grupalReturnRegistrationService.getSolicitudes(grupoId);
-            // setInvitations(data);
-
-            await Promise.resolve();
-            setInvitations([]);
+            const data = await grupalReturnRegistrationService.getSolicitudes(grupoId);
+            setInvitations(data);
         } catch (err) {
             setError(err instanceof ApiError ? err.message : "Error al cargar las invitaciones enviadas");
         } finally {
