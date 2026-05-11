@@ -9,3 +9,16 @@ export async function listColonyMembers(
   );
   return data;
 }
+
+export async function removeColonyMember(
+  colonyCodigo: number,
+  memberId: number,
+): Promise<void> {
+  await apiService.patch<void>(
+    `/api/v1/colonias/sacar-miembro/${colonyCodigo}/`,
+    { miembro_id: memberId },
+  );
+}
+
+
+
