@@ -25,22 +25,18 @@ export const useDeleteColony = (): UseDeleteColonyReturn => {
       return true;
     } catch (err) {
       if (err instanceof ApiError) {
-        // TODO: Cambiar los mensajes de error cuando la api este disponible
         switch (err.status) {
           case 404:
-            setError("La colonia que intentas eliminar no existe.");
-            break;
-          case 403:
-            setError("No tienes permisos para realizar esta acción.");
+            setError("Colonia no encontrada.");
             break;
           case 409:
-            setError("No se puede eliminar la colonia porque tiene registros asociados.");
+            setError("La colonia ya está desactivada.");
             break;
           case 422:
-            setError("Error en la solicitud de eliminación.");
+            setError("Error de validación en la solicitud.");
             break;
           default:
-            setError(err.message || "Error inesperado al eliminar la colonia.");
+            setError(err.message || "Error inesperado al intentar desactivar la colonia.");
         }
       } else {
         setError(

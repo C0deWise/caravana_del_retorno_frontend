@@ -112,7 +112,7 @@ export function MultimediaCard({
 
   return (
     <div
-      className={`flex items-center gap-3 mt-2 p-3 rounded-lg border border-gray-200 bg-white shadow-sm
+      className={`flex items-center gap-3 p-3 rounded-lg border border-gray-200 bg-white shadow-sm
         transition-all duration-500
         ${isLeaving ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}
     >
@@ -145,7 +145,6 @@ export function MultimediaCard({
         <UploadStatusIndicator upload={upload} size={size} />
       </div>
 
-      {/* Contenedor de botones de acción */}
       <div className="flex items-center gap-1.5 shrink-0 ml-1">
         {isError && allowRetry && onRetry && (
           <button
@@ -169,7 +168,7 @@ export function MultimediaCard({
             cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           title="Eliminar archivo"
         >
-          <XMarkIcon className="w-4 h-4" />
+          <XMarkIcon className="w-5 h-5 font-bold" />
         </button>
       </div>
     </div>

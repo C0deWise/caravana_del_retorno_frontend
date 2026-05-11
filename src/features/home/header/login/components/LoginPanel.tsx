@@ -6,7 +6,7 @@ import { authService } from "@/features/home/header/login/services/auth.service"
 import { useRouter } from "next/navigation";
 
 interface LoginPanelProps {
-  onClose: () => void;
+  readonly onClose: () => void;
 }
 
 export default function LoginPanel({ onClose }: LoginPanelProps) {
@@ -16,7 +16,7 @@ export default function LoginPanel({ onClose }: LoginPanelProps) {
   const router = useRouter();
   const { login } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const trimmed = documento.trim();
@@ -39,7 +39,7 @@ export default function LoginPanel({ onClose }: LoginPanelProps) {
   };
 
   return (
-    <div className="absolute top-full -right-9 z-50 mt-2 w-80 rounded-bl-xl bg-primary p-6 shadow-lg">
+    <div className="absolute top-full -right-9 z-50 mt-2 w-80 rounded-b-xl bg-primary p-6 shadow-lg">
       <h2 className="mb-4 text-xl font-semibold">Iniciar sesión</h2>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">

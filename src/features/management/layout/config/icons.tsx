@@ -2,6 +2,7 @@ import {
   HomeIcon,
   UserGroupIcon,
   UserIcon,
+  NewspaperIcon,
   PhotoIcon,
   DocumentTextIcon
 } from "@heroicons/react/24/solid";
@@ -15,4 +16,5 @@ export const iconMap: Record<
   user: UserIcon,
   report: DocumentTextIcon,
   photo: PhotoIcon,
+  newspaper: NewspaperIcon,
 };

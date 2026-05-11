@@ -8,6 +8,7 @@ interface ExpandableContentProps {
   readonly className?: string;
   readonly duration?: number;
   readonly onAnimatingChange?: (isAnimating: boolean) => void;
+  readonly spacing?: string;
 }
 
 export function ExpandableContent({
@@ -16,6 +17,7 @@ export function ExpandableContent({
   className = "",
   duration = 500,
   onAnimatingChange,
+  spacing = "1rem",
 }: ExpandableContentProps) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
@@ -50,7 +52,7 @@ export function ExpandableContent({
         overflow: isOpen ? "visible" : "hidden",
         transition: `height ${duration}ms ease-out, opacity ${duration}ms ease-out, margin ${duration}ms ease-out`,
         opacity: isOpen ? 1 : 0,
-        marginBottom: isOpen ? "1rem" : "0",
+        marginBottom: isOpen ? spacing : "0",
       }}
       className={className}
     >

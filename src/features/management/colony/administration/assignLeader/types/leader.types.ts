@@ -1,16 +1,17 @@
 export interface AssignLeaderRequest {
   coloniaCodigo: number;
   liderId: number;
+  isChange?: boolean;
 }
 
 export interface SetLeaderRequest {
-  lider_id: number;
+  lider: number;
 }
 
 export interface SetLeaderResponse {
-  co_codigo: number;
-  co_pais: string;
-  co_departamento: string;
-  co_ciudad: string;
+  codigo: number;
+  pais: string;
+  departamento: string | null;
+  ciudad: string | null;
   lider: number;
 }

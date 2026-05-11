@@ -56,6 +56,7 @@ export function AssignLeaderModalForm({
     const ok = await assignLeader({
       coloniaCodigo: colony.codigo,
       liderId: selectedUser.id,
+      isChange: hasLeader,
     });
     if (ok) {
       onSuccess?.();

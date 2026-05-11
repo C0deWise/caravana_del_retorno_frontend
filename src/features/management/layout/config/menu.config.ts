@@ -65,14 +65,15 @@ export const menuConfig: MenuItem[] = [
       }
     ],
   },
+
   {
-    label: "Gestión Multimedia",
-    href: "/gestion/multimedia",
-    icon: "photo",
+    label: "Gestión Publicaciones",
+    href: "/gestion/publicaciones",
+    icon: "newspaper",
     subitems: [
       {
-        label: "Cargar Contenido",
-        href: "/gestion/multimedia/cargar",
+        label: "Administrar Publicaciones",
+        href: "/gestion/publicaciones/administrar",
       },
     ],
   },

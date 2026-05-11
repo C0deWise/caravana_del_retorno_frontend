@@ -1,5 +1,5 @@
-export const normalizeString = (value: string): string =>
-  value.toLowerCase().trim();
+export const normalizeString = (value: string | undefined | null): string =>
+  (value ?? "").toLowerCase().trim();
 
 export const normalizeText = (value: string): string =>
   normalizeString(value)
