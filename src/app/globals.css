@@ -1,15 +1,18 @@
 @import "tailwindcss";
 
 @theme {
-  /* Fuente */
+  /* Tipografía */
   --font-sans: var(--font-inter);
+
+  /* Escala de fuente para accesibilidad */
+  --font-scale: 1;
 
   /* Colores principales */
   --color-primary: #024059;
   --color-secondary: #f28f38;
   --color-accent-red: #ec1e25;
   --color-accent-green: #038c4a;
-  --color-accent-yellow: #eabe03;
+  --color-accent-yellow: #ffb900;
   --color-danger: #960d0d;
   --color-success: #38c878;
 
@@ -23,11 +26,57 @@
   --color-text: #343434;
   --color-text-muted: #707070;
   --color-text-inverse: #ffffff;
+
+  /* Tipografía escalable */
+  --text-xs: calc(0.75rem * var(--font-scale));
+  --text-xs--line-height: 1rem;
+
+  --text-sm: calc(0.875rem * var(--font-scale));
+  --text-sm--line-height: 1.25rem;
+
+  --text-base: calc(1rem * var(--font-scale));
+  --text-base--line-height: 1.5rem;
+
+  --text-lg: calc(1.125rem * var(--font-scale));
+  --text-lg--line-height: 1.75rem;
+
+  --text-xl: calc(1.25rem * var(--font-scale));
+  --text-xl--line-height: 1.75rem;
+
+  --text-2xl: calc(1.5rem * var(--font-scale));
+  --text-2xl--line-height: 2rem;
+
+  --text-3xl: calc(1.875rem * var(--font-scale));
+  --text-3xl--line-height: 2.25rem;
+
+  --text-4xl: calc(2.25rem * var(--font-scale));
+  --text-4xl--line-height: 2.5rem;
 }
 
 body {
   background: var(--color-bg);
   font-family: var(--font-sans);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-card);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-bg-border);
+  border-radius: 10px;
+  border: 3px solid var(--color-bg-card);
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
 }
 
 .sidebar-collapsed {
@@ -38,12 +87,15 @@ body {
 
 .sidebar-expanded {
   width: auto;
-  min-width: 20rem; /* 320px */
-  max-width: 30rem; /* 384px */
+  min-width: 20rem;
+  /* 320px */
+  max-width: 30rem;
+  /* 384px */
 }
 
 /* ===== ESTILOS COMPARTIDOS DE FORMULARIOS ===== */
 @layer components {
+
   /* Inputs de texto estándar */
   .input-base {
     @apply w-full px-4 py-3 rounded-lg transition-colors;
@@ -62,6 +114,27 @@ body {
     color: var(--color-text-muted);
   }
 
+  /* Textarea estándar */
+  .textarea-base {
+    @apply w-full px-4 py-3 rounded-lg transition-colors resize-none;
+    background-color: var(--color-bg-card);
+    border: 1px solid transparent;
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+  }
+
+  .textarea-base:focus {
+    outline: none;
+    background-color: var(--color-bg);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(2, 64, 89, 0.1);
+  }
+
+  .textarea-base::placeholder {
+    color: var(--color-text-muted);
+  }
+
   /* Input con error */
   .input-error {
     background-color: #fee;
@@ -77,7 +150,7 @@ body {
 
   /* Select estándar */
   .select-base {
-    @apply px-3 py-3 rounded-lg transition-colors;
+    @apply px-3 py-3 rounded-lg transition-colors cursor-pointer;
     background-color: var(--color-bg-card);
     border: 1px solid transparent;
   }
@@ -178,6 +251,12 @@ body {
     color: #856404;
   }
 
+  .alert-info {
+    @apply mt-6 p-4 rounded border-l-4;
+    background-color: #e0e0e0;
+    border-color: #e0e0e0a3;
+  }
+
   /* Barra de colores colombiana */
   .colombia-bar {
     @apply hidden lg:flex flex-col w-2 rounded-full overflow-hidden;
@@ -211,6 +290,7 @@ body {
     color: var(--color-text-muted);
   }
 }
+
 /* Clases para formularios */
 .input-base {
   width: 100%;
@@ -269,4 +349,65 @@ body {
 .alert-success-text {
   color: var(--color-accent-green);
   font-size: 0.875rem;
+}
+
+/* ===== MARCHING ANTS ANIMATION ===== */
+@keyframes marching-ants {
+  to {
+    background-position:
+      16px 0,
+      -16px 100%,
+      0 -16px,
+      100% 16px;
+  }
+}
+
+.marching-ants {
+  --ants-color: rgb(14 116 144);
+  --ants-size: 16px;
+  --ants-stroke: 2px;
+
+  background:
+    linear-gradient(90deg, var(--ants-color) 50%, transparent 50%) repeat-x,
+    linear-gradient(90deg, var(--ants-color) 50%, transparent 50%) repeat-x,
+    linear-gradient(0deg, var(--ants-color) 50%, transparent 50%) repeat-y,
+    linear-gradient(0deg, var(--ants-color) 50%, transparent 50%) repeat-y,
+    rgba(14, 116, 144, 0.1);
+
+  background-size:
+    var(--ants-size) var(--ants-stroke),
+    var(--ants-size) var(--ants-stroke),
+    var(--ants-stroke) var(--ants-size),
+    var(--ants-stroke) var(--ants-size),
+    auto;
+
+  background-position:
+    0 0,
+    0 100%,
+    0 0,
+    100% 0,
+    0 0;
+
+  animation: marching-ants 0.8s linear infinite;
+}
+
+@layer utilities {
+  .animate-marquee {
+    display: inline-block;
+    white-space: nowrap;
+    animation: marquee var(--marquee-duration, 5s) linear infinite alternate;
+  }
+
+  @keyframes marquee {
+
+    0%,
+    10% {
+      transform: translateX(0);
+    }
+
+    90%,
+    100% {
+      transform: translateX(var(--marquee-dist, -10px));
+    }
+  }
 }

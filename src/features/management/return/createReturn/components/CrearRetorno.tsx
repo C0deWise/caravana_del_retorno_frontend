@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useCreateRetorno } from "../hooks/useCreateRetorno";
 import { RequireAuth } from "@/auth/components/RequireAuth";
-import { ConfirmModal } from "@/components/confirmModal";
+import { ConfirmModal } from "@/components/feedback/confirmModal";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 11 }, (_, i) => CURRENT_YEAR + i);
@@ -18,7 +18,7 @@ function CrearRetornoFeature() {
   const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     resetState();
     const value = e.target.value;
-    setSelectedYear(value ? parseInt(value) : null);
+    setSelectedYear(value ? Number.parseInt(value) : null);
   };
 
   const handleCreateClick = () => {
@@ -123,3 +123,4 @@ export default function CrearRetorno() {
     </RequireAuth>
   );
 }
+

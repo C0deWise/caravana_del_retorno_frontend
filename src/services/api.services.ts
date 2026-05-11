@@ -9,7 +9,7 @@ export class ApiError extends Error {
 }
 
 class ApiService {
-  private baseURL: string;
+  private readonly baseURL: string;
 
   constructor() {
     const baseURL = process.env.NEXT_PUBLIC_API_URL;
@@ -168,6 +168,74 @@ class ApiService {
     );
 
     return this.handleResponse<T>(response);
+  }
+
+  public async getBlob(endpoint: string): Promise<Blob> {
+    const response = await fetch(
+      `${this.baseURL}${endpoint}`,
+      this.buildRequestOptions("GET"),
+    );
+
+    if (!response.ok) {
+      const error = await this.parseErrorResponse(response);
+      const message = this.buildErrorMessage(error, response);
+      throw new ApiError(response.status, message);
+    }
+
+    return response.blob();
+  }
+  
+  public async postWithProgress<T>(
+    endpoint: string,
+    data: unknown,
+    onProgress?: (percentage: number) => void,
+  ): Promise<T> {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", `${this.baseURL}${endpoint}`);
+      xhr.setRequestHeader("Content-Type", "application/json");
+
+      if (xhr.upload && onProgress) {
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const percentage = Math.round((event.loaded * 100) / event.total);
+            onProgress(percentage);
+          }
+        };
+      }
+
+      xhr.onload = async () => {
+        if (xhr.status === 0) {
+          return reject(new Error("Error de conexión"));
+        }
+
+        const headers = new Headers();
+        const contentType = xhr.getResponseHeader("content-type");
+        const contentLength = xhr.getResponseHeader("content-length");
+
+        if (contentType) headers.set("content-type", contentType);
+        if (contentLength) headers.set("content-length", contentLength);
+
+        const response = new Response(xhr.responseText || null, {
+          status: xhr.status,
+          statusText: xhr.statusText,
+          headers: headers,
+        });
+
+        try {
+          const result = await this.handleResponse<T>(response);
+          resolve(result);
+        } catch (error) {
+          reject(error);
+        }
+      };
+
+      xhr.onerror = () => {
+        reject(new Error("Error de conexión"));
+      };
+
+      xhr.send(JSON.stringify(data));
+    });
   }
 }
 

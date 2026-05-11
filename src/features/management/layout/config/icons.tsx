@@ -1,11 +1,20 @@
 import {
   HomeIcon,
-  ArrowUturnLeftIcon,
+  UserGroupIcon,
   UserIcon,
+  NewspaperIcon,
+  PhotoIcon,
+  DocumentTextIcon
 } from "@heroicons/react/24/solid";
 
-export const iconMap: Record<string, React.ReactNode> = {
-  home: <HomeIcon className="w-6 h-6 shrink-0" />,
-  arrowTurnLeft: <ArrowUturnLeftIcon className="w-6 h-6 shrink-0" />,
-  user: <UserIcon className="w-6 h-6 shrink-0" />,
+export const iconMap: Record<
+  string,
+  React.ComponentType<{ className?: string }>
+> = {
+  home: HomeIcon,
+  userGroup: UserGroupIcon,
+  user: UserIcon,
+  report: DocumentTextIcon,
+  photo: PhotoIcon,
+  newspaper: NewspaperIcon,
 };
