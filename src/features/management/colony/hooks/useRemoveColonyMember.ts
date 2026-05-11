@@ -1,3 +1,5 @@
+"use client";
+
 import { useCallback, useState } from "react";
 import { removeColonyMember } from "../services/colony-members.service";
 import { ApiError } from "@/services/api.services";
@@ -7,25 +9,33 @@ export function useRemoveColonyMember() {
   const [error, setError] = useState<string | null>(null);
 
   const removeMember = useCallback(
-    async (colonyId: number, memberId: number): Promise<void> => {
+    async (colonyCodigo: number, memberId: number): Promise<void> => {
       setIsRemoving(true);
       setError(null);
 
       try {
-        await removeColonyMember(colonyId, memberId);
+        await removeColonyMember(colonyCodigo, memberId);
       } catch (err) {
         const apiError = err as ApiError;
-        switch (apiError.status) { // TODO: Cambiar a las respuestas reales de la API cuando esten disponibles
+        let message = apiError.message || "Error al eliminar el miembro.";
+
+        switch (apiError.status) {
           case 404:
-            setError("El miembro no fue encontrado en esta colonia.");
+            message = "Colonia o usuario no encontrado.";
+            break;
+          case 409:
+            message = "Conflicto de negocio - No se puede remover al usuario.";
+            break;
+          case 422:
+            message = "Body inválido o campos faltantes.";
             break;
           case 403:
-            setError("No tienes permisos para eliminar este miembro.");
+            message = "No tienes permisos para eliminar este miembro.";
             break;
-          default:
-            setError(apiError.message || "Error al eliminar el miembro.");
         }
-        throw err;
+
+        setError(message);
+        throw new Error(message);
       } finally {
         setIsRemoving(false);
       }

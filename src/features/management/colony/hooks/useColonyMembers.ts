@@ -4,8 +4,10 @@ import { ColonyMember } from "../types/colony-members.types";
 import { listColonyMembers } from "../services/colony-members.service";
 import { ApiError } from "@/services/api.services";
 import { useGetColony } from "./useGetColony";
+import { sortColonyMembers } from "../utils/member-sorter";
 
 export function useColonyMembers(targetColonyId: number): {
+
   members: ColonyMember[];
   colonyLabel: string;
   isLoading: boolean;
@@ -14,6 +16,7 @@ export function useColonyMembers(targetColonyId: number): {
   isAdminView: boolean;
   totalMembers: number;
   removeMemberLocally: (memberId: number) => void;
+  refetchMembers: () => Promise<void>;
 } {
   const { user } = useAuth();
   const [members, setMembers] = useState<ColonyMember[]>([]);
@@ -31,17 +34,11 @@ export function useColonyMembers(targetColonyId: number): {
   const colonyLabel = useMemo(() => {
     if (!colony) return "Cargando...";
 
-    if (colony.ciudad && colony.departamento) {
-      return `${colony.ciudad}, ${colony.departamento}`;
-    }
-
-    return colony.pais;
-  }, [colony]);
-  const colonyLabel = colony
-    ? [colony.ciudad, colony.departamento, colony.pais]
+    return [colony.ciudad, colony.departamento, colony.pais]
       .filter(Boolean)
-      .join(", ")
-    : "Cargando...";
+      .join(", ");
+  }, [colony]);
+
 
   const fetchMembers = useCallback(async () => {
     if (!targetColonyId) {
@@ -55,7 +52,7 @@ export function useColonyMembers(targetColonyId: number): {
 
     try {
       const data = await listColonyMembers(targetColonyId);
-      setMembers(data);
+      setMembers(sortColonyMembers(data));
     } catch (err) {
       const apiError = err as ApiError;
       switch (apiError.status) {
@@ -97,5 +94,7 @@ export function useColonyMembers(targetColonyId: number): {
     isAdminView,
     totalMembers: members.length,
     removeMemberLocally,
+    refetchMembers: fetchMembers,
   };
 }
+

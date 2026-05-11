@@ -11,10 +11,14 @@ export async function listColonyMembers(
 }
 
 export async function removeColonyMember(
-  colonyId: number,
+  colonyCodigo: number,
   memberId: number,
 ): Promise<void> {
-  await apiService.delete<void>(
-    `/api/v1/usuario/colonia/${colonyId}/${memberId}`, // TODO: Cambiar a la api real cuando este disponible
+  await apiService.patch<void>(
+    `/api/v1/colonias/sacar-miembro/${colonyCodigo}/`,
+    { miembro_id: memberId },
   );
 }
+
+
+

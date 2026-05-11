@@ -1,22 +1,49 @@
 "use client";
+
 import Spinner from "@/components/feedback/Spinner";
 import { useColonyMembers } from "../../hooks/useColonyMembers";
+import { useRemoveColonyMember } from "../../hooks/useRemoveColonyMember";
 import { useAuth } from "@/auth/context/AuthContext";
 import { RequireAuth } from "@/auth/components/RequireAuth";
 import { MemberList } from "./MemberList";
 import { UserRole } from "@/types/user.types";
+import { useToast } from "@/components/feedback/Toast";
 
 export default function ColonyMembers() {
   const { user } = useAuth();
+  const { showToast } = useToast();
 
   const targetColonyId = user?.codigo_colonia ?? 0;
 
-  const { members, colonyLabel, isLoading, error, totalMembers } =
-    useColonyMembers(targetColonyId);
+  const {
+    members,
+    colonyLabel,
+    isLoading,
+    error,
+    totalMembers,
+    removeMemberLocally,
+    refetchMembers,
+  } = useColonyMembers(targetColonyId);
+
+  const { removeMember, isRemoving } = useRemoveColonyMember();
+
+  const handleRemove = async (memberId: number) => {
+    if (!targetColonyId) return;
+
+    try {
+      await removeMember(targetColonyId, memberId);
+      removeMemberLocally(memberId);
+      showToast("Miembro eliminado correctamente", "success");
+      await refetchMembers();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Error al eliminar el miembro";
+      showToast(message, "error");
+    }
+  };
 
   return (
     <RequireAuth>
-      <div className="flex flex-col w-full min-h-screen">
+      <div className="flex flex-col w-full h-full">
         <header className="sticky top-0 z-10 mx-10 rounded-xl bg-bg-card px-8 py-4 shadow-xl">
           <div className="flex items-end justify-between gap-6">
             <div>
@@ -41,7 +68,7 @@ export default function ColonyMembers() {
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto space-y-8 pb-8 md:pb-10 pt-4">
+        <div className="space-y-8 pb-8 md:pb-10 pt-4">
           {isLoading && (
             <div className="flex items-center justify-center py-12">
               <div className="flex items-center space-x-3 text-primary">
@@ -59,7 +86,15 @@ export default function ColonyMembers() {
 
           {!isLoading && !error && (
             <main className="mx-auto max-w-6xl">
-              <MemberList members={members} userRole={user?.role as UserRole} />
+              <MemberList
+                members={members}
+                userRole={user?.role as UserRole}
+                onRemove={handleRemove}
+                isRemoving={isRemoving}
+                colonyName={colonyLabel}
+                currentUserId={user?.id}
+              />
+
             </main>
           )}
         </div>
