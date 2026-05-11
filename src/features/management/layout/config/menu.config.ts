@@ -48,6 +48,21 @@ export const menuConfig: MenuItem[] = [
         label: "Formulario de inscripción",
         href: "/gestion/retorno/registro",
       },
+      {
+        label: "Grupos de Retorno",
+        href: "/gestion/retorno/grupos",
+      }
+    ],
+  },
+  {
+    label: "Gestión de Reportes",
+    href: "/gestion/reportes/",
+    icon: "report",
+    subitems: [
+      {
+        label: "Generar reportes",
+        href: "/gestion/reportes",
+      }
     ],
   },
 
@@ -62,4 +77,4 @@ export const menuConfig: MenuItem[] = [
       },
     ],
   },
-];
+]

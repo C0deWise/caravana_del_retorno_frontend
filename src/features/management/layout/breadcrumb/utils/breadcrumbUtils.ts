@@ -2,6 +2,7 @@ export const segmentNames: Record<string, string> = {
   gestion: "Gestión",
   colonia: "Colonia",
   retorno: "Retorno",
+  reportes: "Reportes"
 };
 
 export function formatSegment(segment: string): string {
