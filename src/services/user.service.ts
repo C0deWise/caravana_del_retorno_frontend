@@ -3,7 +3,7 @@ import type { UserSearchResult } from "@/types/user.types";
 
 export const userService = {
   getUserById: async (id: number): Promise<UserSearchResult> => {
-    return apiService.get(`/api/v1/usuario/${id}`);
+    return apiService.get(`/api/v1/usuario/buscar_id/${id}/`);
   },
 
   searchByName: async (nombre: string): Promise<UserSearchResult[]> => {

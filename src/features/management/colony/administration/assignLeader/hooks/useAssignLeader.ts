@@ -23,14 +23,16 @@ export const useAssignLeaderToColony = (): UseAssignLeader => {
   const assignLeader = async ({
     coloniaCodigo,
     liderId,
+    isChange,
   }: AssignLeaderRequest): Promise<SetLeaderResponse | null> => {
     setLoading(true);
     setError(null);
     setSuccess(false);
 
     try {
-      const response = await leaderService.setLeader(coloniaCodigo, {
-        lider_id: liderId,
+      const serviceMethod = isChange ? leaderService.changeLeader : leaderService.setLeader;
+      const response = await serviceMethod(coloniaCodigo, {
+        lider: liderId,
       });
 
       setSuccess(true);

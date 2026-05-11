@@ -5,7 +5,11 @@ import { PlusIcon } from "@heroicons/react/24/solid";
 import { CreatePublicationModal } from "./CreatePublicationModal";
 import { RequireAuth } from "@/auth/components/RequireAuth";
 
-export function CreatePublicationButton() {
+interface CreatePublicationButtonProps {
+  readonly onRefresh?: () => void;
+}
+
+export function CreatePublicationButton({ onRefresh }: CreatePublicationButtonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -23,6 +27,7 @@ export function CreatePublicationButton() {
         <CreatePublicationModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
+          onRefresh={onRefresh}
         />
       </>
     </RequireAuth>

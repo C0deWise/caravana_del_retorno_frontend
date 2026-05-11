@@ -3,6 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 const API_BASE = process.env.API_BASE_URL!;
 type RouteParams = { params: Promise<{ path: string[] }> };
 
+interface FetchError extends Error {
+  code?: string;
+  cause?: { code?: string };
+}
+
 async function fetchWithRetry(url: string, init: RequestInit, retries = 3) {
   let lastError: unknown;
 
@@ -21,11 +26,10 @@ async function fetchWithRetry(url: string, init: RequestInit, retries = 3) {
       return response;
     } catch (error) {
       lastError = error;
-      const code =
-        (error as any)?.cause?.code ||
-        (error as any)?.code;
+      const fetchError = error as FetchError;
+      const code = fetchError.cause?.code || fetchError.code;
 
-      if (!["ENOTFOUND", "ECONNRESET", "ETIMEDOUT"].includes(code) || attempt === retries - 1) {
+      if (!code || !["ENOTFOUND", "ECONNRESET", "ETIMEDOUT"].includes(code) || attempt === retries - 1) {
         throw error;
       }
 
@@ -42,7 +46,7 @@ async function forwardRequest(
   method: string,
 ): Promise<NextResponse> {
   const { path } = await params;
-  const url = `${API_BASE}/${path.join("/")}`;
+  const url = `${API_BASE}/${path.join("/")}/`;
   const isReadMethod = method === "GET" || method === "DELETE";
 
   let body: string | undefined;
@@ -78,8 +82,9 @@ async function forwardRequest(
         },
       });
     }
-  } catch (error: any) {
-    const code = error?.cause?.code || error?.code || "FETCH_ERROR";
+  } catch (error) {
+    const fetchError = error as FetchError;
+    const code = fetchError.cause?.code || fetchError.code || "FETCH_ERROR";
 
     return NextResponse.json(
       {

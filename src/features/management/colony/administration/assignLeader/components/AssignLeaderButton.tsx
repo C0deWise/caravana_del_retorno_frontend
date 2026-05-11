@@ -38,9 +38,8 @@ export function AssignLeaderButton({
       <button
         type="button"
         onClick={openModal}
-        className={`flex w-[165px] items-center justify-center gap-2 px-4 py-2 text-text-inverse hover:opacity-90 rounded-xl text-sm font-semibold transition-all shadow-md active:scale-95 cursor-pointer ${
-          hasLeader ? "bg-secondary" : "bg-primary"
-        }`}
+        className={`flex w-[165px] items-center justify-center gap-2 px-4 py-2 text-text-inverse hover:opacity-90 rounded-xl text-sm font-semibold transition-all shadow-md active:scale-95 cursor-pointer ${hasLeader ? "bg-secondary" : "bg-primary"
+          }`}
         title={textButton}
       >
         {hasLeader ? (

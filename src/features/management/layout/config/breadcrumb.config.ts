@@ -12,10 +12,14 @@ export const breadcrumbLabels: Record<string, string> = {
   "/gestion/retorno": "Gestión de Retorno",
   "/gestion/retorno/crear": "Crear Retorno",
   "/gestion/retorno/registro": "Formulario de inscripción",
+
+  "/gestion/publicaciones": "Gestión de Publicaciones",
+  "/gestion/publicaciones/administrar": "Administrar Publicaciones",
 };
 
 export const nonClickableBreadcrumbRoutes = new Set<string>([
   "/gestion/usuario",
   "/gestion/colonia",
   "/gestion/retorno",
+  "/gestion/publicaciones",
 ]);

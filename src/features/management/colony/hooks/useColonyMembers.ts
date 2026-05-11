@@ -3,12 +3,13 @@ import { useAuth } from "@/auth/context/AuthContext";
 import { ColonyMember } from "../types/colony-members.types";
 import { listColonyMembers } from "../services/colony-members.service";
 import { ApiError } from "@/services/api.services";
-import { useListColonies } from "./useListColonies";
+import { useGetColony } from "./useGetColony";
 
 export function useColonyMembers(targetColonyId: number): {
   members: ColonyMember[];
   colonyLabel: string;
   isLoading: boolean;
+  isLoadingColony: boolean;
   error: string | null;
   isAdminView: boolean;
   totalMembers: number;
@@ -18,16 +19,13 @@ export function useColonyMembers(targetColonyId: number): {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { colonies, listColonies } = useListColonies();
+  const { getColony, colony, loading: isLoadingColony } = useGetColony();
 
   useEffect(() => {
-    void listColonies();
-  }, [listColonies]);
-
-  const colony = useMemo(
-    () => colonies.find((c) => c.codigo === targetColonyId),
-    [colonies, targetColonyId],
-  );
+    if (targetColonyId) {
+      void getColony(targetColonyId);
+    }
+  }, [targetColonyId, getColony]);
 
   const colonyLabel = useMemo(() => {
     if (!colony) return "Cargando...";
@@ -82,6 +80,7 @@ export function useColonyMembers(targetColonyId: number): {
     members,
     colonyLabel,
     isLoading,
+    isLoadingColony,
     error,
     isAdminView,
     totalMembers: members.length,

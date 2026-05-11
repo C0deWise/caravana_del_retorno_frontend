@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/auth/context/AuthContext";
 import { RequireAuth } from "@/auth/components/RequireAuth";
 import { ConfirmModal } from "@/components/feedback/confirmModal";
-import { useListColonies } from "../../hooks/useListColonies";
+import { useGetColony } from "../../hooks/useGetColony";
 import { useListAccessRequests } from "../hooks/useListAccessRequest";
 import { useAcceptAccessRequest } from "../hooks/useAcceptAccessRequest";
 import { useRejectAccessRequest } from "../hooks/useRejectAccessRequest";
@@ -26,10 +26,10 @@ export default function AccessRequests() {
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
 
   const {
-    listColonies,
-    colonies,
+    getColony,
+    colony: leaderColony,
     loading: isLoadingColonies,
-  } = useListColonies();
+  } = useGetColony();
   const {
     requests,
     isLoading,
@@ -52,12 +52,10 @@ export default function AccessRequests() {
   } = useRejectAccessRequest();
 
   useEffect(() => {
-    void listColonies();
-  }, [listColonies]);
-
-  const leaderColony = user?.codigo_colonia
-    ? (colonies.find((item) => item.codigo === user.codigo_colonia) ?? null)
-    : null;
+    if (user?.codigo_colonia) {
+      void getColony(user.codigo_colonia);
+    }
+  }, [user?.codigo_colonia, getColony]);
 
   const handleApprove = useCallback(
     (requestId: number) => {
