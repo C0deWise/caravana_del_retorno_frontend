@@ -12,7 +12,7 @@ interface InviteModalProps {
     readonly isOpen: boolean;
     readonly onClose: () => void;
     readonly grupoId: number;
-    readonly activeReturnCode: number;
+    readonly activeReturnCode: number | null;
     readonly currentMembers: MiembroGrupo[];
     readonly onInviteSent: () => void;
 }
