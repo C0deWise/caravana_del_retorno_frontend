@@ -29,8 +29,8 @@ function GrupalReturnRegistrationFeature() {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   const { grupo, isLoading: grupoLoading, error: grupoError } = useGrupo(user?.id);
-  const { members, isLoading: membersLoading, refetch: refetchMembers } = useGrupalMembersList(grupo?.id);
-  const { invitations, isLoading: invitationsLoading, error: invitationsError, hasPending, refetch: refetchInvitations } = useSentInvitations(grupo?.id);
+  const { members, isLoading: membersLoading, refetch: refetchMembers } = useGrupalMembersList(grupo?.gr_codigo);
+  const { invitations, isLoading: invitationsLoading, error: invitationsError, hasPending, refetch: refetchInvitations } = useSentInvitations(grupo?.gr_codigo);
   const { cancelGroup, isLoading: cancelling, error: cancelError } = useCancelGroup();
   const { removeMember, isLoading: removingMember } = useRemoveMember();
   const { removeExternalPerson, isLoading: removingExternal } = useRemoveExternalPerson();
@@ -42,22 +42,20 @@ function GrupalReturnRegistrationFeature() {
 
   const canEnroll = !hasPending && members.length >= 1;
 
-  const handleRemoveMember = async (usuarioId: number) => {
+  const handleRemoveInvitation = async (id: number, kind: "usuario" | "persona") => {
     if (!grupo) return;
-    await removeMember(usuarioId, grupo.id);
+    if (kind === "usuario") {
+      await removeMember(id, grupo.gr_codigo);
+    } else {
+      await removeExternalPerson(id, grupo.gr_codigo);
+    }
     void refetchMembers();
     void refetchInvitations();
   };
 
-  const handleRemoveExternal = async (personaId: number) => {
-    if (!grupo) return;
-    await removeExternalPerson(personaId, grupo.id);
-    void refetchMembers();
-  };
-
   const handleCancelConfirm = async () => {
     if (!grupo) return;
-    await cancelGroup(grupo.id);
+    await cancelGroup(grupo.gr_codigo);
     setShowCancelConfirm(false);
   };
 
@@ -94,7 +92,7 @@ function GrupalReturnRegistrationFeature() {
       <div className="flex justify-center px-4 py-8">
         <GrupalRegistrationForm
           retornoId={activeReturn.codigo}
-          grupoId={grupo.id}
+          grupoId={grupo.gr_codigo}
           retornoAnio={activeReturn.anio}
           onSuccess={() => setView("main")}
         />
@@ -103,24 +101,21 @@ function GrupalReturnRegistrationFeature() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-8 space-y-8">
-      <div className="flex items-center justify-between">
-        <h1 className="page-title">Registro grupal</h1>
-        <button
-          type="button"
-          className="btn-ca text-accent-red text-sm"
-          onClick={() => setShowCancelConfirm(true)}
-          disabled={cancelling}
-        >
-          {cancelling ? <Spinner size="sm" /> : "Cancelar grupo"}
-        </button>
+    <div className="mx-auto w-full max-w-2xl px-4 py-4 space-y-2 rounded-xl border border-bg-border bg-bg-card ">
+      <div className="flex flex-1 items-start justify-center">
+        <div className="w-full max-w-md rounded-lg">
+          <h1 className="page-title">Registro grupal</h1>
+          <h2 className="section-title">Gestiona tu grupo para el retorno</h2>
+        </div>
       </div>
 
-      {cancelError && (
-        <div className="alert-error">
-          <p className="alert-error-text">{cancelError}</p>
-        </div>
-      )}
+      {
+        cancelError && (
+          <div className="alert-error">
+            <p className="alert-error-text">{cancelError}</p>
+          </div>
+        )
+      }
 
       {/* Acciones de invitación */}
       <div className="flex gap-3">
@@ -147,15 +142,15 @@ function GrupalReturnRegistrationFeature() {
           invitations={invitations}
           isLoading={invitationsLoading}
           error={invitationsError}
-          onRemove={handleRemoveMember}
-          isRemoving={removingMember}
+          onRemove={handleRemoveInvitation}
+          isRemoving={removingMember || removingExternal}
         />
       </section>
 
       {/* Botón inscribir */}
-      <div className="flex justify-end">
+      <div className="alert-info justify-center">
         {hasPending && (
-          <p className="text-text-muted text-sm mr-4 self-center">
+          <p className="alert-info-text text-sm justify-center">
             Hay invitaciones pendientes de aceptar.
           </p>
         )}
@@ -164,36 +159,50 @@ function GrupalReturnRegistrationFeature() {
             El grupo debe tener al menos un miembro.
           </p>
         )}
-        <button
-          type="button"
-          className="btn-primary"
-          disabled={!canEnroll || !activeReturn}
-          onClick={() => setView("form")}
-        >
-          Inscribir grupo
-        </button>
       </div>
 
-      {/* Modales */}
-      {grupo && (
-        <>
-          <InviteMemberModal
-            isOpen={showInviteMember}
-            onClose={() => setShowInviteMember(false)}
-            grupoId={grupo.id}
-            activeReturnCode={activeReturn?.codigo ?? null}
-            currentMembers={members}
-            onInviteSent={() => void refetchInvitations()}
-          />
+      <div className="flex gap-3 justify-center">
+          <button
+            type="button"
+            className="btn-danger"
+            onClick={() => setShowCancelConfirm(true)}
+            disabled={cancelling}
+          >
+            {cancelling ? <Spinner size="sm" /> : "Eliminar grupo"}
+          </button>
 
-          <ExternalPersonModal
-            isOpen={showInviteExternal}
-            onClose={() => setShowInviteExternal(false)}
-            grupoId={grupo.id}
-            onPersonaAdded={() => void refetchMembers()}
-          />
-        </>
-      )}
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={!canEnroll || !activeReturn}
+            onClick={() => setView("form")}
+          >
+            Inscribir grupo
+          </button>
+        </div>
+
+      {/* Modales */}
+      {
+        grupo && (
+          <>
+            <InviteMemberModal
+              isOpen={showInviteMember}
+              onClose={() => setShowInviteMember(false)}
+              grupoId={grupo.gr_codigo}
+              activeReturnCode={activeReturn?.codigo ?? null}
+              currentMembers={members}
+              onInviteSent={() => void refetchInvitations()}
+            />
+
+            <ExternalPersonModal
+              isOpen={showInviteExternal}
+              onClose={() => setShowInviteExternal(false)}
+              grupoId={grupo.gr_codigo}
+              onPersonaAdded={() => { void refetchMembers(); void refetchInvitations(); }}
+            />
+          </>
+        )
+      }
 
       <ConfirmModal
         isOpen={showCancelConfirm}
@@ -205,7 +214,7 @@ function GrupalReturnRegistrationFeature() {
         confirmLabel="Sí, cancelar"
         cancelLabel="Volver"
       />
-    </div>
+    </div >
   );
 }
 

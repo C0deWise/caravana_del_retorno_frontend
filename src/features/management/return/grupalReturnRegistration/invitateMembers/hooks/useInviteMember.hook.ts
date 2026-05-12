@@ -35,9 +35,6 @@ export function useInviteMember(currentMembers: MiembroGrupo[]): UseInviteMember
         reset();
         try {
             const alreadyInGroup = currentMembers.some((m) => m.id === user.id);
-            console.log("currentMembers:", currentMembers);
-            console.log("user.id buscado:", user.id);
-            console.log("alreadyInGroup:", alreadyInGroup);
             if (alreadyInGroup) {
                 setError("already_in_group");
                 setErrorMessage("Este usuario ya pertenece a un grupo");
@@ -53,7 +50,6 @@ export function useInviteMember(currentMembers: MiembroGrupo[]): UseInviteMember
                 }
             }
 
-            console.log("Registrando miembro con: ", user.id, grupoId)
             await grupalReturnRegistrationService.solicitarMiembro({ us_codigo: user.id, gr_codigo: grupoId });
             return true;
         } catch (err) {

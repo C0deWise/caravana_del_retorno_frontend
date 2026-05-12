@@ -1,14 +1,14 @@
 import Spinner from "@/components/feedback/Spinner";
-import { SolicitudMiembro } from "../../types/grupalReturnRegistration";
+import { EntradaInvitacion } from "../../types/grupalReturnRegistration";
 import { SentInvitationCard } from "./SentInvitationCard";
 
-const VISIBLE_STATES = new Set<SolicitudMiembro["estado"]>(["Pendiente", "Aceptada"]);
+const VISIBLE_MEMBER_STATES = new Set<string>(["pendiente", "aceptada"]);
 
 interface SentInvitationsListProps {
-    readonly invitations: SolicitudMiembro[];
+    readonly invitations: EntradaInvitacion[];
     readonly isLoading: boolean;
     readonly error: string | null;
-    readonly onRemove: (usuarioId: number) => void;
+    readonly onRemove: (id: number, kind: "usuario" | "persona") => void;
     readonly isRemoving?: boolean;
 }
 
@@ -19,7 +19,9 @@ export function SentInvitationsList({
     onRemove,
     isRemoving,
 }: SentInvitationsListProps) {
-    const visible = invitations.filter((inv) => VISIBLE_STATES.has(inv.estado));
+    const visible = invitations.filter((inv) =>
+        inv.kind === "persona" || VISIBLE_MEMBER_STATES.has(inv.data.estado.toLowerCase())
+    );
 
     if (isLoading) {
         return (
@@ -48,7 +50,7 @@ export function SentInvitationsList({
     return (
         <ul className="space-y-3">
             {visible.map((inv, i) => (
-                <li key={inv.id}>
+                <li key={inv.kind === "usuario" ? inv.data.id : `persona-${inv.data.pe_codigo}`}>
                     <SentInvitationCard 
                         invitation={inv} 
                         index={i + 1}

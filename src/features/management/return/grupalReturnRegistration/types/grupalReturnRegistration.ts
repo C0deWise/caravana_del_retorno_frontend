@@ -1,13 +1,18 @@
 import { UserApi } from "@/types/user.types";
+import { Persona } from "../externalPerson/types/persona.types";
 
 export interface GruposRetornoCreateRequest {
-    liderId: number,
+    lider: number,
 }
 
 export interface GruposRetorno {
-    id: number,
-    liderId: number,
+    gr_codigo: number,
+    us_codigo_lider: number,
 }
+
+export type EntradaInvitacion = 
+    | { kind: "usuario"; data: SolicitudMiembro }
+    | { kind: "persona"; data: Persona };
 
 export type SolicitudEstado = "Pendiente" | "Aceptada" | "Rechazada";
 

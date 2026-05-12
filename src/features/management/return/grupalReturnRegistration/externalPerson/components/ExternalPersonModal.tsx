@@ -69,7 +69,6 @@ export function ExternalPersonModal({
     };
 
     const handleCreateAndAdd = async () => {
-        console.log("Form final enviado:", form);
         await createAndAdd(form, grupoId);
         onPersonaAdded();
     };

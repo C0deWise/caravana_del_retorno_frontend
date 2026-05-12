@@ -100,10 +100,8 @@ export function useExternedPerson(): UseExternalPersonReturn {
         setIsLoading(true);
         setError(null);
 
-        try {            
-            console.log("Creando persona con data:", data);
+        try {
             const nueva = await personaService.create(data);
-            console.log("Creando persona con data:", data);
             await personaService.asociarGrupo({ pe_codigo: nueva.pe_codigo, gr_codigo: grupoId });
             setStep("success");
         } catch (err) {

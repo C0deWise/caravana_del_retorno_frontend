@@ -14,15 +14,6 @@ interface UseGrupoReturn {
     createError: string | null;
 }
 
-// ── MOCK ──────────────────────────────────────────────────────────────────────
-const USE_MOCK = true;
-
-const MOCK_GRUPO: GruposRetorno = {
-    id: 1,
-    liderId: 0, // se sobreescribe con el liderId real
-};
-// ─────────────────────────────────────────────────────────────────────────────
-
 export function useGrupo(liderId: number | undefined): UseGrupoReturn {
     const [grupo, setGrupo] = useState<GruposRetorno | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -37,13 +28,6 @@ export function useGrupo(liderId: number | undefined): UseGrupoReturn {
         setError(null);
 
         try {
-
-            if (USE_MOCK) {
-                await new Promise((r) => setTimeout(r, 400));
-                setGrupo({ ...MOCK_GRUPO, liderId: liderId ?? 0 });
-                return;
-            }
-
             const grupos = await grupalReturnRegistrationService.getGruposPorLider(liderId);
             setGrupo(grupos.length > 0 ? grupos[0] : null);
         } catch (err) {
@@ -66,7 +50,7 @@ export function useGrupo(liderId: number | undefined): UseGrupoReturn {
         setCreateError(null);
 
         try {
-            const nuevo = await grupalReturnRegistrationService.createGrupo({ liderId: id });
+            const nuevo = await grupalReturnRegistrationService.createGrupo({ lider: id });
             setGrupo(nuevo);
         } catch (err) {
             setCreateError(err instanceof ApiError ? err.message : "Error al crear el grupo");
