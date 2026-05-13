@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { listRelationshipsWithUsersService } from "../services/relationship.service";
 import { ApiError } from "@/services/api.services";
+import { getMockRelationships } from "../mocks/relationship.mock";
 import type {
   RelationshipItem,
   RelationshipStatus,
@@ -14,6 +15,7 @@ interface UseListRelationshipsReturn {
   hasMore: boolean;
   loadMore: () => void;
   refetch: () => void;
+  usedMocks: boolean;
 }
 
 const PAGE_SIZE = 20;
@@ -48,6 +50,7 @@ const resolveErrorMessage = (error: unknown): string => {
 
 export function useListRelationships(
   targetUserId: number,
+  useMocks = false,
 ): UseListRelationshipsReturn {
   const [allRelationships, setAllRelationships] = useState<RelationshipItem[]>(
     [],
@@ -65,6 +68,14 @@ export function useListRelationships(
     if (!targetUserId) {
       setAllRelationships([]);
       setPage(1);
+      setError(null);
+      return;
+    }
+
+    if (useMocks) {
+      setAllRelationships(getMockRelationships(targetUserId));
+      setPage(1);
+      setLoading(false);
       setError(null);
       return;
     }
@@ -99,7 +110,7 @@ export function useListRelationships(
     return () => {
       cancelled = true;
     };
-  }, [targetUserId, fetchVersion]);
+  }, [targetUserId, fetchVersion, useMocks]);
 
   const uniqueRelationships = useMemo(() => {
     const map = new Map<string, RelationshipItem>();
@@ -152,5 +163,6 @@ export function useListRelationships(
     hasMore,
     loadMore,
     refetch,
+    usedMocks: useMocks,
   };
 }

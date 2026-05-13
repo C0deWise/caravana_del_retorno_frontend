@@ -14,6 +14,7 @@ export interface ListCardProps {
   readonly title: ReactNode;
   readonly subtitle?: ReactNode;
   readonly actions?: ReactNode;
+  readonly showIndex?: boolean;
 }
 
 export default function ListCard({
@@ -24,6 +25,7 @@ export default function ListCard({
   title,
   subtitle,
   actions,
+  showIndex = true,
 }: ListCardProps) {
   const finalBadge =
     iconBadge ??
@@ -43,13 +45,15 @@ export default function ListCard({
 
   return (
     <div className="flex items-stretch overflow-hidden rounded-2xl border border-bg-border bg-bg shadow-sm transition-shadow hover:shadow-md">
-      <div className="flex w-14 shrink-0 items-center justify-center border-r border-primary/20 bg-primary/5 md:w-16">
-        <span className="select-none text-xl font-bold text-primary/80">
-          {index + 1}
-        </span>
-      </div>
+      {showIndex && (
+        <div className="flex w-14 shrink-0 items-center justify-center border-r border-primary/20 bg-primary/5 md:w-16">
+          <span className="select-none text-xl font-bold text-primary/80">
+            {index + 1}
+          </span>
+        </div>
+      )}
 
-      <div className="flex min-w-0 flex-1 items-center gap-4 p-3 md:px-5">
+      <div className="flex min-w-0 flex-1 items-center gap-4 py-3 px-4">
         <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-linear-to-tl from-primary/90 to-secondary/90 shadow-md">
           {icon}
           {finalBadge}

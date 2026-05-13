@@ -7,7 +7,7 @@ import { MarqueeText } from "@/components/common/MarqueeText";
 import { ColonyMember } from "../../types/colony-members.types";
 import { UserRole } from "@/types/user.types";
 import { getVisibleMemberData } from "../utils/rolePermissions";
-import { RoleTag } from "@/components/common/RoleTag";
+import { UserRoleTag } from "@/features/management/colony/components/UserRoleTag";
 import { MemberActions } from "./MemberActions";
 import { ConfirmModal } from "@/components/feedback/confirmModal";
 
@@ -65,7 +65,7 @@ export function MemberCard({
         index={index}
         icon={avatarContent}
         title={<MarqueeText text={fullName} className="w-full" />}
-        subtitle={<RoleTag roleId={member.role} />}
+        subtitle={<UserRoleTag roleId={member.role} />}
         actions={
           <MemberActions
             visibleData={visibleData}

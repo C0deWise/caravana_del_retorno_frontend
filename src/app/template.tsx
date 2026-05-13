@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import Spinner from "@/components/feedback/Spinner";
+import { useAuth } from "@/auth/context/AuthContext";
 
 const MIN_LOAD_TIME = 1000;
 
@@ -16,38 +17,37 @@ function waitForImage(img: HTMLImageElement): Promise<void> {
 
     const cleanup = () => {
       loaded = true;
-      img.removeEventListener("load", onLoad);
-      img.removeEventListener("error", onError);
+      img.removeEventListener("load", onComplete);
+      img.removeEventListener("error", onComplete);
     };
 
-    const onLoad = () => {
+    function onComplete() {
       if (!loaded) {
         cleanup();
         resolve();
       }
-    };
+    }
 
-    const onError = () => {
-      if (!loaded) {
-        cleanup();
-        resolve();
-      }
-    };
-
-    img.addEventListener("load", onLoad, { once: true });
-    img.addEventListener("error", onError, { once: true });
+    img.addEventListener("load", onComplete, { once: true });
+    img.addEventListener("error", onComplete, { once: true });
   });
 }
 
 async function waitForFonts(): Promise<void> {
-  await document.fonts.ready;
+  try {
+    if (document?.fonts) {
+      await document.fonts.ready;
+    }
+  } catch (e) {
+    console.error("Error waiting for fonts", e);
+  }
 }
 
 function handleResourcesLoaded(
   abortSignal: AbortSignal,
   startTime: number,
   onComplete: () => void,
-  timeoutRef: React.MutableRefObject<ReturnType<typeof setTimeout> | null>,
+  timeoutRef: React.RefObject<ReturnType<typeof setTimeout> | null>,
 ) {
   if (abortSignal.aborted) return;
 
@@ -63,7 +63,8 @@ function handleResourcesLoaded(
   }
 }
 
-export default function Template({ children }: { children: React.ReactNode }) {
+export default function Template({ children }: { readonly children: React.ReactNode }) {
+  const { isHydrating } = useAuth();
   const [loading, setLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -81,15 +82,18 @@ export default function Template({ children }: { children: React.ReactNode }) {
 
     const fontPromise = waitForFonts();
 
-    Promise.all([imagePromise, fontPromise]).finally(() => {
+    void Promise.all([imagePromise, fontPromise]).finally(() => {
+      const signal = abortControllerRef.current?.signal;
+      if (!signal) return;
       handleResourcesLoaded(
-        abortControllerRef.current!.signal,
+        signal,
         startTimeRef.current,
         () => setLoading(false),
         timeoutRef,
       );
     });
 
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
       if (!abortControllerRef.current?.signal.aborted) {
         setLoading(false);
@@ -98,6 +102,8 @@ export default function Template({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    if (isHydrating) return; // Wait until session is loaded before checking resources
+
     abortControllerRef.current = new AbortController();
     startTimeRef.current = Date.now();
 
@@ -113,7 +119,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
       globalThis.cancelIdleCallback(requestIdleCallbackId);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [checkResourcesLoaded]);
+  }, [checkResourcesLoaded, isHydrating]);
 
   return (
     <>
@@ -130,10 +136,10 @@ export default function Template({ children }: { children: React.ReactNode }) {
           justifyContent: "center",
           flexDirection: "column",
           gap: "1rem",
-          opacity: loading ? 1 : 0,
-          filter: loading ? "blur(0px)" : "blur(8px)",
+          opacity: loading || isHydrating ? 1 : 0,
+          filter: loading || isHydrating ? "blur(0px)" : "blur(8px)",
           transition: "opacity 0.8s ease-out, filter 0.8s ease-out",
-          pointerEvents: loading ? "auto" : "none",
+          pointerEvents: loading || isHydrating ? "auto" : "none",
         }}
       >
         <Spinner size="xl" />
@@ -145,8 +151,8 @@ export default function Template({ children }: { children: React.ReactNode }) {
             letterSpacing: "0.025em",
             fontFamily: "var(--font-inter), sans-serif",
             animation: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-            opacity: loading ? 1 : 0,
-            transition: loading ? "opacity 0.6s ease-out 0.3s" : "none",
+            opacity: loading || isHydrating ? 1 : 0,
+            transition: loading || isHydrating ? "opacity 0.6s ease-out 0.3s" : "none",
           }}
         >
           Conectando con la Caravana del Retorno, Florencia, Cauca...
@@ -157,10 +163,10 @@ export default function Template({ children }: { children: React.ReactNode }) {
       <div
         ref={containerRef}
         style={{
-          display: loading ? "none" : "block",
-          opacity: loading ? 0 : 1,
-          transition: loading ? "none" : "opacity 0.8s ease-out",
-          pointerEvents: loading ? "none" : "auto",
+          display: loading || isHydrating ? "none" : "block",
+          opacity: loading || isHydrating ? 0 : 1,
+          transition: loading || isHydrating ? "none" : "opacity 0.8s ease-out",
+          pointerEvents: loading || isHydrating ? "none" : "auto",
         }}
       >
         {children}

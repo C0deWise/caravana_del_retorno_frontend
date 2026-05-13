@@ -1,5 +1,5 @@
-import ListRelationships from "@/features/management/user/listRelationships/components/ListRelationships";
+import RelationshipsPanel from "@/features/management/user/userRelationship/components/RelationshipsPanel";
 
 export default function ListarParentescosPage() {
-  return <ListRelationships />;
+  return <RelationshipsPanel />;
 }

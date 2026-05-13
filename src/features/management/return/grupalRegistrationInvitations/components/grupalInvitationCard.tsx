@@ -5,7 +5,7 @@ import {
 } from "@heroicons/react/24/outline";
 import type { GrupalInvitation } from "../types/grupalInscription.types";
 import ListCard from "@/components/common/ListCard";
-import { StatusTag } from "@/components/common/StatusTag";
+import { RequestStatusTag } from "@/features/management/components/RequestStatusTag";
 import { GrupalInvitationActions } from "./GrupalInvitationActions";
 
 interface GrupalInvitationCardProps {
@@ -49,7 +49,7 @@ export function GrupalInvitationCard({
           <span className="text-sm text-text-muted">
             Invitación recibida el {formatDate(invitation.createdAt)}
           </span>
-          <StatusTag status={invitation.status}/>
+          <RequestStatusTag status={invitation.status}/>
         </div>
       }
       actions={

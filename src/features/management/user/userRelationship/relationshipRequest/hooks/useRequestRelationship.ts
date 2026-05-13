@@ -2,8 +2,8 @@
 
 import { useCallback, useState } from "react";
 import { ApiError } from "@/services/api.services";
-import { requestRelationshipService } from "../services/relationship.service";
-import type { KinshipType } from "../types/relationship.type";
+import { requestRelationshipService } from "../services/requestRelationship.service";
+import type { KinshipType } from "../../types/relationship.type";
 
 interface UseRequestRelationshipReturn {
   isSubmitting: boolean;

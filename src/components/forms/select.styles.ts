@@ -78,4 +78,8 @@ export const selectStyles: StylesConfig<SelectOption, false> = {
     ...base,
     color: "var(--color-text)",
   }),
+  menuPortal: (base) => ({
+    ...base,
+    zIndex: 9999,
+  }),
 };

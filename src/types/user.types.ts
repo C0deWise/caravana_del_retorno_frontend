@@ -1,19 +1,30 @@
 export type UserDocumentType = "CC" | "CE";
 export type UserGender = "M" | "F" | "otro";
-export type UserRole = "usuario" | "lider_colonia" | "admin";
+export type UserRole = "usuario" | "lider_colonia" | "admin" | "invitado";
 type userCodeRole = 1 | 2 | 3;
 
-export const ROLE_TO_CODE: Record<UserRole, userCodeRole> = {
+export const ROLE_TO_CODE: Record<Exclude<UserRole, "invitado">, userCodeRole> = {
   usuario: 1,
   lider_colonia: 2,
   admin: 3,
 };
 
-export const CODE_TO_ROLE: Record<userCodeRole, UserRole> = {
+const ROLES_MAP: Record<number, UserRole> = {
   1: "usuario",
   2: "lider_colonia",
   3: "admin",
 };
+
+export const CODE_TO_ROLE = new Proxy(ROLES_MAP, {
+  get: (target, prop) => {
+    if (typeof prop === "symbol") return target[prop as unknown as number];
+    
+    const key = Number.parseInt(prop, 10);
+    if (Number.isNaN(key)) return target[prop as unknown as number];
+
+    return target[key] || "Invitado";
+  },
+});
 
 export interface UserApi {
   id: number;
@@ -37,5 +48,5 @@ export type UserData = Omit<UserApi, "codigo_rol"> & { role: UserRole };
 
 // Search Types
 export type UserSearchResult = UserApi;
-export const USER_SEARCH_MODES = ["nombre", "documento"] as const;
+export const USER_SEARCH_MODES = ["general", "nombre", "documento"] as const;
 export type UserSearchMode = (typeof USER_SEARCH_MODES)[number];

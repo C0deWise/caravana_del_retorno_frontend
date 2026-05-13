@@ -27,16 +27,15 @@ export const KINSHIP_TYPE_OPTIONS: { label: string; value: KinshipType }[] = [
   { label: "Cónyuge", value: "conyuge" },
 ];
 
-export interface RequestRelationshipDto {
-  codigo_solicitante: number;
-  codigo_destinatario: number;
-  tipo_parentesco: KinshipType;
-}
+export const formatKinshipType = (rawType: string): string => {
+  const normalizedType = rawType.toLowerCase().trim() as KinshipType;
+  const option = KINSHIP_TYPE_OPTIONS.find((opt) => opt.value === normalizedType);
+  return option ? option.label : rawType;
+};
 
 export type RelationshipStatus =
   | "pendiente"
   | "aceptada"
-  | "rechazada"
   | "expirada";
 
 export type User = Pick<UserData, "id" | "nombre" | "apellido">;
@@ -69,12 +68,4 @@ export interface RelationshipResponse<TData = unknown> {
   success: boolean;
   message: string;
   data?: TData;
-}
-
-export interface UserByIdResponse {
-  id: number;
-  nombre: string;
-  apellido: string;
-  correo: string;
-  documento: string;
 }

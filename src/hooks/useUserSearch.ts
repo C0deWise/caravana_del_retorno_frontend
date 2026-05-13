@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { ApiError } from "@/services/api.services";
 import { userService } from "@/services/user.service";
 import type { UserSearchResult, UserSearchMode } from "@/types/user.types";
@@ -10,10 +10,27 @@ interface UseUserSearchReturn {
   error: string | null;
 }
 
+const getErrorMessage = (err: unknown): string => {
+  if (!(err instanceof ApiError)) {
+    return "Error de conexión, intenta de nuevo";
+  }
+
+  switch (err.status) {
+    case 404:
+      return "No se encontraron resultados";
+    case 422:
+      return "Error de validación en la búsqueda";
+    default:
+      return err.message;
+  }
+};
+
 export const useUserSearch = (): UseUserSearchReturn => {
   const [results, setResults] = useState<UserSearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  const lastRequestRef = useRef<number>(0);
 
   const search = useCallback(
     async (mode: UserSearchMode, value: string): Promise<UserSearchResult[] | null> => {
@@ -25,31 +42,29 @@ export const useUserSearch = (): UseUserSearchReturn => {
         return null;
       }
 
+      const currentRequestId = ++lastRequestRef.current;
       setLoading(true);
       setError(null);
-      setResults([]);
 
       try {
         const response = await userService.createSearchFn(mode, value);
+        
+        if (currentRequestId !== lastRequestRef.current) {
+          return null;
+        }
+
         setResults(response);
         return response;
       } catch (err) {
-        if (err instanceof ApiError) {
-          if (err.status === 404) {
-            setError("No se encontraron resultados");
-          } else if (err.status === 422) {
-            setError("Error de validación en la búsqueda");
-          } else {
-            setError(err.message);
-          }
-        } else {
-          setError("Error de conexión, intenta de nuevo");
+        if (currentRequestId === lastRequestRef.current) {
+          setError(getErrorMessage(err));
+          setResults([]);
         }
-
-        setResults([]);
         return null;
       } finally {
-        setLoading(false);
+        if (currentRequestId === lastRequestRef.current) {
+          setLoading(false);
+        }
       }
     },
     [],
