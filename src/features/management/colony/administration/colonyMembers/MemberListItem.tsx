@@ -1,6 +1,6 @@
 import { UserIcon, ChevronDownIcon, CakeIcon, IdentificationIcon, CalendarDaysIcon, PhoneIcon, EnvelopeIcon } from "@heroicons/react/24/solid";
 import { MarqueeText } from "@/components/common/MarqueeText";
-import { RoleTag } from "@/components/common/RoleTag";
+import { UserRoleTag } from "@/features/management/colony/components/UserRoleTag";
 import { ExpandableContent } from "@/components/layout/ExpandableContent";
 import { calculateAge } from "@/utils/formatting";
 import { CODE_TO_ROLE } from "@/types/user.types";
@@ -14,7 +14,7 @@ interface MemberListItemProps {
 }
 
 export function MemberListItem({ member, isExpanded, onToggle }: MemberListItemProps) {
-  const roleName = CODE_TO_ROLE[member.role as keyof typeof CODE_TO_ROLE];
+  const roleName = CODE_TO_ROLE[member.role];
   const isAdmin = roleName === "admin";
 
   return (
@@ -57,7 +57,7 @@ export function MemberListItem({ member, isExpanded, onToggle }: MemberListItemP
         </div>
 
         <div className="shrink-0 flex items-center gap-3">
-          <RoleTag roleId={member.role} />
+          <UserRoleTag roleId={member.role} />
           <ChevronDownIcon className={`w-4 h-4 text-text-muted transition-transform duration-300 ${
             isExpanded ? "rotate-180 text-primary" : ""
           }`} />

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo, forwardRef, useImperativeHandle } from "react";
-import Select from "react-select";
 import { useCreateColony } from "../hooks/useCreateColony";
 import type { ColonyData } from "@/types/colony.types";
 import {
@@ -11,7 +10,7 @@ import {
 import type { City } from "@/constants/countries";
 import CountrySelect from "@/components/forms/CountrySelect";
 import { ConfirmModal } from "@/components/feedback/confirmModal";
-import { selectStyles } from "@/utils/styles";
+import { SelectField } from "@/components/forms/SelectField";
 import { ExpandableContent } from "@/components/layout/ExpandableContent";
 
 type SelectOption = {
@@ -162,7 +161,6 @@ export const CreateColonyModalForm = forwardRef<
           onChange={handlePaisChange}
           instanceId="create-colony-country-select-modal"
           inputId="create-colony-country-select-input-modal"
-          styles={selectStyles}
           openMenuOnFocus={false}
         />
 
@@ -171,32 +169,24 @@ export const CreateColonyModalForm = forwardRef<
           isOpen={coloniaData.pais === "Colombia"}
           onAnimatingChange={setIsAnimating}
         >
-          <div>
-            <label
-              className="label-base"
-              htmlFor="create-colony-department-select-input-modal"
-            >
-              Departamento
-            </label>
-            <Select
-              instanceId="create-colony-department-select-modal"
-              inputId="create-colony-department-select-input-modal"
-              options={departmentOptions}
-              value={
-                departmentOptions.find(
-                  (opt) => opt.value === coloniaData.departamento,
-                ) || null
-              }
-              onChange={handleDepartamentoChange}
-              placeholder="Seleccione un departamento"
-              isSearchable
-              isClearable
-              isDisabled={isAnimating}
-              openMenuOnFocus={false}
-              styles={selectStyles}
-              noOptionsMessage={() => "No se encontraron departamentos"}
-            />
-          </div>
+          <SelectField
+            label="Departamento"
+            instanceId="create-colony-department-select-modal"
+            inputId="create-colony-department-select-input-modal"
+            options={departmentOptions}
+            value={
+              departmentOptions.find(
+                (opt) => opt.value === coloniaData.departamento,
+              ) || null
+            }
+            onChange={handleDepartamentoChange}
+            placeholder="Seleccione un departamento"
+            isSearchable
+            isClearable
+            isDisabled={isAnimating}
+            openMenuOnFocus={false}
+            noOptionsMessage={() => "No se encontraron departamentos"}
+          />
         </ExpandableContent>
 
         {/* Municipio */}
@@ -205,31 +195,23 @@ export const CreateColonyModalForm = forwardRef<
           onAnimatingChange={setIsAnimating}
           className="space-y-6"
         >
-          <div>
-            <label
-              className="label-base"
-              htmlFor="create-colony-city-select-input-modal"
-            >
-              Municipio
-            </label>
-            <Select
-              instanceId="create-colony-city-select-modal"
-              inputId="create-colony-city-select-input-modal"
-              options={cityOptions}
-              value={
-                cityOptions.find((opt) => opt.value === coloniaData.ciudad) ||
-                null
-              }
-              onChange={handleMunicipioChange}
-              placeholder="Seleccione un municipio"
-              isSearchable
-              isClearable
-              isDisabled={isAnimating || cities.length === 0}
-              openMenuOnFocus={false}
-              styles={selectStyles}
-              noOptionsMessage={() => "No se encontraron municipios"}
-            />
-          </div>
+          <SelectField
+            label="Municipio"
+            instanceId="create-colony-city-select-modal"
+            inputId="create-colony-city-select-input-modal"
+            options={cityOptions}
+            value={
+              cityOptions.find((opt) => opt.value === coloniaData.ciudad) ||
+              null
+            }
+            onChange={handleMunicipioChange}
+            placeholder="Seleccione un municipio"
+            isSearchable
+            isClearable
+            isDisabled={isAnimating || cities.length === 0}
+            openMenuOnFocus={false}
+            noOptionsMessage={() => "No se encontraron municipios"}
+          />
         </ExpandableContent>
 
         <div className="flex gap-3 pt-2">

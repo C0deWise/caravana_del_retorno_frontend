@@ -2,7 +2,7 @@ import { BellIcon } from "@heroicons/react/24/outline";
 import ListCard from "@/components/common/ListCard";
 import type { AccessRequest } from "../types/access-request.types";
 import { AccessRequestActions } from "./AccessRequestActions";
-import { StatusTag } from "../../../../../components/common/StatusTag";
+import { RequestStatusTag } from "@/features/management/components/RequestStatusTag";
 import { formatDate } from "@/utils/formatting";
 
 interface AccessRequestCardProps {
@@ -33,7 +33,7 @@ export function AccessRequestCard({
           <span className="text-sm text-text-muted">
             Solicitud realizada el {formatDate(request.createdAt)}
           </span>
-          <StatusTag status={request.status} />
+          <RequestStatusTag status={request.status} />
         </div>
       }
       actions={

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { SliderPill } from "@/components/layout/SliderPill";
-import { Autocomplete } from "@/components/forms/Autocomplete";
 import { SearchInput } from "@/components/forms/SearchInput";
 import { useUserSearch } from "@/hooks/useUserSearch";
 import { USER_SEARCH_MODES, UserSearchMode, UserSearchResult } from "@/types/user.types";
+import { SelectField } from "@/components/forms/SelectField";
+import { useAuth } from "@/auth/context/AuthContext";
 
 interface UserSearchFieldProps {
   readonly variant?: "autocomplete" | "simple";
@@ -15,6 +16,9 @@ interface UserSearchFieldProps {
   readonly placeholder?: string;
   readonly className?: string;
   readonly label?: string;
+  readonly initialMode?: UserSearchMode;
+  readonly excludeIds?: number[];
+  readonly showModeSelector?: boolean;
 }
 
 export function UserSearchField({
@@ -25,14 +29,94 @@ export function UserSearchField({
   placeholder,
   className = "",
   label,
-}: UserSearchFieldProps) {
-  const [searchType, setSearchType] = useState<UserSearchMode>("nombre");
-  const { search, results, loading } = useUserSearch();
+  initialMode = "general",
+  excludeIds = [],
+  showModeSelector = false,
+}: Readonly<UserSearchFieldProps>) {
+  const { user: currentUser } = useAuth();
+  const [searchType, setSearchType] = useState<UserSearchMode>(initialMode);
+  const [inputValue, setInputValue] = useState("");
+  const { search, results, loading, error } = useUserSearch();
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleSearchInternal = useCallback(
+    (query: string, { action }: { action: string }) => {
+      if (action === "input-blur" || action === "menu-close") {
+        return;
+      }
+
+      setInputValue(query);
+
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+
+      if (action === "input-change" && query.length === 0) {
+        search(searchType, "");
+        return;
+      }
+
+      if (query.length >= 2) {
+        debounceTimerRef.current = setTimeout(() => {
+          search(searchType, query);
+          onSearch?.(query, searchType);
+        }, 500);
+      }
+    },
+    [search, searchType, onSearch],
+  );
+
+  const filteredResults = results.filter((u) => {
+    if (u.id === currentUser?.id) return false;
+    if (u.codigo_rol === 3) return false;
+    if (excludeIds.includes(u.id)) return false;
+    return true;
+  });
+
+  const selectOptions = filteredResults.map((user) => ({
+    value: user.id.toString(),
+    label: `${user.nombre} ${user.apellido} (${user.documento})`,
+    user,
+  }));
+
+  const getModeLabel = (mode: UserSearchMode) => {
+    switch (mode) {
+      case "general":
+        return "General";
+      case "nombre":
+        return "Nombre";
+      case "documento":
+        return "Documento";
+      default:
+        return mode;
+    }
+  };
+
+  const getPlaceholder = () => {
+    if (placeholder) return placeholder;
+    switch (searchType) {
+      case "documento":
+        return "Ej: 123456...";
+      case "nombre":
+        return "Ej: Juan Pérez...";
+      case "general":
+        return "Nombre o documento...";
+      default:
+        return "Buscar...";
+    }
+  };
+
+  const handleSearchSimple = useCallback(
     (query: string) => {
-      search(searchType, query);
-      onSearch?.(query, searchType);
+      if (query.length === 0) {
+        search(searchType, "");
+        return;
+      }
+      
+      if (query.length >= 2) {
+        search(searchType, query);
+        onSearch?.(query, searchType);
+      }
     },
     [search, searchType, onSearch],
   );
@@ -40,65 +124,67 @@ export function UserSearchField({
   return (
     <div className={`space-y-4 ${className}`}>
       {/* Selector de modo de búsqueda */}
-      <div className="relative flex bg-bg-card p-1 rounded-xl border border-bg-border overflow-hidden">
-        <SliderPill activeValue={searchType} />
-        {USER_SEARCH_MODES.map((type) => (
-          <button
-            key={type}
-            type="button"
-            onClick={() => {
-              setSearchType(type);
-              onModeChange?.(type);
-            }}
-            className={`relative z-10 flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors duration-300 ${
-              searchType === type ? "text-primary" : "text-text-muted hover:text-text"
-            }`}
-          >
-            {type === "documento" ? "Por Documento" : "Por Nombre"}
-          </button>
-        ))}
-      </div>
+      {showModeSelector && (
+        <div className="relative flex bg-bg-card p-1 rounded-xl border border-bg-border overflow-hidden">
+          <SliderPill activeValue={searchType} options={[...USER_SEARCH_MODES]} />
+          {USER_SEARCH_MODES.map((type) => (
+            <button
+              key={type}
+              type="button"
+              onClick={() => {
+                setSearchType(type);
+                onModeChange?.(type);
+              }}
+              className={`relative z-10 flex-1 py-2 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-colors duration-300 ${
+                searchType === type ? "text-primary" : "text-text-muted hover:text-text"
+              }`}
+            >
+              {getModeLabel(type)}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Campo de búsqueda según la variante */}
       {variant === "autocomplete" ? (
-        <Autocomplete<UserSearchResult>
+        <SelectField
           key={searchType}
           label={label}
-          placeholder={
-            placeholder ||
-            (searchType === "documento" ? "Ej: 123456..." : "Ej: Juan Pérez...")
-          }
-          onSearch={handleSearchInternal}
-          results={results}
-          loading={loading}
-          onSelect={(user) => onSelect?.(user)}
-          getDisplayValue={(user) =>
-            searchType === "documento" ? user.documento : `${user.nombre} ${user.apellido}`
-          }
-          renderItem={(user, isHighlighted) => (
-            <div className="px-4 py-2.5">
-              <p className={`text-sm font-semibold ${isHighlighted ? "text-primary" : "text-text"}`}>
-                {user.nombre} {user.apellido}
-              </p>
-              <p className="text-xs text-text-muted">{user.documento}</p>
-            </div>
-          )}
-          clearOnSelect
+          inputId="user-search-autocomplete"
+          placeholder={getPlaceholder()}
+          inputValue={inputValue}
+          onInputChange={handleSearchInternal}
+          options={selectOptions}
+          isLoading={loading}
+          loadingMessage={() => "Buscando..."}
+          onChange={(option) => {
+            if (option) {
+              setInputValue("");
+              onSelect?.(option.user);
+            }
+          }}
+          noOptionsMessage={({ inputValue: currentInput }) => {
+            if (error) return error;
+            return currentInput.length < 2 && currentInput.length > 0
+              ? "Escribe al menos 2 caracteres..."
+              : "No se encontraron usuarios";
+          }}
+          isClearable
+          filterOption={() => true}
         />
       ) : (
-        <SearchInput
-          key={searchType}
-          label={label}
-          placeholder={
-            placeholder ||
-            (searchType === "documento" ? "Ej: 123456..." : "Ej: Juan Pérez...")
-          }
-          onSearch={handleSearchInternal}
-          loading={loading}
-          debounceTime={400}
-        />
+        <div className="space-y-2">
+          <SearchInput
+            key={searchType}
+            label={label}
+            placeholder={getPlaceholder()}
+            onSearch={handleSearchSimple}
+            loading={loading}
+            debounceTime={400}
+          />
+          {error && <p className="text-xs text-danger px-1">{error}</p>}
+        </div>
       )}
     </div>
   );
 }
-

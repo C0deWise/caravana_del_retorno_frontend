@@ -126,7 +126,7 @@ export function PublicationsPanel() {
         {loading && (
           <div className="flex items-center justify-center py-12">
             <div className="flex items-center space-x-3 text-primary">
-              <Spinner size="sm" />
+              <Spinner size="lg" />
               <span className="font-medium">Cargando publicaciones...</span>
             </div>
           </div>

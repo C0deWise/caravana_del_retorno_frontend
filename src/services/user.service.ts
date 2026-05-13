@@ -1,4 +1,4 @@
-import { apiService } from "@/services/api.services";
+import { apiService, ApiError } from "@/services/api.services";
 import type { UserSearchResult } from "@/types/user.types";
 
 export const userService = {
@@ -16,14 +16,33 @@ export const userService = {
     return apiService.get(`/api/v1/usuario/buscar_documento/${documento}`);
   },
 
-  createSearchFn: (
+  safeSearchByDocument: async (documento: string): Promise<UserSearchResult[]> => {
+    try {
+      const user = await userService.searchByDocument(documento);
+      return user ? [user] : [];
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 404) return [];
+      throw err;
+    }
+  },
+
+  createSearchFn: async (
     mode: string,
     value: string,
   ): Promise<UserSearchResult[]> => {
+    const trimmed = value.trim();
+
     if (mode === "nombre") {
-      return userService.searchByName(value);
+      return userService.searchByName(trimmed);
     }
-    return userService.searchByDocument(value).then((user) => [user]);
+
+    if (mode === "documento") {
+      return userService.safeSearchByDocument(trimmed);
+    }
+
+    return /^\d+$/.test(trimmed)
+      ? userService.safeSearchByDocument(trimmed)
+      : userService.searchByName(trimmed);
   },
 };
 

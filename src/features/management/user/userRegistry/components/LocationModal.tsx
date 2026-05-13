@@ -1,18 +1,18 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Select, { type StylesConfig } from "react-select";
 import {
   getDepartments,
   getCitiesByDepartmentName,
 } from "@/constants/countries";
 import type { City } from "@/constants/countries";
 import CountrySelect from "@/components/forms/CountrySelect";
+import { SelectField } from "@/components/forms/SelectField";
 
 interface LocationModalProps {
-  onClose: () => void;
-  onSave: (location: LocationData) => void;
-  initialData?: LocationData;
+  readonly onClose: () => void;
+  readonly onSave: (location: LocationData) => void;
+  readonly initialData?: LocationData;
 }
 
 export interface LocationData {
@@ -89,20 +89,6 @@ export default function LocationModal({
     onClose();
   };
 
-  const customStyles: StylesConfig<SelectOption, false> = {
-    control: (base) => ({
-      ...base,
-      borderColor: "#d1d5db",
-      borderRadius: "0.5rem",
-      padding: "0.25rem",
-      fontSize: "1rem",
-    }),
-    menu: (base) => ({
-      ...base,
-      zIndex: 9999,
-    }),
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="bg-bg rounded-lg shadow-2xl w-full max-w-md p-6 mx-4">
@@ -117,60 +103,53 @@ export default function LocationModal({
             onChange={handlePaisChange}
             instanceId="location-modal-country-select"
             inputId="location-modal-country-select-input"
-            styles={customStyles}
           />
 
           {/* Departamento - Solo para Colombia */}
           {locationData.pais === "Colombia" && (
-            <div>
-              <label className="label-base">Departamento</label>
-              <Select
-                instanceId="create-colony-department-select"
-                inputId="create-colony-department-select-input"
-                options={departmentOptions}
-                value={
-                  departmentOptions.find(
-                    (opt) => opt.value === locationData.departamento,
-                  ) || null
-                }
-                onChange={handleDepartamentoChange}
-                placeholder="Seleccione un departamento"
-                isSearchable
-                isClearable
-                openMenuOnFocus
-                styles={customStyles}
-                noOptionsMessage={() => "No se encontraron departamentos"}
-              />
-            </div>
+            <SelectField
+              label="Departamento"
+              instanceId="create-colony-department-select"
+              inputId="create-colony-department-select-input"
+              options={departmentOptions}
+              value={
+                departmentOptions.find(
+                  (opt) => opt.value === locationData.departamento,
+                ) || null
+              }
+              onChange={handleDepartamentoChange}
+              placeholder="Seleccione un departamento"
+              isSearchable
+              isClearable
+              openMenuOnFocus
+              noOptionsMessage={() => "No se encontraron departamentos"}
+            />
           )}
 
           {/* Municipio - Solo para Colombia */}
           {locationData.pais === "Colombia" && (
-            <div>
-              <label className="label-base">Municipio</label>
-              <Select
-                instanceId="create-colony-city-select"
-                inputId="create-colony-city-select-input"
-                options={cityOptions}
-                value={
-                  cityOptions.find(
-                    (opt) => opt.value === locationData.municipio,
-                  ) || null
-                }
-                onChange={handleMunicipioChange}
-                placeholder={
-                  locationData.departamento
-                    ? "Seleccione un municipio"
-                    : "Seleccione primero un departamento"
-                }
-                isSearchable
-                isClearable
-                openMenuOnFocus
-                isDisabled={!locationData.departamento || cities.length === 0}
-                styles={customStyles}
-                noOptionsMessage={() => "No se encontraron municipios"}
-              />
-            </div>
+            <SelectField
+              label="Municipio"
+              instanceId="create-colony-city-select"
+              inputId="create-colony-city-select-input"
+              options={cityOptions}
+              value={
+                cityOptions.find(
+                  (opt) => opt.value === locationData.municipio,
+                ) || null
+              }
+              onChange={handleMunicipioChange}
+              placeholder={
+                locationData.departamento
+                  ? "Seleccione un municipio"
+                  : "Seleccione primero un departamento"
+              }
+              isSearchable
+              isClearable
+              openMenuOnFocus
+              isDisabled={!locationData.departamento || cities.length === 0}
+              noOptionsMessage={() => "No se encontraron municipios"}
+            />
           )}
         </div>
 

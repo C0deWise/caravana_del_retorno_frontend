@@ -139,7 +139,7 @@ export default function AccessRequests() {
           {isLoading && (
             <div className="flex items-center justify-center py-12">
               <div className="flex items-center space-x-3 text-primary">
-                <Spinner size="sm" />
+                <Spinner size="lg" />
                 <span className="font-medium">Cargando solicitudes...</span>
               </div>
             </div>

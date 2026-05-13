@@ -150,16 +150,27 @@ body {
 
   /* Select estándar */
   .select-base {
-    @apply px-3 py-3 rounded-lg transition-colors cursor-pointer;
+    @apply px-4 py-3 rounded-xl transition-all cursor-pointer appearance-none;
     background-color: var(--color-bg-card);
-    border: 1px solid transparent;
+    border: 1px solid var(--color-bg-border);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23707070' %3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.25rem;
+    padding-right: 2.5rem;
+    color: var(--color-text);
+    font-size: 0.875rem;
   }
 
   .select-base:focus {
     outline: none;
     background-color: var(--color-bg);
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px rgba(2, 64, 89, 0.1);
+    box-shadow: 0 0 0 4px rgba(2, 64, 89, 0.08);
+  }
+
+  .select-base:hover:not(:focus) {
+    border-color: var(--color-primary);
   }
 
   /* Labels de formulario */

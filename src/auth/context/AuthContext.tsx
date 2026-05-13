@@ -30,7 +30,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }: { readonly children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
   const [user, setUser] = useState<UserData | null>(null);
   const [isFetchingSession, setIsFetchingSession] = useState(false);

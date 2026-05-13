@@ -8,7 +8,7 @@ const MIN_LOADING_TIME = 300;
 export default function PageTransition({
   children,
 }: {
-  children: React.ReactNode;
+  readonly children: React.ReactNode;
 }) {
   const [loading, setLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -30,26 +30,31 @@ export default function PageTransition({
 
     const start = performance.now();
 
+    let timeoutId: number;
+
     const promise =
       images.length === 0
         ? Promise.resolve()
         : Promise.all(images.map(waitForLoad));
 
-    promise.finally(() => {
+    void promise.finally(() => {
       const elapsed = performance.now() - start;
       const remaining = Math.max(0, MIN_LOADING_TIME - elapsed);
 
-      const timeoutId = window.setTimeout(() => {
+      timeoutId = window.setTimeout(() => {
         setLoading(false);
       }, remaining);
-
-      return () => window.clearTimeout(timeoutId);
     });
+
+    return () => {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+    };
   }, []);
 
   return (
-    <div className="relative min-h-100">
-      {" "}
+    <div className="relative min-h-[100px] h-full flex flex-col">
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center bg-white/20 backdrop-blur-sm z-10 rounded-lg">
           <Spinner size="lg" />
@@ -57,7 +62,7 @@ export default function PageTransition({
       )}
       <div
         ref={containerRef}
-        className="w-full"
+        className="w-full flex-1 flex flex-col"
         style={{ visibility: loading ? "hidden" : "visible" }}
       >
         {children}

@@ -1,7 +1,5 @@
-"use client";
-
 import { useMemo } from "react";
-import Select, { type StylesConfig } from "react-select";
+import { SelectField } from "@/components/forms/SelectField";
 import { getAllCountries } from "@/constants/countries";
 
 type SelectOption = {
@@ -10,18 +8,17 @@ type SelectOption = {
 };
 
 type CountrySelectProps = {
-  value: string;
-  onChange: (country: string) => void;
-  instanceId?: string;
-  inputId?: string;
-  label?: string;
-  placeholder?: string;
-  isSearchable?: boolean;
-  isClearable?: boolean;
-  openMenuOnFocus?: boolean;
-  isDisabled?: boolean;
-  styles?: StylesConfig<SelectOption, false>;
-  noOptionsMessage?: () => string;
+  readonly value: string;
+  readonly onChange: (country: string) => void;
+  readonly instanceId?: string;
+  readonly inputId?: string;
+  readonly label?: string;
+  readonly placeholder?: string;
+  readonly isSearchable?: boolean;
+  readonly isClearable?: boolean;
+  readonly openMenuOnFocus?: boolean;
+  readonly isDisabled?: boolean;
+  readonly noOptionsMessage?: () => string;
 };
 
 export default function CountrySelect({
@@ -35,7 +32,6 @@ export default function CountrySelect({
   isClearable = true,
   openMenuOnFocus = true,
   isDisabled = false,
-  styles,
   noOptionsMessage = () => "No se encontraron países",
 }: CountrySelectProps) {
   const countryOptions = useMemo(
@@ -55,24 +51,19 @@ export default function CountrySelect({
   };
 
   return (
-    <div>
-      <label className="label-base" htmlFor={inputId}>
-        {label}
-      </label>
-      <Select
-        instanceId={instanceId}
-        inputId={inputId}
-        options={countryOptions}
-        value={selectedOption}
-        onChange={handleChange}
-        placeholder={placeholder}
-        isSearchable={isSearchable}
-        isClearable={isClearable}
-        openMenuOnFocus={openMenuOnFocus}
-        isDisabled={isDisabled}
-        styles={styles}
-        noOptionsMessage={noOptionsMessage}
-      />
-    </div>
+    <SelectField
+      label={label}
+      instanceId={instanceId}
+      inputId={inputId}
+      options={countryOptions}
+      value={selectedOption}
+      onChange={handleChange}
+      placeholder={placeholder}
+      isSearchable={isSearchable}
+      isClearable={isClearable}
+      openMenuOnFocus={openMenuOnFocus}
+      isDisabled={isDisabled}
+      noOptionsMessage={noOptionsMessage}
+    />
   );
 }

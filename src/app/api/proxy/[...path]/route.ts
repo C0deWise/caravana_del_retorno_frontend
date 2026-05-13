@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const API_BASE = process.env.API_BASE_URL!;
+const API_BASE = process.env.API_BASE_URL;
 type RouteParams = { params: Promise<{ path: string[] }> };
 
 interface FetchError extends Error {
@@ -13,31 +13,71 @@ async function fetchWithRetry(url: string, init: RequestInit, retries = 3) {
 
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 8000);
-
       const response = await fetch(url, {
         ...init,
-        signal: controller.signal,
+        signal: AbortSignal.timeout(30000),
         cache: "no-store",
       });
 
-      clearTimeout(timeout);
       return response;
     } catch (error) {
       lastError = error;
       const fetchError = error as FetchError;
+      
+      const isTimeout = error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError");
       const code = fetchError.cause?.code || fetchError.code;
 
-      if (!code || !["ENOTFOUND", "ECONNRESET", "ETIMEDOUT"].includes(code) || attempt === retries - 1) {
+      const retryableCodes = ["ENOTFOUND", "ECONNRESET", "ETIMEDOUT"];
+      const isRetryable = isTimeout || (code && retryableCodes.includes(code));
+
+      if (!isRetryable || attempt === retries - 1) {
         throw error;
       }
 
-      await new Promise((r) => setTimeout(r, 400 * (attempt + 1)));
+      await new Promise((r) => setTimeout(r, 500 * (attempt + 1)));
     }
   }
 
   throw lastError;
+}
+
+async function handleApiResponse(response: Response): Promise<NextResponse> {
+  const text = await response.text();
+
+  if (response.status === 204 || !text) {
+    return new NextResponse(null, { status: response.status });
+  }
+
+  try {
+    return NextResponse.json(JSON.parse(text), { status: response.status });
+  } catch {
+    return new NextResponse(text, {
+      status: response.status,
+      headers: {
+        "Content-Type": response.headers.get("content-type") ?? "text/plain",
+      },
+    });
+  }
+}
+
+function handleProxyError(error: unknown, method: string, url: string): NextResponse {
+  console.error(`[Proxy Error] ${method} ${url}:`, error);
+
+  const isTimeout = error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError");
+  const status = isTimeout ? 504 : 502;
+  
+  const fetchError = error as FetchError;
+  const code = fetchError.cause?.code || fetchError.code || (isTimeout ? "TIMEOUT" : "FETCH_ERROR");
+
+  return NextResponse.json(
+    {
+      error: isTimeout ? "Gateway Timeout" : "Proxy request failed",
+      message: error instanceof Error ? error.message : "An unexpected error occurred",
+      code,
+      url,
+    },
+    { status },
+  );
 }
 
 async function forwardRequest(
@@ -66,34 +106,9 @@ async function forwardRequest(
       redirect: "follow",
     });
 
-    const text = await response.text();
-
-    if (response.status === 204 || !text) {
-      return new NextResponse(null, { status: response.status });
-    }
-
-    try {
-      return NextResponse.json(JSON.parse(text), { status: response.status });
-    } catch {
-      return new NextResponse(text, {
-        status: response.status,
-        headers: {
-          "Content-Type": response.headers.get("content-type") ?? "text/plain",
-        },
-      });
-    }
+    return handleApiResponse(response);
   } catch (error) {
-    const fetchError = error as FetchError;
-    const code = fetchError.cause?.code || fetchError.code || "FETCH_ERROR";
-
-    return NextResponse.json(
-      {
-        error: "Proxy request failed",
-        code,
-        url,
-      },
-      { status: 502 },
-    );
+    return handleProxyError(error, method, url);
   }
 }
 
