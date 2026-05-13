@@ -34,4 +34,9 @@ export const buildMockUsers = (
     role: "admin",
     codigo_colonia: null,
   },
+  invitado: {
+    ...MOCK_USER_BASE,
+    role: "invitado",
+    codigo_colonia: null,
+  },
 });

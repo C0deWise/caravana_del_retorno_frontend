@@ -23,4 +23,5 @@ export const rolePermissions: Record<UserRole, string[]> = {
     "/gestion/retorno/registro",
     "/gestion/retorno/grupos",
   ],
+  invitado: [],
 };

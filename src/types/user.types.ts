@@ -1,9 +1,9 @@
 export type UserDocumentType = "CC" | "CE";
 export type UserGender = "M" | "F" | "otro";
-export type UserRole = "usuario" | "lider_colonia" | "admin" | "Invitado";
+export type UserRole = "usuario" | "lider_colonia" | "admin" | "invitado";
 type userCodeRole = 1 | 2 | 3;
 
-export const ROLE_TO_CODE: Record<Exclude<UserRole, "Invitado">, userCodeRole> = {
+export const ROLE_TO_CODE: Record<Exclude<UserRole, "invitado">, userCodeRole> = {
   usuario: 1,
   lider_colonia: 2,
   admin: 3,
