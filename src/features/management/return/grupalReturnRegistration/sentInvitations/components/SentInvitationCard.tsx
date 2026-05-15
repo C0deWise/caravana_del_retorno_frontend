@@ -1,7 +1,7 @@
 import ListCard from "@/components/common/ListCard";
 import { EntradaInvitacion } from "../../types/grupalReturnRegistration";
 import { TrashIcon, UserIcon } from "@heroicons/react/24/outline";
-import { StatusTag } from "@/components/common/StatusTag";
+import { RequestStatusTag } from "@/features/management/components/RequestStatusTag";
 
 interface SentInvitationCardProps {
     readonly invitation: EntradaInvitacion;
@@ -32,7 +32,7 @@ export function SentInvitationCard({ invitation, index, onRemove, isRemoving }: 
             }
             actions={
                 <div className="flex items-center gap-2">
-                    <StatusTag status={estado} />
+                    <RequestStatusTag status={estado} />
                     <button
                         type="button"
                         className="btn-ghost text-accent-red hover:text-accent-red/80"
