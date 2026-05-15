@@ -91,7 +91,7 @@ function GenerateReportsFeature() {
     return (
         <div className="flex flex-col min-h-screen w-full items-center px-4 py-8 bg-bg">
             <div className="rounded-lg shadox-xl w-full max-w-4xl bg-bg">
-                <h1 className="page-title">Generar reportes</h1>
+                <h1 className="page-title">Generar Reportes</h1>
 
                 {isAdmin ? (
                 <h2 className="section-title">Selecciona el tipo de reporte que deseas generar</h2>

@@ -25,8 +25,8 @@ function RegistrationSelectorContent() {
     return (
         <div className="flex items-center justify-center px-4 py-12">
             <div className="w-full max-w-xl rounded 2xl bg-bg-card p-8 shadow-md">
-                <h1 className="page-title mb-2">Registro al retorno</h1>
-                <h2 className="text-text-muted mb-8">Selecciona cómo desesas registrar tu asistencia</h2>
+                <h1 className="page-title mb-1">Registro al Retorno</h1>
+                <h2 className="section-title mb-2">Selecciona cómo desesas registrar tu asistencia</h2>
 
                 {(error ?? createError) && (
                     <div className="alert-error mb-6">
