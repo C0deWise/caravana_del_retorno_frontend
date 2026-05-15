@@ -8,7 +8,8 @@ import {
   useEffect,
 } from "react";
 import { UserApi, UserData, UserRole, CODE_TO_ROLE } from "@/types/user.types";
-import { buildMockUsers } from "../utils/mockUsers";
+import { buildMockUsers } from "@/features/dev/config/mockUsers";
+import { useDev } from "@/features/dev/context/DevContext";
 
 const IS_DEV = process.env.NEXT_PUBLIC_DEV_TOOLS === "true";
 const STORAGE_KEY = "session_documento";
@@ -21,25 +22,16 @@ interface AuthContextType {
   login: (user: UserData) => void;
   updateUser: (partial: Partial<UserData>) => void;
   logout: () => void;
-  setRoleOverride?: (role: UserRole | undefined) => void;
-  mockColoniaId?: number | null;
-  setMockColoniaId?: (id: number | null) => void;
-  mockUserId?: number | null;
-  setMockUserId?: (id: number | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { readonly children: ReactNode }) {
+  const { roleOverride, setRoleOverride, mockColoniaId, mockUserId, isDev } = useDev();
   const [mounted, setMounted] = useState(false);
   const [user, setUser] = useState<UserData | null>(null);
   const [isFetchingSession, setIsFetchingSession] = useState(false);
   const [sessionChecked, setSessionChecked] = useState(false);
-  const [roleOverride, setRoleOverride] = useState<UserRole | undefined>(
-    IS_DEV ? "usuario" : undefined,
-  );
-  const [mockColoniaId, setMockColoniaId] = useState<number | null>(null);
-  const [mockUserId, setMockUserId] = useState<number | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -48,7 +40,7 @@ export function AuthProvider({ children }: { readonly children: ReactNode }) {
   useEffect(() => {
     if (!mounted) return;
 
-    if (IS_DEV) {
+    if (isDev) {
       setSessionChecked(true);
       return;
     }
@@ -103,7 +95,7 @@ export function AuthProvider({ children }: { readonly children: ReactNode }) {
   const isHydrating = !mounted || !sessionChecked || isFetchingSession;
 
   const effectiveUser: UserData | null =
-    IS_DEV && roleOverride !== undefined
+    isDev && roleOverride !== undefined
       ? {
           ...buildMockUsers(mockColoniaId)[
             roleOverride as Exclude<UserRole, undefined>
@@ -113,7 +105,7 @@ export function AuthProvider({ children }: { readonly children: ReactNode }) {
       : user;
 
   const effectiveRole =
-    IS_DEV && roleOverride !== undefined ? roleOverride : user?.role;
+    isDev && roleOverride !== undefined ? roleOverride : user?.role;
 
   const login = (newUser: UserData) => {
     localStorage.setItem(STORAGE_KEY, newUser.documento);
@@ -140,13 +132,6 @@ export function AuthProvider({ children }: { readonly children: ReactNode }) {
         login,
         updateUser,
         logout,
-        ...(IS_DEV && {
-          setRoleOverride,
-          mockColoniaId,
-          setMockColoniaId,
-          mockUserId,
-          setMockUserId,
-        }),
       }}
     >
       {children}
