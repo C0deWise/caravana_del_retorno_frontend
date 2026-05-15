@@ -228,6 +228,21 @@ body {
     cursor: not-allowed;
   }
 
+  .btn-danger {
+    @apply px-6 py-2 text-lg font-semibold rounded-lg transition-colors;
+    background-color: var(--color-accent-red);
+    color: var(--color-text-inverse);
+  }
+
+  .btn-danger:hover:not(:disabled) {
+    background-color: var(--color-danger);
+  }
+
+  .btn-danger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed
+  }
+
   /* Alertas */
   .alert-error {
     @apply mt-6 p-4 rounded border-l-4;
