@@ -87,16 +87,22 @@ async function forwardRequest(
 ): Promise<NextResponse> {
   const { path } = await params;
   const url = `${API_BASE}/${path.join("/")}/`;
-  const isReadMethod = method === "GET" || method === "DELETE";
+  const isReadMethod = method === "GET" || method === "HEAD";
 
-  let body: string | undefined;
+  // Copiar headers originales
+  const headers = new Headers();
+  const allowedHeaders = ["content-type", "authorization", "accept"];
+  request.headers.forEach((value, key) => {
+    if (allowedHeaders.includes(key.toLowerCase()) || key.toLowerCase().startsWith("x-")) {
+      headers.set(key, value);
+    }
+  });
+
+  let body: ArrayBuffer | undefined;
   if (!isReadMethod) {
-    const rawBody = await request.text();
-    body = rawBody.trim() ? rawBody : undefined;
+    body = await request.arrayBuffer();
+    if (body.byteLength === 0) body = undefined;
   }
-
-  const headers: HeadersInit = {};
-  if (body) headers["Content-Type"] = "application/json";
 
   try {
     const response = await fetchWithRetry(url, {

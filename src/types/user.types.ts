@@ -34,6 +34,7 @@ export interface UserApi {
   celular: string;
   correo: string;
   codigo_colonia: number | null;
+  codigo_retorno: number | null;
   codigo_rol: userCodeRole;
   nombre: string;
   apellido: string;

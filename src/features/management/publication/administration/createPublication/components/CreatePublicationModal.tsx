@@ -5,20 +5,21 @@ import { useAuth } from "@/auth/context/AuthContext";
 import { useCreatePublication } from "../hooks/useCreatePublication";
 import { AnimatedModal } from "@/components/feedback/AnimatedModal";
 import { useLocalMultimedia } from "../hooks/useLocalMultimedia";
-import { useUploadMultimedia } from "../hooks/useUploadMultimedia";
 import Spinner from "@/components/feedback/Spinner";
 import { PublicationBasicInfo } from "./PublicationBasicInfo";
 import { PublicationMultimediaList } from "./PublicationMultimediaList";
 import { MultimediaSelectionModal } from "./MultimediaSelectionModal";
+import { MultimediaCardUploadState } from "./MultimediaCard";
 import { PhotoIcon } from "@heroicons/react/24/outline";
 
 interface CreatePublicationModalProps {
   readonly isOpen: boolean;
   readonly onClose: () => void;
   readonly onRefresh?: () => void;
+  readonly fixedRetornoId?: number;
 }
 
-export function CreatePublicationModal({ isOpen, onClose, onRefresh }: CreatePublicationModalProps) {
+export function CreatePublicationModal({ isOpen, onClose, onRefresh, fixedRetornoId }: CreatePublicationModalProps) {
   const { user } = useAuth();
   const { createPublication, isLoading: isCreating, error: createError } = useCreatePublication();
 
@@ -26,21 +27,21 @@ export function CreatePublicationModal({ isOpen, onClose, onRefresh }: CreatePub
   const [resena, setResena] = useState("");
   const [success, setSuccess] = useState(false);
   const [isMultimediaModalOpen, setIsMultimediaModalOpen] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const { items, addFiles, remove, clear } = useLocalMultimedia();
-  const { uploadStates, isUploading, uploadAllFiles, retryFile, resetStates, removeState } = useUploadMultimedia();
 
   const resetForm = () => {
     setTitulo("");
     setResena("");
     setSuccess(false);
+    setUploadProgress(0);
     clear();
-    resetStates();
   };
 
   const handleClose = () => {
     if (isMultimediaModalOpen) return;
-    if (!isUploading && !isCreating) {
+    if (!isCreating) {
       resetForm();
       onClose();
     }
@@ -59,36 +60,36 @@ export function CreatePublicationModal({ isOpen, onClose, onRefresh }: CreatePub
     if (!user) return;
 
     const codigoAutor = user.id;
-    const codigoColonia = user.codigo_colonia ?? 0;
-    const codigoRetorno = (user as unknown as Record<string, unknown>).codigo_retorno as number | undefined ?? 0;
+    const codigoRetorno = fixedRetornoId ?? user.codigo_retorno ?? 0;
 
     try {
       await createPublication({
         titulo,
         resena,
-        codigo_autor: codigoAutor,
-        codigo_colonia: codigoColonia,
-        codigo_retorno: codigoRetorno,
+        autor: codigoAutor,
+        retorno_id: codigoRetorno,
+        archivos: items.map(it => it.file),
+      }, (percentage) => {
+        setUploadProgress(percentage);
       });
 
-      if (items.length > 0) {
-        uploadAllFiles(items, onCompleteSuccess);
-      } else {
-        onCompleteSuccess();
-      }
+      onCompleteSuccess();
     } catch (err) {
       console.error(err);
     }
   };
 
-  const isLoading = isCreating || isUploading;
+  const isLoading = isCreating;
 
-  let submitButtonText = "Publicar";
-  if (isCreating) {
-    submitButtonText = "Creando...";
-  } else if (isUploading) {
-    submitButtonText = "Subiendo archivos...";
-  }
+  const uploadStates = items.reduce((acc, it) => {
+    acc[it.id] = {
+      status: isCreating ? "uploading" : (success ? "success" : "idle"),
+      progress: uploadProgress
+    };
+    return acc;
+  }, {} as Record<string, MultimediaCardUploadState>);
+
+  const submitButtonText = isCreating ? "Publicando..." : "Publicar";
 
   return (
     <>
@@ -132,9 +133,6 @@ export function CreatePublicationModal({ isOpen, onClose, onRefresh }: CreatePub
                   items={items}
                   remove={remove}
                   uploadStates={uploadStates}
-                  removeState={removeState}
-                  retryFile={retryFile}
-                  onCompleteSuccess={onCompleteSuccess}
                 />
 
                 {createError && (

@@ -34,6 +34,10 @@ class ApiService {
   }
 
   private buildErrorMessage(error: unknown, response: Response): string {
+    if (response.status === 422) {
+      console.error("Validation Error (422) Detail:", JSON.stringify(error, null, 2));
+    }
+
     if (
       error &&
       typeof error === "object" &&
@@ -116,10 +120,14 @@ class ApiService {
     };
 
     if (data !== undefined) {
-      options.headers = {
-        "Content-Type": "application/json",
-      };
-      options.body = JSON.stringify(data);
+      if (data instanceof FormData) {
+        options.body = data;
+      } else {
+        options.headers = {
+          "Content-Type": "application/json",
+        };
+        options.body = JSON.stringify(data);
+      }
     }
 
     return options;
@@ -193,7 +201,18 @@ class ApiService {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.open("POST", `${this.baseURL}${endpoint}`);
-      xhr.setRequestHeader("Content-Type", "application/json");
+      
+      const isFormData = data instanceof FormData;
+      if (isFormData) {
+        console.log(`Sending FormData to ${endpoint}:`);
+        (data as FormData).forEach((value, key) => {
+          console.log(`  ${key}:`, value instanceof File ? `File(${value.name})` : value);
+        });
+      }
+      
+      if (!isFormData) {
+        xhr.setRequestHeader("Content-Type", "application/json");
+      }
 
       if (xhr.upload && onProgress) {
         xhr.upload.onprogress = (event) => {
@@ -234,7 +253,11 @@ class ApiService {
         reject(new Error("Error de conexión"));
       };
 
-      xhr.send(JSON.stringify(data));
+      if (isFormData) {
+        xhr.send(data as FormData);
+      } else {
+        xhr.send(JSON.stringify(data));
+      }
     });
   }
 }

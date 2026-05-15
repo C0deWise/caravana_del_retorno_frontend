@@ -7,11 +7,14 @@ export const useCreatePublication = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const createPublication = async (payload: PublicationApiRequest) => {
+  const createPublication = async (
+    payload: PublicationApiRequest,
+    onProgress?: (percentage: number) => void
+  ) => {
     setIsLoading(true);
     setError(null);
     try {
-      const result = await createPublicationService(payload);
+      const result = await createPublicationService(payload, onProgress);
       return result;
     } catch (err) {
       if (err instanceof ApiError) {

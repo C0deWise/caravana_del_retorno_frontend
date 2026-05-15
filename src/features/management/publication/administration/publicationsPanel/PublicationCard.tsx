@@ -1,8 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { NewspaperIcon, EyeIcon, PencilSquareIcon, TrashIcon } from "@heroicons/react/24/solid";
 import ListCard from "@/components/common/ListCard";
 import { PublicationData } from "@/types/publication.types";
+import { userService } from "@/services/user.service";
 
 interface PublicationCardProps {
   readonly publication: PublicationData;
@@ -10,6 +12,20 @@ interface PublicationCardProps {
 }
 
 export function PublicationCard({ publication, index }: PublicationCardProps) {
+  const [authorName, setAuthorName] = useState<string>("Cargando...");
+
+  useEffect(() => {
+    const fetchAuthor = async () => {
+      try {
+        const userData = await userService.getUserById(publication.autor);
+        setAuthorName(`${userData.nombre} ${userData.apellido}`);
+      } catch {
+        setAuthorName(`ID: ${publication.autor}`);
+      }
+    };
+    fetchAuthor();
+  }, [publication.autor]);
+
   // Formatear la fecha si existe
   const formattedDate = publication.fecha_creacion 
     ? new Date(publication.fecha_creacion).toLocaleDateString('es-ES', {
@@ -26,7 +42,7 @@ export function PublicationCard({ publication, index }: PublicationCardProps) {
       title={publication.titulo}
       subtitle={
         <div className="flex items-center gap-2 text-sm text-text-muted">
-          <span className="font-medium text-secondary">Autor: {publication.codigo_autor}</span>
+          <span className="font-medium text-secondary">Autor: {authorName}</span>
           <span>•</span>
           <span>{formattedDate}</span>
           <span>•</span>

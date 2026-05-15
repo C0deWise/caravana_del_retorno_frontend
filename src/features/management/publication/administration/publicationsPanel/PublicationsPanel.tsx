@@ -7,49 +7,46 @@ import { SearchInput } from "@/components/forms/SearchInput";
 import { CreatePublicationButton } from "@/features/management/publication/administration/createPublication/components/CreatePublicationButton";
 import { PublicationCard } from "./PublicationCard";
 import { PublicationData } from "@/types/publication.types";
+import { usePublications } from "../hooks/usePublications";
+import { Retorno } from "@/types/retorno.types";
+import { getRetornosService } from "@/services/retorno.service";
+import { useAuth } from "@/auth/context/AuthContext";
+import { SelectField } from "@/components/forms/SelectField";
+import { SingleValue } from "react-select";
 
-const mockPublications: PublicationData[] = [
-  {
-    codigo: 1,
-    codigo_retorno: 101,
-    codigo_colonia: 1,
-    codigo_autor: 10,
-    titulo: "Historia de nuestra comunidad",
-    resena:
-      "Un recuento detallado de cómo nació nuestra colonia y sus primeros pobladores.",
-    fecha_creacion: "2024-01-15T10:30:00Z",
-  },
-  {
-    codigo: 2,
-    codigo_retorno: 102,
-    codigo_colonia: 1,
-    codigo_autor: 11,
-    titulo: "Tradiciones y celebraciones",
-    resena:
-      "Exploramos las tradiciones más importantes que caracterizan a nuestra comunidad.",
-    fecha_creacion: "2024-02-20T14:45:00Z",
-  },
-  {
-    codigo: 3,
-    codigo_retorno: 103,
-    codigo_colonia: 2,
-    codigo_autor: 12,
-    titulo: "Proyectos comunitarios 2024",
-    resena:
-      "Iniciativas y proyectos que estamos desarrollando para mejorar la calidad de vida.",
-    fecha_creacion: "2024-03-10T09:15:00Z",
-  },
-];
+type RetornoOption = { label: string; value: number };
+
 
 export function PublicationsPanel() {
-  const [publications] = useState<PublicationData[]>(mockPublications);
-  const loading = false;
-  const error = null;
-  const refetch = () => {};
+  const { user } = useAuth();
+  const [retornos, setRetornos] = useState<Retorno[]>([]);
+  const [selectedRetornoId, setSelectedRetornoId] = useState<number | undefined>(undefined);
+  
+  const { publications, loading, error, refetch } = usePublications(selectedRetornoId);
   const [filteredPublications, setFilteredPublications] = useState<
     PublicationData[]
   >([]);
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    const fetchRetornos = async () => {
+      try {
+        const data = await getRetornosService();
+        setRetornos(data);
+        
+        // Priorizar el retorno del usuario si existe en la lista
+        const userRetornoId = user?.codigo_retorno;
+        if (userRetornoId && data.some(r => r.codigo === userRetornoId)) {
+          setSelectedRetornoId(userRetornoId);
+        } else if (data.length > 0) {
+          setSelectedRetornoId(data[0].codigo);
+        }
+      } catch (err) {
+        console.error("Error fetching retornos", err);
+      }
+    };
+    fetchRetornos();
+  }, [user]);
 
   useEffect(() => {
     setFilteredPublications(publications);
@@ -79,10 +76,10 @@ export function PublicationsPanel() {
 
   return (
     <div className="w-full">
-      <header className="mx-10 px-8 py-4 rounded-xl shadow-xl bg-bg-card sticky top-0 z-20">
-        <div className="flex items-center justify-between gap-10">
-          <div className="flex items-center flex-1">
-            <div className="shrink-0 pr-6">
+      <header className="mx-10 px-8 py-4 rounded-xl shadow-xl bg-bg-card sticky top-0 z-20 border border-bg-border/50 backdrop-blur-md">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex flex-col md:flex-row md:items-center gap-6 flex-1">
+            <div className="shrink-0">
               <span className="text-sm font-medium text-text-muted uppercase tracking-wide mb-1 block">
                 Administración
               </span>
@@ -91,22 +88,42 @@ export function PublicationsPanel() {
               </h1>
             </div>
 
-            <div className="w-px h-12 bg-bg-separator mx-4 shrink-0" />
+            <div className="hidden md:block w-px h-12 bg-bg-separator shrink-0" />
 
-            <div className="shrink-0 px-6">
-              <span className="text-sm font-medium text-text-muted uppercase tracking-wide mb-1 block">
-                Total Registros
-              </span>
-              <span className="text-3xl font-bold text-secondary leading-none block">
-                {filteredPublications.length}
-              </span>
+            <div className="shrink-0 min-w-[220px]">
+              <SelectField
+                label="Seleccionar Retorno"
+                options={retornos.map((r) => ({
+                  label: `Caravana ${r.anio} (${r.estado})`,
+                  value: r.codigo,
+                }))}
+                value={
+                  selectedRetornoId
+                    ? {
+                        label: `Caravana ${
+                          retornos.find((r) => r.codigo === selectedRetornoId)
+                            ?.anio
+                        } (${
+                          retornos.find((r) => r.codigo === selectedRetornoId)
+                            ?.estado
+                        })`,
+                        value: selectedRetornoId,
+                      }
+                    : null
+                }
+                onChange={(option: SingleValue<RetornoOption>) => setSelectedRetornoId(option?.value)}
+                isSearchable={false}
+              />
             </div>
 
-            <div className="w-px h-12 bg-bg-separator mx-4 shrink-0" />
+            <div className="hidden md:block w-px h-12 bg-bg-separator shrink-0" />
 
-            <div className="flex-1 max-w-md pl-6">
+            <div className="flex-1 max-w-md">
+              <span className="text-sm font-medium text-text-muted uppercase tracking-wide mb-1 block">
+                Buscar Contenido
+              </span>
               <SearchInput
-                placeholder="Buscar por título o contenido..."
+                placeholder="Título o reseña..."
                 onSearch={handleSearch}
                 value={searchQuery}
                 loading={loading}
@@ -116,8 +133,19 @@ export function PublicationsPanel() {
             </div>
           </div>
 
-          <div className="shrink-0 self-center">
-            <CreatePublicationButton onRefresh={refetch} />
+          <div className="shrink-0 flex items-center gap-4">
+            <div className="text-right hidden lg:block">
+              <span className="text-sm font-medium text-text-muted uppercase tracking-wide mb-1 block">
+                Resultados
+              </span>
+              <span className="text-2xl font-black text-secondary leading-none block">
+                {filteredPublications.length}
+              </span>
+            </div>
+            <CreatePublicationButton 
+              onRefresh={refetch} 
+              retornoId={selectedRetornoId} 
+            />
           </div>
         </div>
       </header>
