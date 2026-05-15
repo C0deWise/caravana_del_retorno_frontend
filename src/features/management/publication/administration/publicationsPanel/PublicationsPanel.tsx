@@ -34,7 +34,6 @@ export function PublicationsPanel() {
         const data = await getRetornosService();
         setRetornos(data);
         
-        // Priorizar el retorno del usuario si existe en la lista
         const userRetornoId = user?.codigo_retorno;
         if (userRetornoId && data.some(r => r.codigo === userRetornoId)) {
           setSelectedRetornoId(userRetornoId);
@@ -133,7 +132,7 @@ export function PublicationsPanel() {
             </div>
           </div>
 
-          <div className="shrink-0 flex items-center gap-4">
+          <div className="shrink-0 flex items-center gap-8">
             <div className="text-right hidden lg:block">
               <span className="text-sm font-medium text-text-muted uppercase tracking-wide mb-1 block">
                 Resultados

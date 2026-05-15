@@ -12,9 +12,18 @@ interface PublicationCardProps {
 }
 
 export function PublicationCard({ publication, index }: PublicationCardProps) {
-  const [authorName, setAuthorName] = useState<string>("Cargando...");
+  const [authorName, setAuthorName] = useState<string>(() => {
+    const cached = userService.getUserFromCache(publication.autor);
+    return cached ? `${cached.nombre} ${cached.apellido}` : "Cargando...";
+  });
 
   useEffect(() => {
+    const cached = userService.getUserFromCache(publication.autor);
+    if (cached) {
+      setAuthorName(`${cached.nombre} ${cached.apellido}`);
+      return;
+    }
+
     const fetchAuthor = async () => {
       try {
         const userData = await userService.getUserById(publication.autor);
@@ -26,7 +35,6 @@ export function PublicationCard({ publication, index }: PublicationCardProps) {
     fetchAuthor();
   }, [publication.autor]);
 
-  // Formatear la fecha si existe
   const formattedDate = publication.fecha_creacion 
     ? new Date(publication.fecha_creacion).toLocaleDateString('es-ES', {
         day: '2-digit',
