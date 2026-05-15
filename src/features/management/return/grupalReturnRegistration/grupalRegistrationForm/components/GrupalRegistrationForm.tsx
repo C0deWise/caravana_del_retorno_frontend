@@ -5,6 +5,7 @@ import { ConfirmModal } from "@/components/feedback/confirmModal";
 import type { RegistroGrupoRetorno, RegistroGrupoRetornoRequest } from "../../types/grupalReturnRegistration";
 import Spinner from "@/components/feedback/Spinner";
 import { useSendGrupalRegistration } from "../hooks/useSendGrupalRegistration";
+import { useGrupalMembersList } from "../../hooks/useGrupalMemberList.hook";
 
 type Answer = 0 | 1;
 
@@ -45,6 +46,8 @@ export function GrupalRegistrationForm({
     const [submittedRecord, setSubmittedRecord] = useState<RegistroGrupoRetorno | null>(null);
     const { sendGrupalRegistration, isLoading, error } = useSendGrupalRegistration();
     const maxLength = 150;
+    const { members } = useGrupalMembersList(grupoId);
+    const memberCount = members.length;
 
     const validateForm = (): boolean => {
         const next: FormErrors = {};
@@ -133,10 +136,11 @@ export function GrupalRegistrationForm({
     }
 
     return (
-        <>
-            <div className="w-full max-w-2xl rounded-2xl bg-bg p-6 shadow-md sm:p-8">
+        <div className="bg-white px-4 py-6">
+            <div className="mx-auto w-full max-w-2xl rounded-2xl bg-bg p-6 shadow-md sm:p-8">
+                <h1 className="page-title">Registro de Asistencia al Retorno</h1>
                 <h2 className="section-title">
-                    Necesidades del grupo
+                    Confirma las necesidades de tu grupo
                     {retornoAnio ? ` — Retorno ${retornoAnio}` : ""}
                 </h2>
 
@@ -149,96 +153,101 @@ export function GrupalRegistrationForm({
                 <form className="mt-6 space-y-6" onSubmit={handleSubmit} noValidate>
                     {/* Hospedaje */}
                     <fieldset>
-                        <legend className="text-text font-medium mb-3">
-                            ¿El grupo necesita hospedaje? <span className="text-error">*</span>
-                        </legend>
-                        <div className="flex gap-4">
-                            {([1, 0] as Answer[]).map((val) => (
-                                <label key={val} className="flex items-center gap-2 cursor-pointer">
-                                    <input
-                                        type="radio"
-                                        name="hospedaje"
-                                        checked={formData.hospedaje === val}
-                                        onChange={() => handleRadioChange("hospedaje", val)}
-                                    />
-                                    <span className="text-text">{val === 1 ? "Sí" : "No"}</span>
-                                </label>
-                            ))}
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <legend className="label-primart mb-0">¿El grupo necesita hospedaje?</legend>
+                            <div className="flex gap-4">
+                                {([1, 0] as Answer[]).map((val) => (
+                                    <label key={val} className="inline-flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="hospedaje"
+                                            checked={formData.hospedaje === val}
+                                            onChange={() => handleRadioChange("hospedaje", val)}
+                                        />
+                                        <span className="text-text">{val === 1 ? "Sí" : "No"}</span>
+                                    </label>
+                                ))}
+                            </div>
                         </div>
+
                         {fieldErrors.hospedaje && (
-                            <p className="text-error text-sm mt-1">{fieldErrors.hospedaje}</p>
+                            <p className="validation-error text-sm mt-1">{fieldErrors.hospedaje}</p>
                         )}
                     </fieldset>
 
                     {/* Transporte */}
                     <fieldset>
-                        <legend className="text-text font-medium mb-3">
-                            ¿El grupo necesita transporte? <span className="text-error">*</span>
-                        </legend>
-                        <div className="flex gap-4">
-                            {([1, 0] as Answer[]).map((val) => (
-                                <label key={val} className="flex items-center gap-2 cursor-pointer">
-                                    <input
-                                        type="radio"
-                                        name="transporte"
-                                        checked={formData.transporte === val}
-                                        onChange={() => handleRadioChange("transporte", val)}
-                                    />
-                                    <span className="text-text">{val === 1 ? "Sí" : "No"}</span>
-                                </label>
-                            ))}
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <legend className="text-text font-medium mb-3">¿El grupo necesita transporte?</legend>
+                            <div className="flex gap-4">
+                                {([1, 0] as Answer[]).map((val) => (
+                                    <label key={val} className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="transporte"
+                                            checked={formData.transporte === val}
+                                            onChange={() => handleRadioChange("transporte", val)}
+                                        />
+                                        <span className="text-text">{val === 1 ? "Sí" : "No"}</span>
+                                    </label>
+                                ))}
+                            </div>
                         </div>
                         {fieldErrors.transporte && (
-                            <p className="text-error text-sm mt-1">{fieldErrors.transporte}</p>
+                            <p className="validation-error text-sm mt-1">{fieldErrors.transporte}</p>
                         )}
                     </fieldset>
 
                     {/* Parqueadero — solo si necesita transporte */}
                     {formData.transporte === 1 && (
                         <fieldset>
-                            <legend className="text-text font-medium mb-3">
-                                ¿El grupo necesita parqueadero? <span className="text-error">*</span>
-                            </legend>
-                            <div className="flex gap-4">
-                                {([1, 0] as Answer[]).map((val) => (
-                                    <label key={val} className="flex items-center gap-2 cursor-pointer">
-                                        <input
-                                            type="radio"
-                                            name="parqueadero"
-                                            checked={formData.parqueadero === val}
-                                            onChange={() => handleRadioChange("parqueadero", val)}
-                                        />
-                                        <span className="text-text">{val === 1 ? "Sí" : "No"}</span>
-                                    </label>
-                                ))}
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <legend className="text-text font-medium mb-3">¿El grupo necesita parqueadero?</legend>
+                                <div className="flex gap-4">
+                                    {([1, 0] as Answer[]).map((val) => (
+                                        <label key={val} className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                name="parqueadero"
+                                                checked={formData.parqueadero === val}
+                                                onChange={() => handleRadioChange("parqueadero", val)}
+                                            />
+                                            <span className="text-text">{val === 1 ? "Sí" : "No"}</span>
+                                        </label>
+                                    ))}
+                                </div>
                             </div>
                             {fieldErrors.parqueadero && (
-                                <p className="text-error text-sm mt-1">{fieldErrors.parqueadero}</p>
+                                <p className="validation-error text-sm mt-1">{fieldErrors.parqueadero}</p>
                             )}
                         </fieldset>
                     )}
 
                     {/* Anotación */}
                     <div>
-                        <label htmlFor="anotacion" className="block text-text font-medium mb-2">
-                            Anotación <span className="text-text-muted text-sm">(opcional)</span>
+                        <label htmlFor="anotacion" className="label-primary mb-0">
+                            Notas adicionales <span className="validation-message validation-info mt-1">(opcional)</span>
                         </label>
                         <textarea
                             id="anotacion"
-                            className="input w-full resize-none"
+                            className="textarea-base mt-2"
                             rows={3}
                             maxLength={maxLength}
                             value={formData.anotacion}
                             onChange={(e) => setFormData((prev) => ({ ...prev, anotacion: e.target.value }))}
-                            placeholder="Indica cualquier observación relevante para el grupo..."
+                            placeholder={`Escribe aquí cualquier relevante para tu grupo (máximo ${maxLength} caracteres)...`}
                         />
-                        <p className="text-text-muted text-xs text-right mt-1">
+                        <p className="validation-message validation-info mt-1 text-right">
                             {formData.anotacion.length}/{maxLength}
                         </p>
                     </div>
 
-                    <div className="flex justify-end">
-                        <button type="submit" className="btn-primary" disabled={isLoading}>
+                    <div className="flex justify-center pt-1">
+                        <button
+                            type="submit" 
+                            className="btn-primary bg-secondary min-w-48 inline-flex items-center justify-center gap-2"
+                            disabled={isLoading}
+                        >
                             {isLoading ? <Spinner size="sm" /> : "Inscribir grupo"}
                         </button>
                     </div>
@@ -255,6 +264,6 @@ export function GrupalRegistrationForm({
                 confirmLabel="Confirmar"
                 cancelLabel="Cancelar"
             />
-        </>
+        </div>
     );
 }

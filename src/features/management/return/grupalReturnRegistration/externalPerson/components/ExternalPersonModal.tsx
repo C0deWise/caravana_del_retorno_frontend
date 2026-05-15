@@ -6,6 +6,12 @@ import { useExternedPerson } from "../hooks/useExternalPerson.hook";
 import { AnimatedModal } from "@/components/feedback/AnimatedModal";
 import { SearchInput } from "@/components/forms/SearchInput";
 import Spinner from "@/components/feedback/Spinner";
+import {
+    ExternalPersonErrors,
+    hasExternalPersonErrors,
+    validateDocumento,
+    validateExternalPersonForm,
+} from "../utils/externalPersonValidation";
 
 const TIPO_DOC_OPTIONS: TipoDoc[] = ["CC", "CE", "TI"];
 const GENERO_OPTIONS: { value: Genero; label: string }[] = [
@@ -37,7 +43,9 @@ export function ExternalPersonModal({
     onPersonaAdded,
 }: ExternalPersonModalProps) {
     const [documento, setDocumento] = useState("");
+    const [documentoError, setDocumentoError] = useState<string | undefined>();
     const [form, setForm] = useState<PersonaCreateRequest>(initialForm);
+    const [formErrors, setFormErrors] = useState<ExternalPersonErrors>({});
     const {
         step,
         foundPersona,
@@ -51,13 +59,17 @@ export function ExternalPersonModal({
 
     const handleClose = () => {
         setDocumento("");
+        setDocumentoError(undefined);
         setForm(initialForm);
+        setFormErrors({});
         reset();
         onClose();
     };
 
     const handleSearch = () => {
-        if (documento.trim().length >= 5) {
+        const error = validateDocumento(documento.trim());
+        setDocumentoError(error);
+        if (!error) {
             handleFieldChange("pe_documento", documento.trim());
             void searchByDocumento(documento.trim());
         }
@@ -69,12 +81,19 @@ export function ExternalPersonModal({
     };
 
     const handleCreateAndAdd = async () => {
+        const errors = validateExternalPersonForm(form);
+        setFormErrors(errors);
+        if (hasExternalPersonErrors(errors)) return;
         await createAndAdd(form, grupoId);
         onPersonaAdded();
     };
 
     const handleFieldChange = (field: keyof PersonaCreateRequest, value: string) => {
         setForm((prev) => ({ ...prev, [field]: value }));
+        // Clear the error for the edited field
+        if (field in formErrors) {
+            setFormErrors((prev) => ({ ...prev, [field]: undefined }));
+        }
     };
 
     return (
@@ -95,10 +114,15 @@ export function ExternalPersonModal({
                             loading={isLoading && step === "search"}
                             minLength={5}
                             onChange={(val) => {
-                                setDocumento(val);
-                                handleFieldChange("pe_documento", val);
+                                const digits = val.replace(/\D/g, "").slice(0, 15);
+                                setDocumento(digits);
+                                handleFieldChange("pe_documento", digits);
+                                setDocumentoError(undefined);
                             }}
                         />
+                        {documentoError && (
+                            <p className="validation-error text-xs mt-1">{documentoError}</p>
+                        )}
                     </div>
                 )}
 
@@ -135,60 +159,78 @@ export function ExternalPersonModal({
                         </div>
 
                         <div>
-                            <label className="block text-sm text-text-muted mb-1 capitalize">
-                                nombre <span className="text-error ml-1">*</span>
+                            <label htmlFor="nombre" className="block text-sm text-text-muted mb-1 capitalize">
+                                nombre <span className="validation-error ml-1">*</span>
                             </label>
                             <input
+                                id="nombre"
                                 type="text"
                                 value={form.pe_nombre ?? ""}
-                                onChange={(e) => handleFieldChange("pe_nombre", e.target.value)}
+                                onChange={(e) => {
+                                    const val = e.target.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñÜü\s'-]/g, "");
+                                    handleFieldChange("pe_nombre", val);
+                                }}
                                 className="input-base w-full"
-                            >
-                            </input>
+                            />
+                            {formErrors.pe_nombre && (
+                                <p className="validation-error text-xs mt-1">{formErrors.pe_nombre}</p>
+                            )}
                         </div>
 
                         <div>
-                            <label className="block text-sm text-text-muted mb-1 capitalize">
-                                apellido <span className="text-error ml-1">*</span>
+                            <label htmlFor="apellido" className="block text-sm text-text-muted mb-1 capitalize">
+                                apellido <span className="validation-error ml-1">*</span>
                             </label>
                             <input
+                                id="apellido"
                                 type="text"
                                 value={form.pe_apellido ?? ""}
-                                onChange={(e) => handleFieldChange("pe_apellido", e.target.value)}
+                                onChange={(e) => {
+                                    const val = e.target.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñÜü\s'-]/g, "");
+                                    handleFieldChange("pe_apellido", val);
+                                }}
                                 className="input-base w-full"
-                            >
-                            </input>
+                            />
+                            {formErrors.pe_apellido && (
+                                <p className="validation-error text-xs mt-1">{formErrors.pe_apellido}</p>
+                            )}
                         </div>
 
                         <div>
-                            <label className="block text-sm text-text-muted mb-1 capitalize">
-                                correo <span className="text-error ml-1">*</span>
+                            <label htmlFor="correo" className="block text-sm text-text-muted mb-1 capitalize">
+                                correo <span className="validation-error ml-1">*</span>
                             </label>
                             <input
+                                id="corro"
                                 type="email"
                                 value={form.pe_correo ?? ""}
                                 onChange={(e) => handleFieldChange("pe_correo", e.target.value)}
                                 className="input-base w-full"
-                            >
-                            </input>
+                            />
+                            {formErrors.pe_correo && (
+                                <p className="validation-error text-xs mt-1">{formErrors.pe_correo}</p>
+                            )}
                         </div>
 
                         <div>
-                            <label className="block text-sm text-text-muted mb-1 capitalize">
-                                Fecha de nacimiento <span className="text-error ml-1">*</span>
+                            <label htmlFor="fecha-nacimiento" className="block text-sm text-text-muted mb-1 capitalize">
+                                Fecha de nacimiento <span className="validation-error ml-1">*</span>
                             </label>
                             <input
+                                id="fecha-nacimiento"
                                 type="date"
                                 value={form.pe_fecha_nacimiento ?? ""}
                                 onChange={(e) => handleFieldChange("pe_fecha_nacimiento", e.target.value)}
                                 className="input-base w-full"
-                            >
-                            </input>
+                            />
+                            {formErrors.pe_fecha_nacimiento && (
+                                <p className="validation-error text-xs mt-1">{formErrors.pe_fecha_nacimiento}</p>
+                            )}
                         </div>
 
                         <div>
                             <p className="block text-sm text-text-muted mb-1">
-                                Género <span className="text-error ml-1">*</span>
+                                Género <span className="validation-error ml-1">*</span>
                             </p>
                             <div className="flex gap-2">
                                 {GENERO_OPTIONS.map(({ value, label }) => (
@@ -221,7 +263,7 @@ export function ExternalPersonModal({
                     </div>
                 )}
 
-                <div className="flex justify-end gap-3 mt-2">
+                <div className="flex justify-center gap-3 mt-2">
                     <button type="button" className="btn-secondary" onClick={handleClose}>
                         {step === "success" ? "Cerrar" : "Cancelar"}
                     </button>
