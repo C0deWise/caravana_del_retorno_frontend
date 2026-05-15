@@ -14,9 +14,9 @@ import { InviteMemberModal } from "../invitateMembers/components/InviteMemberMod
 import { ExternalPersonModal } from "../externalPerson/components/ExternalPersonModal";
 import { SentInvitationsList } from "../sentInvitations/components/SentInvitationsList";
 import { GrupalRegistrationForm } from "../grupalRegistrationForm/components/GrupalRegistrationForm";
-import { returnRegistrationService } from "../../returnRegistrationForm/services/returnRegistration.service";
 import type { Retorno } from "../../types/retorno.types";
 import Spinner from "@/components/feedback/Spinner";
+import { retornoService } from "../../services/retorno.service";
 
 type View = "main" | "form";
 
@@ -37,7 +37,7 @@ function GrupalReturnRegistrationFeature() {
 
   // Resolver retorno activo una sola vez
   useEffect(() => {
-    returnRegistrationService.getActiveReturn().then(setActiveReturn).catch(() => setActiveReturn(null));
+    retornoService.getActiveReturn().then(setActiveReturn).catch(() => setActiveReturn(null));
   }, []);
 
   const canEnroll = !hasPending && members.length >= 1;
