@@ -35,6 +35,8 @@ function GrupalReturnRegistrationFeature() {
   const { removeMember, isLoading: removingMember } = useRemoveMember();
   const { removeExternalPerson, isLoading: removingExternal } = useRemoveExternalPerson();
 
+  // TODO: Validar si un grupo ya está inscrito, editar una inscripción grupal y eliminar una inscripción grupal y/o un grupo
+
   // Resolver retorno activo una sola vez
   useEffect(() => {
     retornoService.getActiveReturn().then(setActiveReturn).catch(() => setActiveReturn(null));
@@ -101,10 +103,10 @@ function GrupalReturnRegistrationFeature() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-4 space-y-2 rounded-xl border border-bg-border bg-bg-card ">
+    <div className="mx-auto w-full max-w-2xl px-4 py-8 space-y-2 rounded-xl border border-bg-border bg-bg-card ">
       <div className="flex flex-1 items-start justify-center">
         <div className="w-full max-w-md rounded-lg">
-          <h1 className="page-title">Registro grupal</h1>
+          <h1 className="page-title">Registro Grupal</h1>
           <h2 className="section-title">Gestiona tu grupo para el retorno</h2>
         </div>
       </div>
@@ -137,7 +139,6 @@ function GrupalReturnRegistrationFeature() {
 
       {/* Invitaciones enviadas */}
       <section>
-        <h2 className="section-title mb-3">Invitaciones enviadas</h2>
         <SentInvitationsList
           invitations={invitations}
           isLoading={invitationsLoading}
@@ -148,7 +149,7 @@ function GrupalReturnRegistrationFeature() {
       </section>
 
       {/* Botón inscribir */}
-      <div className="alert-info justify-center">
+      <div className="justify-center border border-gray-200">
         {hasPending && (
           <p className="alert-info-text text-sm justify-center">
             Hay invitaciones pendientes de aceptar.

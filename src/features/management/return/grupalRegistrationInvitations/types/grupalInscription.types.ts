@@ -1,44 +1,30 @@
 // ── Status ────────────────────────────────────────────────────────────────────
 export type GrupalInvitationStatus =
   | "pendiente"
-  | "aprobada"
-  | "rechazada"
-  | "expirada";
+  | "aceptado"
+  | "rechazado"
+  | "expirado";
 
 // ── DTOs (forma que devuelve la API) ──────────────────────────────────────────
-export interface ParticipantDto {
-  usuario: number;
-  nombre: string;
-  apellido: string;
-}
-
 export interface GrupalInvitationDto {
-  codigo: number;
-  grupo: number;
-  estado: string;
-  fecha_solicitud: string;
+  id: number;
+  usuario_id: number;
   nombre_lider: string;
-  apellido_lider: string;
-  fecha_retorno: string;
-  participantes_confirmados: ParticipantDto[];
+  grupo_id: number;
+  estado: string;
+  timestamp: string;
 }
 
 export type ListGrupalInvitationsResponseDto = GrupalInvitationDto[];
 
 // ── Domain models ─────────────────────────────────────────────────────────────
-export interface Participant {
-  userId: number;
-  fullName: string;
-}
-
 export interface GrupalInvitation {
   id: number;
+  userId: number;
   groupId: number;
   status: GrupalInvitationStatus;
   createdAt: string;
   leaderFullName: string;
-  returnDate: string;
-  confirmedParticipants: Participant[];
   isPending: boolean;
   isExpired: boolean;
   isActionable: boolean;
@@ -47,9 +33,9 @@ export interface GrupalInvitation {
 // ── Mapper ────────────────────────────────────────────────────────────────────
 const STATUS_MAP: Record<string, GrupalInvitationStatus> = {
   pendiente: "pendiente",
-  aprobada: "aprobada",
-  rechazada: "rechazada",
-  expirada: "expirada",
+  aceptado: "aceptado",
+  rechazado: "rechazado",
+  expirado: "expirado",
 };
 
 const normalizeStatus = (raw: string): GrupalInvitationStatus =>
@@ -61,18 +47,14 @@ export const mapGrupalInvitationDtoToModel = (
   const status = normalizeStatus(dto.estado);
 
   return {
-    id: dto.codigo,
-    groupId: dto.grupo,
+    id: dto.id,
+    userId: dto.usuario_id,
+    groupId: dto.grupo_id,
     status,
-    createdAt: dto.fecha_solicitud,
-    leaderFullName: `${dto.nombre_lider} ${dto.apellido_lider}`.trim(),
-    returnDate: dto.fecha_retorno,
-    confirmedParticipants: dto.participantes_confirmados.map((p) => ({
-      userId: p.usuario,
-      fullName: `${p.nombre} ${p.apellido}`.trim(),
-    })),
+    createdAt: dto.timestamp,
+    leaderFullName: dto.nombre_lider,
     isPending: status === "pendiente",
-    isExpired: status === "expirada",
+    isExpired: status === "expirado",
     isActionable: status === "pendiente",
   };
 };
