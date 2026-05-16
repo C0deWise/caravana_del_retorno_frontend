@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ApiError } from "@/services/api.services";
 import type { GrupalInvitation } from "../types/grupalInscription.types";
 import { listMyGrupalInvitations } from "../services/grupalInscription.service";
+import { useAuth } from "@/auth/context/AuthContext";
 
 interface UseGrupalInscriptionListReturn {
   invitations: GrupalInvitation[];
@@ -18,13 +19,15 @@ export function useGrupalInscriptionList(): UseGrupalInscriptionListReturn {
   const [invitations, setInvitations] = useState<GrupalInvitation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   const fetchInvitations = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const data = await listMyGrupalInvitations();
+      if (!user) return;
+      const data = await listMyGrupalInvitations(String(user.id));
       setInvitations(data);
     } catch (err) {
       const apiError = err as ApiError;

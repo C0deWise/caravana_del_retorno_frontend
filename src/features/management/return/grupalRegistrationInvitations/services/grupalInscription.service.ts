@@ -9,10 +9,10 @@ import {
   mapGrupalInvitationListDtoToModel,
 } from "../types/grupalInscription.types";
 
-export async function listMyGrupalInvitations(): Promise<GrupalInvitation[]> {
+export async function listMyGrupalInvitations(userId: string): Promise<GrupalInvitation[]> {
 
   const data = await apiService.get<ListGrupalInvitationsResponseDto>(
-    "/api/v1/grupos/mis-invitaciones",
+    `/api/v1/grupoRetorno/solicitudes/recientes/usuario/${userId}`,
   );
 
   return mapGrupalInvitationListDtoToModel(data);
@@ -23,7 +23,7 @@ export async function acceptGrupalInvitation(
 ): Promise<GrupalInvitation> {
 
   const data = await apiService.patch<GrupalInvitationDto>(
-    `/api/v1/grupos/solicitud-grupo/${invitationId}/aceptar`,
+    `/api/v1/grupoRetorno/solicitudes/aceptar/${invitationId}`,
   );
 
   return mapGrupalInvitationDtoToModel(data);
@@ -34,7 +34,7 @@ export async function rejectGrupalInvitation(
 ): Promise<GrupalInvitation> {
 
   const data = await apiService.patch<GrupalInvitationDto>(
-    `/api/v1/grupos/solicitud-grupo/${invitationId}/rechazar`,
+    `/api/v1/grupoRetorno/solicitudes/rechazar/${invitationId}`,
   );
 
   return mapGrupalInvitationDtoToModel(data);
