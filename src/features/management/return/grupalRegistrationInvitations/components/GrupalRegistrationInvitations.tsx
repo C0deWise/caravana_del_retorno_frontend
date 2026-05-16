@@ -43,14 +43,14 @@ export default function ListGrupalInscription() {
 
   // El usuario ya pertenece a un grupo si tiene al menos una invitación aceptada
   const hasActiveGroup = useMemo(
-    () => invitations.some((inv) => inv.status === "aprobada"),
+    () => invitations.some((inv) => inv.status === "aceptado"),
     [invitations],
   );
 
   const filteredInvitations = useMemo(
     () =>
       hasActiveGroup
-        ? invitations.filter((inv) => inv.status === "aprobada")
+        ? invitations.filter((inv) => inv.status === "aceptado")
         : invitations.filter((inv) => inv.isPending || inv.isExpired),
     [invitations, hasActiveGroup],
   );
