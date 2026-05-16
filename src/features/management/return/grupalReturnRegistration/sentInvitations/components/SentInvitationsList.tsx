@@ -2,7 +2,7 @@ import Spinner from "@/components/feedback/Spinner";
 import { EntradaInvitacion } from "../../types/grupalReturnRegistration";
 import { SentInvitationCard } from "./SentInvitationCard";
 
-const VISIBLE_MEMBER_STATES = new Set<string>(["pendiente", "aceptada"]);
+const VISIBLE_MEMBER_STATES = new Set<string>(["pendiente", "aceptado"]);
 
 interface SentInvitationsListProps {
     readonly invitations: EntradaInvitacion[];
@@ -53,7 +53,7 @@ export function SentInvitationsList({
                 <li key={inv.kind === "usuario" ? inv.data.id : `persona-${inv.data.pe_codigo}`}>
                     <SentInvitationCard 
                         invitation={inv} 
-                        index={i + 1}
+                        index={i}
                         onRemove={onRemove}
                         isRemoving={isRemoving}    
                     />

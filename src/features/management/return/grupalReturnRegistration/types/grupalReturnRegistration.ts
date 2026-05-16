@@ -14,7 +14,7 @@ export type EntradaInvitacion =
     | { kind: "usuario"; data: SolicitudMiembro }
     | { kind: "persona"; data: Persona };
 
-export type SolicitudEstado = "Pendiente" | "Aceptada" | "Rechazada";
+export type SolicitudEstado = "Pendiente" | "Aceptado" | "Rechazado";
 
 export interface SolicitudMiembroRequest {
     us_codigo: number;
@@ -32,10 +32,11 @@ export interface SolicitudMiembro {
 
 export interface RegistroGrupoRetornoRequest {
     retorno: number;
-    grupoId: number;
+    cod_grupo: number;
     num_hospedaje: number;
     num_transporte: number;
-    num_parqueadero: number;
+    num_parqueadero_carro: number;
+    num_parqueadero_moto: number;
     anotacion?: string;
 }
 
@@ -45,7 +46,8 @@ export interface RegistroGrupoRetorno {
     grupoId: number;
     num_hospedaje: number;
     num_transporte: number;
-    num_parqueadero: number;
+    num_parqueadero_carro: number;
+    num_parqueadero_moto: number;
     anotacion: string | null;
 }
 
