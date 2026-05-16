@@ -4,9 +4,9 @@ import { UserSearchResult } from "@/types/user.types"
 import { InviteMemberError } from "../types/inviteMember.types";
 import { MiembroGrupo } from "../../types/grupalReturnRegistration";
 import { useCallback, useState } from "react";
-import { returnRegistrationService } from "../../../returnRegistrationForm/services/returnRegistration.service";
 import { grupalReturnRegistrationService } from "../../services/grupalReturnRegistration.service";
 import { ApiError } from "@/services/api.services";
+import { retornoService } from "../../../services/retorno.service";
 
 interface UseInviteMemberReturn {
     inviteMember: (user: UserSearchResult, grupoId: number, activeReturnCode: number | null) => Promise<boolean>;
@@ -42,7 +42,7 @@ export function useInviteMember(currentMembers: MiembroGrupo[]): UseInviteMember
             }
 
             if (activeReturnCode) {
-                const hasIndividualRegistration = await returnRegistrationService.hasUserRegistrationInReturn(user.id, activeReturnCode);
+                const hasIndividualRegistration = await retornoService.hasUserRegistrationInReturn(user.id, activeReturnCode);
                 if (hasIndividualRegistration) {
                     setError("already_registered_individually");
                     setErrorMessage("Este usuario ya tiene un registro individual para este retorno");
