@@ -20,7 +20,6 @@ type FormErrors = {
   accomodation?: string;
   transport?: string;
   parking?: string;
-  people_in_charge?: string;
 };
 
 const initialForm: {
@@ -428,14 +427,14 @@ function ReturnRegistrationFormContent() {
         </h2>
 
         {error && (
-          <div className="alert-error">
+          <div className="alert-error mt-4">
             <p className="alert-error-text">{error}</p>
           </div>
         )}
 
         <form className="mt-6 space-y-6" onSubmit={handleSubmit} noValidate>
           <fieldset>
-            <div className="flex flex-col gap-3 px-6 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-3 px-6 py-1 sm:flex-row sm:items-center sm:justify-between">
               <legend className="label-primary mb-0">¿Tiene hospedaje?</legend>
               <div
                 className={`inline-flex items-center gap-5 rounded-lg px-3 py-2 ${fieldErrors.accomodation ? "border border-danger" : "border border-transparent"}`}
@@ -466,7 +465,7 @@ function ReturnRegistrationFormContent() {
           </fieldset>
 
           <fieldset>
-            <div className="flex flex-col gap-3 px-6 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-3 px-6 py-1 sm:flex-row sm:items-center sm:justify-between">
               <legend className="label-primary mb-0">¿Tiene transporte?</legend>
               <div
                 className={`inline-flex items-center gap-5 rounded-lg px-3 py-2 ${fieldErrors.transport ? "border border-danger" : "border border-transparent"}`}
