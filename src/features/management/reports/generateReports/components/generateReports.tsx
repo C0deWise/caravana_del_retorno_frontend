@@ -18,7 +18,7 @@ function GenerateReportsFeature() {
     const [reportType, setReportType] = useState<ReportType>("colony");
     const [selectedReturn, setSelectedReturn] = useState<number | null>(null);
     const [selectedColony, setSelectedColony] = useState<number | null>(
-        !isAdmin ? (user?.codigo_colonia ?? null) : null
+        isAdmin ? null : (user?.codigo_colonia ?? null)
     );
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [colonySearch, setColonySearch] = useState("");
@@ -59,16 +59,11 @@ function GenerateReportsFeature() {
                 : { type: "general", returnId: selectedReturn };
 
         try {
-            // MOCK TEMPORAL — reemplazar por generateReport(params) cuando el backend esté listo
-            const response = await fetch("/mock-report.pdf");
-            const blob = await response.blob();
-            // FIN MOCK
-
-            // const blob = await generateReport(params);
-
+            const blob = await generateReport(params);
+            if (!blob) return;
             const url = URL.createObjectURL(blob);
             setPreviewUrl(url);
-        } catch (err) { }
+        } catch { }
 
     }
 
@@ -94,7 +89,7 @@ function GenerateReportsFeature() {
                 <h1 className="page-title">Generar Reportes</h1>
 
                 {isAdmin ? (
-                <h2 className="section-title">Selecciona el tipo de reporte que deseas generar</h2>
+                    <h2 className="section-title">Selecciona el tipo de reporte que deseas generar</h2>
                 ) : (
                     <h2 className="section-title">Genera el reporte de tu colonia</h2>
                 )}
