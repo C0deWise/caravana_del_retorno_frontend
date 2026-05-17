@@ -179,9 +179,16 @@ class ApiService {
   }
 
   public async getBlob(endpoint: string): Promise<Blob> {
+    const options = this.buildRequestOptions("GET");
+
+    options.headers = {
+      ...options.headers,
+      "Accept": "application/pdf"
+    };
+
     const response = await fetch(
       `${this.baseURL}${endpoint}`,
-      this.buildRequestOptions("GET"),
+      options
     );
 
     if (!response.ok) {
@@ -190,9 +197,10 @@ class ApiService {
       throw new ApiError(response.status, message);
     }
 
-    return response.blob();
+    const blob = await response.blob();
+    return new Blob([blob], { type: "application/pdf" });
   }
-  
+
   public async postWithProgress<T>(
     endpoint: string,
     data: unknown,
@@ -201,7 +209,7 @@ class ApiService {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.open("POST", `${this.baseURL}${endpoint}`);
-      
+
       const isFormData = data instanceof FormData;
       if (isFormData) {
         console.log(`Sending FormData to ${endpoint}:`);
@@ -209,7 +217,7 @@ class ApiService {
           console.log(`  ${key}:`, value instanceof File ? `File(${value.name})` : value);
         });
       }
-      
+
       if (!isFormData) {
         xhr.setRequestHeader("Content-Type", "application/json");
       }
