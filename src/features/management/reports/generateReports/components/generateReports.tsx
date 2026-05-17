@@ -30,6 +30,7 @@ function GenerateReportsFeature() {
 
     const loading = LoadingReturns || loadingColonies || loadingReport;
     const error = errorReturns ?? errorColonies ?? errorReport;
+    const userColony = colonies.find(c => c.codigo === selectedColony);
 
     useEffect(() => {
         if (reportType === "colony") {
@@ -91,7 +92,9 @@ function GenerateReportsFeature() {
                 {isAdmin ? (
                     <h2 className="section-title">Selecciona el tipo de reporte que deseas generar</h2>
                 ) : (
-                    <h2 className="section-title">Genera el reporte de tu colonia</h2>
+                    <>
+                        <h2 className="section-title">Genera el reporte de tu colonia{userColony ? `: ${formatColonyLabel(userColony)}` : ""}</h2>
+                    </>
                 )}
 
                 <div className="mt-10 flex flex-row flex-wrap items-center justify-center gap-4">
