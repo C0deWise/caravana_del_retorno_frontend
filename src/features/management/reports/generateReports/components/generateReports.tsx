@@ -92,9 +92,7 @@ function GenerateReportsFeature() {
                 {isAdmin ? (
                     <h2 className="section-title">Selecciona el tipo de reporte que deseas generar</h2>
                 ) : (
-                    <>
-                        <h2 className="section-title">Genera el reporte de tu colonia{userColony ? `: ${formatColonyLabel(userColony)}` : ""}</h2>
-                    </>
+                    <h2 className="section-title">Genera el reporte de tu colonia{userColony ? `: ${formatColonyLabel(userColony)}` : ""}</h2>
                 )}
 
                 <div className="mt-10 flex flex-row flex-wrap items-center justify-center gap-4">

@@ -12,7 +12,7 @@ import type {
   ReturnRegistrationApi,
   ReturnRegistrationCreateRequest,
 } from "../types/returnRegistration.types";
-import { retornoService } from "../../services/retorno.service";
+import { retornoService } from "../../../services/retorno.service";
 
 type ParkingOption = "none" | "car" | "bike";
 

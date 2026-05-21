@@ -1,4 +1,4 @@
-import ReturnRegistrationForm from "@/features/management/return/returnRegistrationForm/components/ReturnRegistrationForm";
+import ReturnRegistrationForm from "@/features/management/return/returnRegistration/returnRegistrationForm/components/ReturnRegistrationForm";
 
 export default function Retorno() {
   return <ReturnRegistrationForm />;
