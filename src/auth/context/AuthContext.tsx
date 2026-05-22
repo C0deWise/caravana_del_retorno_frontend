@@ -6,12 +6,14 @@ import {
   ReactNode,
   useState,
   useEffect,
+  useMemo,
 } from "react";
-import { UserApi, UserData, UserRole, CODE_TO_ROLE } from "@/types/user.types";
+import { UserData, UserRole } from "@/types/user.types";
 import { buildMockUsers } from "../utils/mockUsers";
+import { authApi } from "@/services/auth.api";
+import { tokenStorage } from "@/auth/utils/tokenStorage";
 
 const IS_DEV = process.env.NEXT_PUBLIC_DEV_TOOLS === "true";
-const STORAGE_KEY = "session_documento";
 
 interface AuthContextType {
   user: UserData | null;
@@ -28,7 +30,7 @@ interface AuthContextType {
   setMockUserId?: (id: number | null) => void;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<AuthContextType | null>(null); //uwu
 
 export function AuthProvider({ children }: { readonly children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
@@ -53,9 +55,9 @@ export function AuthProvider({ children }: { readonly children: ReactNode }) {
       return;
     }
 
-    const savedDocumento = localStorage.getItem(STORAGE_KEY);
+    const accessToken = tokenStorage.getAccessToken();
 
-    if (!savedDocumento) {
+    if (!accessToken) {
       setSessionChecked(true);
       return;
     }
@@ -63,35 +65,13 @@ export function AuthProvider({ children }: { readonly children: ReactNode }) {
     const rehidrate = async () => {
       setIsFetchingSession(true);
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-
       try {
-        const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "";
-        const res = await fetch(`${baseURL}/api/v1/usuario/todos`, {
-          signal: controller.signal,
-        });
-
-        if (!res.ok) throw new Error("No se pudo consultar la sesión");
-
-        const usuarios: UserApi[] = await res.json();
-        const found = usuarios.find((u) => u.documento === savedDocumento);
-
-        if (!found) {
-          localStorage.removeItem(STORAGE_KEY);
-          setUser(null);
-        } else {
-          const { codigo_rol, ...rest } = found;
-          setUser({
-            ...rest,
-            role: CODE_TO_ROLE[codigo_rol],
-          });
-        }
+        const sessionUser = await authApi.me();
+        setUser(sessionUser);
       } catch {
-        localStorage.removeItem(STORAGE_KEY);
+        tokenStorage.clear();
         setUser(null);
       } finally {
-        clearTimeout(timeoutId);
         setIsFetchingSession(false);
         setSessionChecked(true);
       }
@@ -105,9 +85,7 @@ export function AuthProvider({ children }: { readonly children: ReactNode }) {
   const effectiveUser: UserData | null =
     IS_DEV && roleOverride !== undefined
       ? {
-          ...buildMockUsers(mockColoniaId)[
-            roleOverride as Exclude<UserRole, undefined>
-          ]!,
+          ...buildMockUsers(mockColoniaId)[roleOverride]!,
           id: mockUserId ?? 999,
         }
       : user;
@@ -116,7 +94,6 @@ export function AuthProvider({ children }: { readonly children: ReactNode }) {
     IS_DEV && roleOverride !== undefined ? roleOverride : user?.role;
 
   const login = (newUser: UserData) => {
-    localStorage.setItem(STORAGE_KEY, newUser.documento);
     setUser(newUser);
   };
 
@@ -125,30 +102,40 @@ export function AuthProvider({ children }: { readonly children: ReactNode }) {
   };
 
   const logout = () => {
-    localStorage.removeItem(STORAGE_KEY);
+    authApi.logout();
     setUser(null);
     setRoleOverride(undefined);
   };
 
+  const contextValue = useMemo(
+    () => ({
+      user: effectiveUser,
+      isAuthenticated: !!effectiveUser,
+      isHydrating,
+      effectiveRole,
+      login,
+      updateUser,
+      logout,
+      ...(IS_DEV && {
+        setRoleOverride,
+        mockColoniaId,
+        setMockColoniaId,
+        mockUserId,
+        setMockUserId,
+      }),
+    }),
+    [
+      effectiveUser,
+      isHydrating,
+      effectiveRole,
+      mockColoniaId,
+      mockUserId,
+      roleOverride,
+    ],
+  );
+
   return (
-    <AuthContext.Provider
-      value={{
-        user: effectiveUser,
-        isAuthenticated: !!effectiveUser,
-        isHydrating,
-        effectiveRole,
-        login,
-        updateUser,
-        logout,
-        ...(IS_DEV && {
-          setRoleOverride,
-          mockColoniaId,
-          setMockColoniaId,
-          mockUserId,
-          setMockUserId,
-        }),
-      }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

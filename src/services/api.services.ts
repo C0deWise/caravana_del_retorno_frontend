@@ -1,3 +1,5 @@
+import { tokenStorage } from "@/auth/utils/tokenStorage";
+
 export class ApiError extends Error {
   constructor(
     public status: number,
@@ -110,72 +112,118 @@ class ApiService {
 
     return JSON.parse(text) as T;
   }
+/**
+   * Intenta refrescar el token de acceso utilizando una petición al backend.
+   * Si el refresco falla (ej. sesión expirada), invalida el almacenamiento local.
+   */
+  private async refreshAccessToken(): Promise<string | null> {
+    try {
+      const response = await fetch(`${this.baseURL}/api/v1/usuario/refresh`, {
+        method: "POST",
+        credentials: "include", // Incluye cookies (refresh token) para la validación
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
+// Si el servidor rechaza el refresco, cerramos sesión de forma segura >:)
+      if (!response.ok) {
+        tokenStorage.clear();
+        return null;
+      }
+
+      const data = (await response.json()) as { access_token?: string };
+      if (!data.access_token) {
+        tokenStorage.clear();
+        return null;
+      }
+// Almacenamos el nuevo JWT y lo retornamos para reintentar la petición original
+      tokenStorage.setAccessToken(data.access_token);
+      return data.access_token;
+    } catch {
+      tokenStorage.clear();
+      return null;
+    }
+  }
+/**
+   * Construye los headers necesarios para cada petición, inyectando el token JWT
+   * si existe en el almacenamiento.
+   */
   private buildRequestOptions(
     method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE",
     data?: unknown,
   ): RequestInit {
     const options: RequestInit = {
       method,
+      credentials: "include",
     };
+// Obtención del token actual (JWT)
+    const token = tokenStorage.getAccessToken();
+    const headers: Record<string, string> = {};
+// Inyección de autorización (Bearer Token)
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
 
     if (data !== undefined) {
       if (data instanceof FormData) {
         options.body = data;
       } else {
-        options.headers = {
-          "Content-Type": "application/json",
-        };
+        headers["Content-Type"] = "application/json";
         options.body = JSON.stringify(data);
       }
     }
 
+    if (Object.keys(headers).length > 0) {
+      options.headers = headers;
+    }
+
     return options;
+  }
+  /**
+   * Ejecuta peticiones uwu HTTP con lógica de reintento ante expiración del token. :3
+   */
+  private async request<T>(
+    method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE",
+    endpoint: string,
+    data?: unknown,
+    retryOnAuthFailure = true,
+  ): Promise<T> {
+    const response = await fetch(
+      `${this.baseURL}${endpoint}`,
+      this.buildRequestOptions(method, data),
+    );
+// Detección de expiración de token (401)
+    const isRefreshEndpoint = endpoint.includes("/api/v1/usuario/refresh");
+    if (response.status === 401 && retryOnAuthFailure && !isRefreshEndpoint) {
+      const newToken = await this.refreshAccessToken();
+      if (newToken) {
+        // Reintento recursivo de la petición original con el nuevo token
+        return this.request<T>(method, endpoint, data, false);
+      }
+    }
+
+    return this.handleResponse<T>(response);
   }
 
   public async get<T>(endpoint: string): Promise<T> {
-    const response = await fetch(
-      `${this.baseURL}${endpoint}`,
-      this.buildRequestOptions("GET"),
-    );
-
-    return this.handleResponse<T>(response);
+    return this.request<T>("GET", endpoint);
   }
 
   public async post<T>(endpoint: string, data?: unknown): Promise<T> {
-    const response = await fetch(
-      `${this.baseURL}${endpoint}`,
-      this.buildRequestOptions("POST", data),
-    );
-
-    return this.handleResponse<T>(response);
+    return this.request<T>("POST", endpoint, data);
   }
 
   public async patch<T>(endpoint: string, data?: unknown): Promise<T> {
-    const response = await fetch(
-      `${this.baseURL}${endpoint}`,
-      this.buildRequestOptions("PATCH", data),
-    );
-
-    return this.handleResponse<T>(response);
+    return this.request<T>("PATCH", endpoint, data);
   }
 
   public async put<T>(endpoint: string, data?: unknown): Promise<T> {
-    const response = await fetch(
-      `${this.baseURL}${endpoint}`,
-      this.buildRequestOptions("PUT", data),
-    );
-
-    return this.handleResponse<T>(response);
+    return this.request<T>("PUT", endpoint, data);
   }
 
   public async delete<T>(endpoint: string): Promise<T> {
-    const response = await fetch(
-      `${this.baseURL}${endpoint}`,
-      this.buildRequestOptions("DELETE"),
-    );
-
-    return this.handleResponse<T>(response);
+    return this.request<T>("DELETE", endpoint);
   }
 
   public async getBlob(endpoint: string): Promise<Blob> {

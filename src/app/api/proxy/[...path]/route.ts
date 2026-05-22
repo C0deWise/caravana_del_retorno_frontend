@@ -8,11 +8,28 @@ interface FetchError extends Error {
   cause?: { code?: string };
 }
 
-async function fetchWithRetry(url: string, init: RequestInit, retries = 3) {
+function buildTargetUrl(base: string, pathSegments: string[]): string {
+  const normalizedBase = base.replace(/\/+$/, "");
+  let relativePath = pathSegments.join("/").replace(/^\/+/, "");
+
+  // If API_BASE already contains /api/v1, avoid duplicating it from proxied path.
+  if (/\/api\/v1$/i.test(normalizedBase) && relativePath.startsWith("api/v1/")) {
+    relativePath = relativePath.slice("api/v1/".length);
+  }
+
+  return `${normalizedBase}/${relativePath}`;
+}
+
+async function fetchWithRetry(
+  url: string,
+  buildInit: (attempt: number) => RequestInit,
+  retries = 3,
+) {
   let lastError: unknown;
 
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
+      const init = buildInit(attempt);
       const response = await fetch(url, {
         ...init,
         signal: AbortSignal.timeout(30000),
@@ -43,34 +60,42 @@ async function fetchWithRetry(url: string, init: RequestInit, retries = 3) {
 
 async function handleApiResponse(response: Response): Promise<NextResponse> {
   const contentType = response.headers.get("content-type")?.toLocaleLowerCase() || "";
+  const setCookieHeader = response.headers.get("set-cookie");
+
+  const appendProxyHeaders = (proxyResponse: NextResponse) => {
+    if (setCookieHeader) {
+      proxyResponse.headers.set("set-cookie", setCookieHeader);
+    }
+    return proxyResponse;
+  };
 
   if (contentType.includes("application/json") || contentType.includes("text/")) {
 
     const text = await response.text();
 
     if (response.status === 204 || !text) {
-      return new NextResponse(null, { status: response.status });
+      return appendProxyHeaders(new NextResponse(null, { status: response.status }));
     }
 
     try {
-      return NextResponse.json(JSON.parse(text), { status: response.status });
+      return appendProxyHeaders(NextResponse.json(JSON.parse(text), { status: response.status }));
     } catch {
-      return new NextResponse(text, {
+      return appendProxyHeaders(new NextResponse(text, {
         status: response.status,
         headers: {
           "Content-Type": response.headers.get("content-type") ?? "text/plain",
         },
-      });
+      }));
     }
   }
 
   const arrayBuffer = await response.arrayBuffer();
-  return new NextResponse(arrayBuffer, {
+  return appendProxyHeaders(new NextResponse(arrayBuffer, {
     status: response.status,
     headers: {
       "Content-Type": contentType,
     }
-  })
+  }));
 }
 
 function handleProxyError(error: unknown, method: string, url: string): NextResponse {
@@ -99,31 +124,49 @@ async function forwardRequest(
   method: string,
 ): Promise<NextResponse> {
   const { path } = await params;
-  const url = `${API_BASE}/${path.join("/")}/`;
+  if (!API_BASE) {
+    return NextResponse.json(
+      {
+        error: "Proxy misconfiguration",
+        message: "API_BASE_URL is not configured",
+      },
+      { status: 500 },
+    );
+  }
+
+  const url = buildTargetUrl(API_BASE, path);
   const isReadMethod = method === "GET" || method === "HEAD";
 
   // Copiar headers originales
   const headers = new Headers();
-  const allowedHeaders = ["content-type", "authorization", "accept"];
+  const allowedHeaders = new Set(["content-type", "authorization", "accept", "cookie"]);
   request.headers.forEach((value, key) => {
-    if (allowedHeaders.includes(key.toLowerCase()) || key.toLowerCase().startsWith("x-")) {
+    if (allowedHeaders.has(key.toLowerCase()) || key.toLowerCase().startsWith("x-")) {
       headers.set(key, value);
     }
   });
 
-  let body: ArrayBuffer | undefined;
+  let rawBody: Uint8Array | undefined;
   if (!isReadMethod) {
-    body = await request.arrayBuffer();
-    if (body.byteLength === 0) body = undefined;
+    const bodyBuffer = await request.arrayBuffer();
+    if (bodyBuffer.byteLength > 0) {
+      rawBody = new Uint8Array(bodyBuffer);
+    }
   }
 
   try {
-    const response = await fetchWithRetry(url, {
-      method,
-      headers,
-      body,
-      redirect: "follow",
-    });
+    const response = await fetchWithRetry(
+      url,
+      () => {
+        const body = rawBody ? new Uint8Array(rawBody) : undefined;
+        return {
+          method,
+          headers,
+          body,
+          redirect: "follow",
+        };
+      },
+    );
 
     return handleApiResponse(response);
   } catch (error) {
