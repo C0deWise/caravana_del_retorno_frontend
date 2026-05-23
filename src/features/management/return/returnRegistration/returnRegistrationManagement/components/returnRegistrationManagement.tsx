@@ -8,6 +8,7 @@ import { useSendReturnUnregistration } from "../../returnUnregistration/hook/use
 import { useReturnRegistrationManagement } from "../hooks/useReturnRegistrationManagement.hook";
 import { EditReturnRegistrationForm } from "../../editReturnRegistration/components/EditReturnRegistrationForm";
 import type { ReturnRegistrationApi } from "../../types/returnRegistration.types";
+import { useRouter } from "next/navigation";
 
 type Props = {
     readonly userId: number;
@@ -85,15 +86,15 @@ function ActionsView({
                 <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
                     <button
                         type="button"
-                        className="btn-secondary min-w-40"
+                        className="btn-danger min-w-40 hover:opacity-90"
                         onClick={onRequestUnregister}
                         disabled={unregistrationLoading}
                     >
-                        Cancelar inscripción
+                        Darse de baja
                     </button>
                     <button
                         type="button"
-                        className="btn-primary min-w-40"
+                        className="btn-primary min-w-40 hover:opacity-90"
                         onClick={onEdit}
                         disabled={unregistrationLoading}
                     >
@@ -114,7 +115,7 @@ function UnregisteredView({ onDone }: { readonly onDone: () => void }) {
                     <p className="alert-success-text">Tu inscripción fue cancelada correctamente.</p>
                 </div>
                 <div className="mt-8 flex justify-center">
-                    <button type="button" className="btn-primary" onClick={onDone}>
+                    <button type="button" className="btn-primary hover:opacity-90" onClick={onDone}>
                         Aceptar
                     </button>
                 </div>
@@ -147,8 +148,9 @@ function ReturnRegistrationManagementReady({
     showConfirmUnregister,
     setShowConfirmUnregister,
 }: ReadyProps) {
-    const { view, currentRegistration, goToEdit, goToActions, handleUnregistered } =
+    const { view, currentRegistration, goToEdit, goToActions } =
         useReturnRegistrationManagement(registration);
+    const router = useRouter();
 
     const handleConfirmUnregister = async () => {
         const response = await sendReturnUnregistration({
@@ -157,7 +159,7 @@ function ReturnRegistrationManagementReady({
         });
         setShowConfirmUnregister(false);
         if (response) {
-            handleUnregistered();
+            router.push("/gestion/retorno/registro");
         }
     };
 

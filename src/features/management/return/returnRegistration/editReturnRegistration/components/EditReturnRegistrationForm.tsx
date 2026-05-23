@@ -266,7 +266,7 @@ export function EditReturnRegistrationForm({
                         </button>
                         <button
                             type="submit"
-                            className="btn-primary min-w-48 inline-flex items-center justify-center gap-2"
+                            className="btn-primary bg-secondary min-w-48 inline-flex items-center justify-center gap-2 hover:opacity-90"
                             disabled={loading}
                         >
                             {loading && <Spinner size="sm" />}
