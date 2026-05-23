@@ -119,7 +119,7 @@ export function EditReturnRegistrationForm({
             num_transporte: formData.transport === 1 ? 0 : 1,
             num_parqueadero_carro: formData.transport === 1 ? Number(formData.parking === "car") : 0,
             num_parqueadero_moto: formData.transport === 1 ? Number(formData.parking === "bike") : 0,
-            note: formData.note || undefined,
+            anotacion: formData.note || undefined,
         };
 
         const response = await editReturnRegistration(payload, registration.codigo);
