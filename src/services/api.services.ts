@@ -169,10 +169,10 @@ class ApiService {
     return this.handleResponse<T>(response);
   }
 
-  public async delete<T>(endpoint: string): Promise<T> {
+  public async delete<T>(endpoint: string, data?: unknown): Promise<T> {
     const response = await fetch(
       `${this.baseURL}${endpoint}`,
-      this.buildRequestOptions("DELETE"),
+      this.buildRequestOptions("DELETE", data),
     );
 
     return this.handleResponse<T>(response);
