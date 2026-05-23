@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { returnUnregistrationService } from  "../service/returnUnregistration.service";
-import type { ReturnUnregistrationApi, ReturnUnregistrationCreateRequest } from "../types/returnUnregistration.types";
+import type { ReturnUnregistrationCreateRequest } from "../types/returnUnregistration.types";
 
 interface UseSendReturnUnregistration {
-    sendReturnUnregistration:(data: ReturnUnregistrationCreateRequest) => Promise<ReturnUnregistrationApi | null>;
+    sendReturnUnregistration:(data: ReturnUnregistrationCreateRequest) => Promise<string | null>;
     loading: boolean;
     error: string | null;
     success: boolean;
@@ -14,11 +14,12 @@ export const useSendReturnUnregistration = (): UseSendReturnUnregistration => {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
 
-    const sendReturnUnregistration = async (data: ReturnUnregistrationCreateRequest): Promise<ReturnUnregistrationApi | null> => {
+    const sendReturnUnregistration = async (data: ReturnUnregistrationCreateRequest): Promise<string | null> => {
         setLoading(true);
         setError(null);
         setSuccess(false);
         try {
+            console.log(`Cancelando inscripción para ${data.usuario} ${data.retorno}`);
             const response = await returnUnregistrationService.deleteReturnRegistration(data);
             setSuccess(true);
             return response;
