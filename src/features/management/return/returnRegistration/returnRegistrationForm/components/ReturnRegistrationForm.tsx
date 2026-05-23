@@ -14,6 +14,7 @@ import type {
 } from "../../types/returnRegistration.types";
 import { retornoService } from "../../../services/retorno.service";
 import { ReturnRegistrationManagement } from "../../returnRegistrationManagement/components/returnRegistrationManagement";
+import { useRouter } from "next/navigation";
 
 type ParkingOption = "none" | "car" | "bike";
 
@@ -112,42 +113,6 @@ function NoActiveReturnView() {
   );
 }
 
-function SubmittedRecordView({
-  record,
-  onReset,
-}: {
-  readonly record: ReturnRegistrationApi;
-  readonly onReset: () => void;
-}) {
-  return (
-    <div className="bg-white px-4 py-6 flex items-center justify-center">
-      <div className="w-full max-w-2xl rounded-2xl bg-bg-card p-8 shadow-md">
-        <h1 className="page-title">Registro de Asistencia al Retorno</h1>
-        <h2 className="section-title">Inscripción exitosa</h2>
-        <div className="alert-success mt-0">
-          <p className="alert-success-text">Tu asistencia fue registrada correctamente.</p>
-        </div>
-        <ul className="mt-4 list-disc pl-6 text-text space-y-1">
-          <li>Tiene hospedaje: {record.num_hospedaje === 0 ? "Sí" : "No"}</li>
-          <li>Tiene transporte: {record.num_transporte === 0 ? "Sí" : "No"}</li>
-          {record.num_transporte === 0 && (
-            <li>
-              Parqueadero:{" "}
-              {parkingLabel(record.num_parqueadero_carro, record.num_parqueadero_moto)}
-            </li>
-          )}
-          {record.anotacion && <li>Nota: {record.anotacion}</li>}
-        </ul>
-        <div className="mt-8 flex justify-center">
-          <button type="button" className="btn-primary" onClick={onReset}>
-            Confirmar
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 type FormGuardProps = {
   user: UserData | null;
   eligibilityLoading: boolean;
@@ -176,7 +141,6 @@ function resolveFormGuard({
   if (eligibilityLoading) return <EligibilityLoadingView />;
   if (eligibilityError) return <EligibilityErrorView error={eligibilityError} />;
   if (!activeReturnCode) return <NoActiveReturnView />;
-  if (submittedRecord) return <SubmittedRecordView record={submittedRecord} onReset={onReset} />;
   if (alreadyRegistered) {
     return (
       <ReturnRegistrationManagement
@@ -194,6 +158,7 @@ function ReturnRegistrationFormContent() {
   const { user } = useAuth();
   const { sendReturnRegistration, loading, error } =
     useSendReturnRegistration();
+  const router = useRouter();
 
   const [formData, setFormData] = useState(initialForm);
   const [fieldErrors, setFieldErrors] = useState<FormErrors>({});
@@ -275,12 +240,12 @@ function ReturnRegistrationFormContent() {
 
   const confirmDetails = useMemo(
     () => [
-      `Tiene hospedaje: ${formData.accomodation === 1 ? "Sí" : "No"}`,
-      `Tiene transporte: ${formData.transport === 1 ? "Sí" : "No"}`,
+      <span key="hospedaje"><strong>Tiene hospedaje: </strong>{formData.accomodation === 1 ? "Sí" : "No"}</span>,
+      <span key="transporte"><strong>Tiene transporte: </strong>{formData.transport === 1 ? "Sí" : "No"}</span>,
       ...(formData.transport === 1
-        ? [`Parqueadero: ${parkingOptionLabel(formData.parking)}`]
+        ? [<span key="parqueadero"><strong>Parqueadero: </strong>{parkingOptionLabel(formData.parking)}</span>,]
         : []),
-      ...(formData.note ? [`Nota: ${formData.note}`] : []),
+      ...(formData.note ? [<span key="nota"><strong>Nota: </strong><em>{formData.note}</em></span>] : []),
     ],
     [formData.accomodation, formData.transport, formData.parking, formData.note],
   );
@@ -388,13 +353,12 @@ function ReturnRegistrationFormContent() {
       num_parqueadero_moto: formData.transport === 0 ? 0 : Number(formData.parking === "bike"),
       anotacion: formData.note || undefined,
     };
-    
+
     const response = await sendReturnRegistration(payload);
     setShowConfirmModal(false);
 
     if (response) {
       setAlreadyRegistered(true);
-      setSubmittedRecord(response);
     }
   };
 
@@ -548,10 +512,18 @@ function ReturnRegistrationFormContent() {
             </p>
           </div>
 
-          <div className="flex justify-center pt-1">
+          <div className="flex justify-center gap-4 pt-1">
+            <button
+              type="button"
+              className="btn-secondary min-w-32"
+              onClick={() => router.push("/gestion/retorno/registro")}
+              disabled={loading}
+            >
+              Cancelar
+            </button>
             <button
               type="submit"
-              className="btn-primary bg-secondary min-w-48 inline-flex items-center justify-center gap-2"
+              className="btn-primary bg-secondary min-w-48 inline-flex items-center justify-center gap-2 hover:opacity-90"
               disabled={loading}
             >
               {loading && <Spinner size="sm" />}
