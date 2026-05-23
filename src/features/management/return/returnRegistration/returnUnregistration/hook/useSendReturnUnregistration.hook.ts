@@ -19,7 +19,6 @@ export const useSendReturnUnregistration = (): UseSendReturnUnregistration => {
         setError(null);
         setSuccess(false);
         try {
-            console.log(`Cancelando inscripción para ${data.usuario} ${data.retorno}`);
             const response = await returnUnregistrationService.deleteReturnRegistration(data);
             setSuccess(true);
             return response;

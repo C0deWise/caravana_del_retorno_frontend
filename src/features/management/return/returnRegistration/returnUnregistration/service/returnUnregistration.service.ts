@@ -50,7 +50,6 @@ class ReturnUnregistrationService {
      * @returns Una promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
     async deleteReturnRegistration(data: ReturnUnregistrationCreateRequest): Promise<string> {
-        console.log(`Eliminando registro con usuario ${data.usuario} y retorno ${data.retorno}`);
         return apiService.delete<string>(`${this.retornosEndpoint}/darse-de-baja`, data);
     }
 }
