@@ -1,6 +1,5 @@
 import { apiService } from '@/services/api.services';
-import type { ReturnRegistrationApi, ReturnRegistrationCreateRequest } from '../types/returnRegistration.types';
-import type { Retorno } from '../../../types/retorno.types';
+import type { ReturnRegistrationApi, ReturnRegistrationCreateRequest } from '../../types/returnRegistration.types';
 
 const ACTIVE_RETURN_STATES = new Set([
     'activo',

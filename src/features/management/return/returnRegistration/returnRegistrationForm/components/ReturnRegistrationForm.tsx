@@ -11,8 +11,9 @@ import type {
   ReturnRegistrationAnswer,
   ReturnRegistrationApi,
   ReturnRegistrationCreateRequest,
-} from "../types/returnRegistration.types";
+} from "../../types/returnRegistration.types";
 import { retornoService } from "../../../services/retorno.service";
+import { ReturnRegistrationManagement } from "../../returnRegistrationManagement/components/returnRegistrationManagement";
 
 type ParkingOption = "none" | "car" | "bike";
 
@@ -111,22 +112,6 @@ function NoActiveReturnView() {
   );
 }
 
-// TODO: Implementar la lógica para que aparezcan los botones de editar y cancelar
-
-function AlreadyRegisteredView() {
-  return (
-    <div className="bg-white px-4 py-6 flex items-center justify-center">
-      <div className="w-full max-w-xl rounded-2xl bg-bg-card p-8 shadow-md text-center">
-        <h1 className="page-title mb-4">Registro de Asistencia al Retorno</h1>
-        <h2 className="section-title mb-4">Formulario ya registrado</h2>
-        <p className="text-text font-medium">
-          Ya has confirmado tu asistencia a este retorno.
-        </p>
-      </div>
-    </div>
-  );
-}
-
 function SubmittedRecordView({
   record,
   onReset,
@@ -151,7 +136,7 @@ function SubmittedRecordView({
               {parkingLabel(record.num_parqueadero_carro, record.num_parqueadero_moto)}
             </li>
           )}
-          {record.note && <li>Nota: {record.note}</li>}
+          {record.anotacion && <li>Nota: {record.anotacion}</li>}
         </ul>
         <div className="mt-8 flex justify-center">
           <button type="button" className="btn-primary" onClick={onReset}>
@@ -168,9 +153,11 @@ type FormGuardProps = {
   eligibilityLoading: boolean;
   eligibilityError: string | null;
   activeReturnCode: number | null;
+  activeReturnYear: number | null;
   alreadyRegistered: boolean;
   submittedRecord: ReturnRegistrationApi | null;
   onReset: () => void;
+  onUnregistered: () => void;
 };
 
 function resolveFormGuard({
@@ -178,17 +165,28 @@ function resolveFormGuard({
   eligibilityLoading,
   eligibilityError,
   activeReturnCode,
+  activeReturnYear,
   alreadyRegistered,
   submittedRecord,
   onReset,
+  onUnregistered,
 }: FormGuardProps): React.ReactNode {
   if (!user) return <NoUserView />;
   if (!user.codigo_colonia) return <NoColonyView />;
   if (eligibilityLoading) return <EligibilityLoadingView />;
   if (eligibilityError) return <EligibilityErrorView error={eligibilityError} />;
   if (!activeReturnCode) return <NoActiveReturnView />;
-  if (alreadyRegistered) return <AlreadyRegisteredView />;
   if (submittedRecord) return <SubmittedRecordView record={submittedRecord} onReset={onReset} />;
+  if (alreadyRegistered) {
+    return (
+      <ReturnRegistrationManagement
+        userId={user.id}
+        activeReturnCode={activeReturnCode}
+        activeReturnYear={activeReturnYear}
+        onUnregistered={onUnregistered}
+      />
+    );
+  }
   return null;
 }
 
@@ -235,7 +233,6 @@ function ReturnRegistrationFormContent() {
 
       try {
         const activeReturn = await retornoService.getActiveReturn();
-        console.log("Retorno obtenido: ", activeReturn);
         if (!isMounted) return;
 
         const parsedCode = Number(activeReturn?.codigo);
@@ -255,8 +252,6 @@ function ReturnRegistrationFormContent() {
             user.id,
             normalizedCode,
           );
-
-        console.log("Tiene registro: ", hasRegistration);
 
         if (!isMounted) return;
         setAlreadyRegistered(hasRegistration);
@@ -334,6 +329,12 @@ function ReturnRegistrationFormContent() {
     setFieldErrors((prev) => ({ ...prev, parking: undefined }));
   };
 
+  const handleUnregistered = () => {
+    setAlreadyRegistered(false);
+    setSubmittedRecord(null);
+    resetForm();
+  };
+
   const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -385,9 +386,9 @@ function ReturnRegistrationFormContent() {
       num_transporte: formData.transport === 1 ? 0 : 1,
       num_parqueadero_carro: formData.transport === 0 ? 0 : Number(formData.parking === "car"),
       num_parqueadero_moto: formData.transport === 0 ? 0 : Number(formData.parking === "bike"),
-      note: formData.note || undefined,
+      anotacion: formData.note || undefined,
     };
-
+    
     const response = await sendReturnRegistration(payload);
     setShowConfirmModal(false);
 
@@ -408,9 +409,11 @@ function ReturnRegistrationFormContent() {
     eligibilityLoading,
     eligibilityError,
     activeReturnCode,
+    activeReturnYear,
     alreadyRegistered,
     submittedRecord,
     onReset: resetForm,
+    onUnregistered: handleUnregistered,
   });
   if (guardView) return guardView;
 
