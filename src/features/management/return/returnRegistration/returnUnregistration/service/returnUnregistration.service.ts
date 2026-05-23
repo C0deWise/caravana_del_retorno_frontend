@@ -1,6 +1,6 @@
 import { apiService } from '@/services/api.services';
-import type { ReturnUnregistrationApi, ReturnUnregistrationCreateRequest } from '../types/returnUnregistration.types';
-import type { Retorno } from '../../types/retorno.types';
+import type { ReturnUnregistrationCreateRequest } from '../types/returnUnregistration.types';
+import type { Retorno } from '../../../types/retorno.types';
 
 const ACTIVE_RETURN_STATES = new Set([
     'activo',
@@ -16,7 +16,6 @@ function hasActiveState(state: string | undefined): boolean {
 }
 
 class ReturnUnregistrationService {
-    private readonly registroEndpoint = '/api/v1/retornos/cancelar-inscripcion/';
     private readonly retornosEndpoint = '/api/v1/retornos/';
 
     /**
@@ -50,10 +49,9 @@ class ReturnUnregistrationService {
      * @param data - Objeto que contiene el ID del usuario y el ID del retorno.
      * @returns Una promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
-    async deleteReturnRegistration(data: ReturnUnregistrationCreateRequest): Promise<ReturnUnregistrationApi> {
-        // Reemplazar mock cuando el endpoint esté disponible
-        // return apiService.post<ReturnUnregistrationApi>(this.registroEndpoint, data);
-        return ({ usuario: data.usuario, retorno: data.retorno });
+    async deleteReturnRegistration(data: ReturnUnregistrationCreateRequest): Promise<string> {
+        console.log(`Eliminando registro con usuario ${data.usuario} y retorno ${data.retorno}`);
+        return apiService.delete<string>(`${this.retornosEndpoint}/darse-de-baja`, data);
     }
 }
 
