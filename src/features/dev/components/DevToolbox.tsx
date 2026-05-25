@@ -52,8 +52,7 @@ function DevToolbox() {
     }
   };
 
-  const shouldShow = isDev || process.env.NODE_ENV === "development";
-  if (!shouldShow) return null;
+  if (!isDev) return null;
 
   return (
     <>
