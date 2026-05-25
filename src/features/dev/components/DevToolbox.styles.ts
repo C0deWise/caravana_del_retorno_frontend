@@ -15,7 +15,7 @@ export const getButtonStyle = (
       ...baseStyle,
       left: pos.x,
       top: pos.y,
-      transition: isDragging ? "none" : "left 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), top 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+      transition: isDragging ? "none" : "left 0.3s ease-out, top 0.3s ease-out 0.1s",
     };
   }
 
