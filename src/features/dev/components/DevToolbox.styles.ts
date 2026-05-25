@@ -61,14 +61,14 @@ export const getPanelStyle = (
     "bottom-left": {
       position: "fixed",
       left: pos.x,
-      bottom: typeof window !== "undefined" ? window.innerHeight - pos.y + MARGIN : MARGIN,
+      bottom: globalThis.window === undefined ? MARGIN : window.innerHeight - pos.y + MARGIN,
       cursor: "default",
       zIndex: 9999,
     },
     "bottom-right": {
       position: "fixed",
       right: MARGIN,
-      bottom: typeof window !== "undefined" ? window.innerHeight - pos.y + MARGIN : MARGIN,
+      bottom: globalThis.window === undefined ? MARGIN : window.innerHeight - pos.y + MARGIN,
       cursor: "default",
       zIndex: 9999,
     },

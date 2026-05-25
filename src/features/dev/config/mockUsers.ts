@@ -14,6 +14,7 @@ const MOCK_USER_BASE: Omit<UserData, "role" | "codigo_colonia"> = {
   pais: "Colombia",
   departamento: "Cauca",
   ciudad: "Popayan",
+  codigo_retorno: null,
 };
 
 export const buildMockUsers = (

@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode, useMemo } from "react";
-import { UserData, UserRole } from "@/types/user.types";
+import { UserRole } from "@/types/user.types";
 import { FEATURE_FLAGS } from "@/config/featureFlags";
 
 export const IS_DEV = process.env.NEXT_PUBLIC_DEV_TOOLS === "true";
@@ -60,16 +60,16 @@ export function useDev() {
   if (context === undefined) {
     return {
       roleOverride: undefined,
-      setRoleOverride: () => {},
+      setRoleOverride: () => { },
       mockColoniaId: null,
-      setMockColoniaId: () => {},
+      setMockColoniaId: () => { },
       mockUserId: null,
-      setMockUserId: () => {},
+      setMockUserId: () => { },
       isDev: false,
       apiMode: false,
-      setApiMode: () => {},
+      setApiMode: () => { },
       featureFlags: FEATURE_FLAGS,
-      setFeatureFlag: () => {},
+      setFeatureFlag: () => { },
     };
   }
   return context;
