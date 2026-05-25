@@ -228,6 +228,21 @@ body {
     cursor: not-allowed;
   }
 
+  .btn-danger {
+    @apply px-6 py-2 text-lg font-semibold rounded-lg transition-colors;
+    background-color: var(--color-accent-red);
+    color: var(--color-text-inverse);
+  }
+
+  .btn-danger:hover:not(:disabled) {
+    background-color: var(--color-danger);
+  }
+
+  .btn-danger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed
+  }
+
   /* Alertas */
   .alert-error {
     @apply mt-6 p-4 rounded border-l-4;
@@ -286,6 +301,44 @@ body {
   .colombia-bar-red {
     @apply flex-1;
     background-color: var(--color-accent-red);
+  }
+
+  /* Stepper numérico */
+  .stepper {
+    @apply inline-flex items-center rounded-lg overflow-hidden;
+    border: 1px solid var(--color-bg-border);
+    background-color: var(--color-bg-card);
+  }
+
+  .stepper-btn {
+    @apply px-3 py-2 transition-colors font-semibold text-base;
+    color: var(--color-primary);
+    background-color: var(--color-bg-card);
+  }
+
+  .stepper-btn:hover:not(:disabled) {
+    background-color: var(--color-bg-border);
+  }
+
+  .stepper-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .stepper-display {
+    @apply flex flex-col items-center px-4 py-1 w-28 text-center;
+    border-left: 1px solid var(--color-bg-border);
+    border-right: 1px solid var(--color-bg-border);
+  }
+
+  .stepper-label {
+    @apply text-xs;
+    color: var(--color-text-muted);
+  }
+
+  .stepper-value {
+    @apply text-sm font-medium;
+    color: var(--color-text);
   }
 
   /* Mensajes de validación */

@@ -18,7 +18,7 @@ function GenerateReportsFeature() {
     const [reportType, setReportType] = useState<ReportType>("colony");
     const [selectedReturn, setSelectedReturn] = useState<number | null>(null);
     const [selectedColony, setSelectedColony] = useState<number | null>(
-        !isAdmin ? (user?.codigo_colonia ?? null) : null
+        isAdmin ? null : (user?.codigo_colonia ?? null)
     );
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [colonySearch, setColonySearch] = useState("");
@@ -30,6 +30,7 @@ function GenerateReportsFeature() {
 
     const loading = LoadingReturns || loadingColonies || loadingReport;
     const error = errorReturns ?? errorColonies ?? errorReport;
+    const userColony = colonies.find(c => c.codigo === selectedColony);
 
     useEffect(() => {
         if (reportType === "colony") {
@@ -59,16 +60,11 @@ function GenerateReportsFeature() {
                 : { type: "general", returnId: selectedReturn };
 
         try {
-            // MOCK TEMPORAL — reemplazar por generateReport(params) cuando el backend esté listo
-            const response = await fetch("/mock-report.pdf");
-            const blob = await response.blob();
-            // FIN MOCK
-
-            // const blob = await generateReport(params);
-
+            const blob = await generateReport(params);
+            if (!blob) return;
             const url = URL.createObjectURL(blob);
             setPreviewUrl(url);
-        } catch (err) { }
+        } catch { }
 
     }
 
@@ -91,12 +87,12 @@ function GenerateReportsFeature() {
     return (
         <div className="flex flex-col min-h-screen w-full items-center px-4 py-8 bg-bg">
             <div className="rounded-lg shadox-xl w-full max-w-4xl bg-bg">
-                <h1 className="page-title">Generar reportes</h1>
+                <h1 className="page-title">Generar Reportes</h1>
 
                 {isAdmin ? (
-                <h2 className="section-title">Selecciona el tipo de reporte que deseas generar</h2>
+                    <h2 className="section-title">Selecciona el tipo de reporte que deseas generar</h2>
                 ) : (
-                    <h2 className="section-title">Genera el reporte de tu colonia</h2>
+                    <h2 className="section-title">Genera el reporte de tu colonia{userColony ? `: ${formatColonyLabel(userColony)}` : ""}</h2>
                 )}
 
                 <div className="mt-10 flex flex-row flex-wrap items-center justify-center gap-4">

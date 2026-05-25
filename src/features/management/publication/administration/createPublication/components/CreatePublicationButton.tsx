@@ -7,9 +7,10 @@ import { RequireAuth } from "@/auth/components/RequireAuth";
 
 interface CreatePublicationButtonProps {
   readonly onRefresh?: () => void;
+  readonly retornoId?: number;
 }
 
-export function CreatePublicationButton({ onRefresh }: CreatePublicationButtonProps) {
+export function CreatePublicationButton({ onRefresh, retornoId }: CreatePublicationButtonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -28,6 +29,7 @@ export function CreatePublicationButton({ onRefresh }: CreatePublicationButtonPr
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onRefresh={onRefresh}
+          fixedRetornoId={retornoId}
         />
       </>
     </RequireAuth>

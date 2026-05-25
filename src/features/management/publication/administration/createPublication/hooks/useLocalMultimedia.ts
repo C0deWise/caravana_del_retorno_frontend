@@ -13,6 +13,7 @@ export type LocalMultimediaItem = {
   size: number;
   type: string;
   dataUrl?: string;
+  file: File;
 };
 
 function getMediaCategory(mimeType: string): MediaCategory | null {
@@ -64,6 +65,7 @@ export function useLocalMultimedia() {
           size: f.size,
           type: f.type,
           dataUrl,
+          file: f,
         };
       });
 

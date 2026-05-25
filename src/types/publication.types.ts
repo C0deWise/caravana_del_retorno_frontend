@@ -1,19 +1,28 @@
+export interface PublicationMultimedia {
+  codigo: number;
+  publicacion: number;
+  tipo: string;
+  formato: string;
+  url: string;
+  descripcion: string;
+}
+
 export interface PublicationApi {
   codigo: number;
-  codigo_retorno: number;
-  codigo_colonia: number;
-  codigo_autor: number;
-  resena: string;
+  retorno: number;
+  autor: number;
   titulo: string;
+  resena: string;
   fecha_creacion: string;
+  multimedia_lista: PublicationMultimedia[];
 }
 
 export interface PublicationApiRequest {
-  codigo_retorno: number;
-  codigo_colonia: number;
-  codigo_autor: number;
-  resena: string;
+  retorno_id: number;
+  autor: number;
   titulo: string;
+  resena: string;
+  archivos: File[];
 }
 
 export type PublicationData = PublicationApi;

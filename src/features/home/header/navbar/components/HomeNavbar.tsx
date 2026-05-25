@@ -39,7 +39,7 @@ export default function HomeNavbar() {
                 className="cursor-pointer"
                 onClick={() => setShowLogin((prev) => !prev)}
               >
-                Login
+                Iniciar Sesión
               </button>
               {showLogin && <LoginPanel onClose={() => setShowLogin(false)} />}
             </div>

@@ -23,7 +23,7 @@ async function fetchWithRetry(url: string, init: RequestInit, retries = 3) {
     } catch (error) {
       lastError = error;
       const fetchError = error as FetchError;
-      
+
       const isTimeout = error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError");
       const code = fetchError.cause?.code || fetchError.code;
 
@@ -42,22 +42,35 @@ async function fetchWithRetry(url: string, init: RequestInit, retries = 3) {
 }
 
 async function handleApiResponse(response: Response): Promise<NextResponse> {
-  const text = await response.text();
+  const contentType = response.headers.get("content-type")?.toLocaleLowerCase() || "";
 
-  if (response.status === 204 || !text) {
-    return new NextResponse(null, { status: response.status });
+  if (contentType.includes("application/json") || contentType.includes("text/")) {
+
+    const text = await response.text();
+
+    if (response.status === 204 || !text) {
+      return new NextResponse(null, { status: response.status });
+    }
+
+    try {
+      return NextResponse.json(JSON.parse(text), { status: response.status });
+    } catch {
+      return new NextResponse(text, {
+        status: response.status,
+        headers: {
+          "Content-Type": response.headers.get("content-type") ?? "text/plain",
+        },
+      });
+    }
   }
 
-  try {
-    return NextResponse.json(JSON.parse(text), { status: response.status });
-  } catch {
-    return new NextResponse(text, {
-      status: response.status,
-      headers: {
-        "Content-Type": response.headers.get("content-type") ?? "text/plain",
-      },
-    });
-  }
+  const arrayBuffer = await response.arrayBuffer();
+  return new NextResponse(arrayBuffer, {
+    status: response.status,
+    headers: {
+      "Content-Type": contentType,
+    }
+  })
 }
 
 function handleProxyError(error: unknown, method: string, url: string): NextResponse {
@@ -65,7 +78,7 @@ function handleProxyError(error: unknown, method: string, url: string): NextResp
 
   const isTimeout = error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError");
   const status = isTimeout ? 504 : 502;
-  
+
   const fetchError = error as FetchError;
   const code = fetchError.cause?.code || fetchError.code || (isTimeout ? "TIMEOUT" : "FETCH_ERROR");
 
@@ -87,16 +100,22 @@ async function forwardRequest(
 ): Promise<NextResponse> {
   const { path } = await params;
   const url = `${API_BASE}/${path.join("/")}/`;
-  const isReadMethod = method === "GET" || method === "DELETE";
+  const isReadMethod = method === "GET" || method === "HEAD";
 
-  let body: string | undefined;
+  // Copiar headers originales
+  const headers = new Headers();
+  const allowedHeaders = ["content-type", "authorization", "accept"];
+  request.headers.forEach((value, key) => {
+    if (allowedHeaders.includes(key.toLowerCase()) || key.toLowerCase().startsWith("x-")) {
+      headers.set(key, value);
+    }
+  });
+
+  let body: ArrayBuffer | undefined;
   if (!isReadMethod) {
-    const rawBody = await request.text();
-    body = rawBody.trim() ? rawBody : undefined;
+    body = await request.arrayBuffer();
+    if (body.byteLength === 0) body = undefined;
   }
-
-  const headers: HeadersInit = {};
-  if (body) headers["Content-Type"] = "application/json";
 
   try {
     const response = await fetchWithRetry(url, {

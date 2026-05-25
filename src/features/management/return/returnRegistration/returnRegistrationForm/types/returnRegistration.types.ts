@@ -5,7 +5,8 @@ export interface ReturnRegistrationCreateRequest {
     retorno: number;
     num_hospedaje: number;
     num_transporte: number;
-    num_parqueadero: number;
+    num_parqueadero_carro: number;
+    num_parqueadero_moto: number;
     note?: string;
 }
 
@@ -15,6 +16,7 @@ export interface ReturnRegistrationApi {
     retorno: number;
     num_hospedaje: number;
     num_transporte: number;
-    num_parqueadero: number;
+    num_parqueadero_carro: number;
+    num_parqueadero_moto: number;
     note?: string;
 }

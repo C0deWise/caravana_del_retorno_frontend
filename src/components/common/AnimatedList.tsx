@@ -40,17 +40,41 @@ export function AnimatedList<T>({
   const itemExit = { opacity: 0, scale: 0.9 };
 
   const [isScrolledTop, setIsScrolledTop] = useState(true);
-  const [isScrolledBottom, setIsScrolledBottom] = useState(false);
+  const [isScrolledBottom, setIsScrolledBottom] = useState(true);
+  const [canScroll, setCanScroll] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (enableScrollShadow) {
+      setCanScroll(false);
+      setIsScrolledBottom(true);
+      setIsScrolledTop(true);
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    }
+  }, [items.length, enableScrollShadow]);
+
   const handleScroll = useCallback(() => {
     if (!scrollRef.current) return;
-    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-    setIsScrolledTop(scrollTop <= 5);
-    setIsScrolledBottom(
-      Math.ceil(scrollTop + clientHeight) >= scrollHeight - 5,
-    );
+    
+    requestAnimationFrame(() => {
+      if (!scrollRef.current) return;
+      const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+      
+      const isScrollable = clientHeight > 0 && scrollHeight > clientHeight + 3;
+      setIsScrolledTop(scrollTop <= 5);
+      
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      
+      scrollTimeoutRef.current = setTimeout(() => {
+        setCanScroll(isScrollable);
+        setIsScrolledBottom(
+          !isScrollable || Math.ceil(scrollTop + clientHeight) >= scrollHeight - 3,
+        );
+      }, 400);
+    });
   }, []);
 
   useEffect(() => {
@@ -70,12 +94,25 @@ export function AnimatedList<T>({
   }, [loading, hasMore, onLoadMore, items.length]);
 
   useEffect(() => {
-    if (enableScrollShadow) {
+    if (!enableScrollShadow || !scrollRef.current) return;
+
+    const observer = new ResizeObserver(() => {
       handleScroll();
-      window.addEventListener("resize", handleScroll);
-      return () => window.removeEventListener("resize", handleScroll);
+    });
+
+    observer.observe(scrollRef.current);
+    
+    if (scrollRef.current.firstElementChild) {
+      observer.observe(scrollRef.current.firstElementChild);
     }
-  }, [enableScrollShadow, items, handleScroll]);
+
+    window.addEventListener("resize", handleScroll);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", handleScroll);
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    };
+  }, [enableScrollShadow, handleScroll]);
 
   const listContent = (
     <div className="flex flex-col">
@@ -148,7 +185,7 @@ export function AnimatedList<T>({
     <div className="relative flex flex-col min-h-0 flex-1 overflow-hidden">
       <div
         className={`absolute top-0 left-0 right-0 h-6 bg-linear-to-b from-black/15 dark:from-white/10 to-transparent pointer-events-none z-10 transition-opacity duration-200 ${
-          isScrolledTop ? "opacity-0" : "opacity-100"
+          !canScroll || isScrolledTop ? "opacity-0" : "opacity-100"
         }`}
       />
 
@@ -162,7 +199,7 @@ export function AnimatedList<T>({
 
       <div
         className={`absolute bottom-0 left-0 right-0 h-6 bg-linear-to-t from-black/15 dark:from-white/10 to-transparent pointer-events-none z-10 transition-opacity duration-200 ${
-          isScrolledBottom ? "opacity-0" : "opacity-100"
+          !canScroll || isScrolledBottom ? "opacity-0" : "opacity-100"
         }`}
       />
     </div>

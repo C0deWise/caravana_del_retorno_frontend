@@ -6,10 +6,10 @@ import { MultimediaCard, MultimediaCardUploadState } from "./MultimediaCard";
 interface PublicationMultimediaListProps {
   readonly items: LocalMultimediaItem[];
   readonly remove: (id: string) => void;
-  readonly uploadStates: Record<string, MultimediaCardUploadState>;
-  readonly removeState: (id: string) => void;
-  readonly retryFile: (item: LocalMultimediaItem, allItems: LocalMultimediaItem[], onAllComplete?: () => void) => void;
-  readonly onCompleteSuccess: () => void;
+  readonly uploadStates?: Record<string, MultimediaCardUploadState>;
+  readonly removeState?: (id: string) => void;
+  readonly retryFile?: (item: LocalMultimediaItem, allItems: LocalMultimediaItem[], onAllComplete?: () => void) => void;
+  readonly onCompleteSuccess?: () => void;
 }
 
 export function PublicationMultimediaList({
@@ -26,7 +26,7 @@ export function PublicationMultimediaList({
     setDeletedItems((prev) => new Set(prev).add(id));
     setTimeout(() => {
       remove(id);
-      removeState(id);
+      if (removeState) removeState(id);
     }, 500);
   };
 
@@ -47,11 +47,11 @@ export function PublicationMultimediaList({
             size={it.size}
             type={it.type}
             dataUrl={it.dataUrl}
-            upload={uploadStates[it.id] || { status: "idle", progress: 0 }}
+            upload={uploadStates?.[it.id] || { status: "idle", progress: 0 }}
             isLeaving={deletedItems.has(it.id)}
-            allowRetry={true}
+            allowRetry={!!retryFile}
             onRemove={handleRemoveFile}
-            onRetry={() => retryFile(it, items, onCompleteSuccess)}
+            onRetry={() => retryFile?.(it, items, onCompleteSuccess)}
           />
         </ExpandableContent>
       ))}

@@ -1,19 +1,47 @@
 import { apiService, ApiError } from "@/services/api.services";
 import type { UserSearchResult } from "@/types/user.types";
 
+const userCache = new Map<number, UserSearchResult>();
+const pendingRequests = new Map<number, Promise<UserSearchResult>>();
+
 export const userService = {
   getUserById: async (id: number): Promise<UserSearchResult> => {
-    return apiService.get(`/api/v1/usuario/buscar_id/${id}/`);
+    if (userCache.has(id)) {
+      return userCache.get(id)!;
+    }
+
+    if (pendingRequests.has(id)) {
+      return pendingRequests.get(id)!;
+    }
+
+    const request = apiService.get<UserSearchResult>(`/api/v1/usuario/buscar_id/${id}/`);
+    pendingRequests.set(id, request);
+
+    try {
+      const userData = await request;
+      userCache.set(id, userData);
+      return userData;
+    } finally {
+      pendingRequests.delete(id);
+    }
+  },
+
+  getUserFromCache: (id: number): UserSearchResult | undefined => {
+    return userCache.get(id);
   },
 
   searchByName: async (nombre: string): Promise<UserSearchResult[]> => {
-    return apiService.get(
+    const results = await apiService.get<UserSearchResult[]>(
       `/api/v1/usuario/buscar/${encodeURIComponent(nombre)}`,
     );
+    results.forEach(user => userCache.set(user.id, user));
+    return results;
   },
 
   searchByDocument: async (documento: string): Promise<UserSearchResult> => {
-    return apiService.get(`/api/v1/usuario/buscar_documento/${documento}`);
+    const user = await apiService.get<UserSearchResult>(`/api/v1/usuario/buscar_documento/${documento}`);
+    if (user) userCache.set(user.id, user);
+    return user;
   },
 
   safeSearchByDocument: async (documento: string): Promise<UserSearchResult[]> => {
