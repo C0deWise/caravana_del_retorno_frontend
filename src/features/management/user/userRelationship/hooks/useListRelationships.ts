@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { listRelationshipsWithUsersService } from "../services/relationship.service";
 import { ApiError } from "@/services/api.services";
-import { getMockRelationships } from "../mocks/relationship.mock";
+import { getMockRelationships } from "@/mocks/relationship.mock";
+import { FEATURE_FLAGS } from "@/config/featureFlags";
 import type {
   RelationshipItem,
   RelationshipStatus,
@@ -15,7 +16,6 @@ interface UseListRelationshipsReturn {
   hasMore: boolean;
   loadMore: () => void;
   refetch: () => void;
-  usedMocks: boolean;
 }
 
 const PAGE_SIZE = 20;
@@ -50,7 +50,7 @@ const resolveErrorMessage = (error: unknown): string => {
 
 export function useListRelationships(
   targetUserId: number,
-  useMocks = false,
+  useMocks = FEATURE_FLAGS.USE_RELATIONSHIP_MOCKS,
 ): UseListRelationshipsReturn {
   const [allRelationships, setAllRelationships] = useState<RelationshipItem[]>(
     [],
@@ -163,6 +163,5 @@ export function useListRelationships(
     hasMore,
     loadMore,
     refetch,
-    usedMocks: useMocks,
   };
 }

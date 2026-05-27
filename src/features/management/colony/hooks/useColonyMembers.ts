@@ -5,8 +5,10 @@ import { listColonyMembers } from "../services/colony-members.service";
 import { ApiError } from "@/services/api.services";
 import { useGetColony } from "./useGetColony";
 import { sortColonyMembers } from "../utils/member-sorter";
+import { getMockColonyMembers } from "@/mocks/colonyMember.mock";
+import { FEATURE_FLAGS } from "@/config/featureFlags";
 
-export function useColonyMembers(targetColonyId: number): {
+export function useColonyMembers(targetColonyId: number, useMocks = FEATURE_FLAGS.USE_COLONY_MEMBER_MOCKS): {
 
   members: ColonyMember[];
   colonyLabel: string;
@@ -23,7 +25,7 @@ export function useColonyMembers(targetColonyId: number): {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { getColony, colony, loading: isLoadingColony } = useGetColony();
+  const { getColony, colony, loading: isLoadingColony } = useGetColony(useMocks);
 
   useEffect(() => {
     if (targetColonyId) {
@@ -49,6 +51,13 @@ export function useColonyMembers(targetColonyId: number): {
 
     setIsLoading(true);
     setError(null);
+
+    if (useMocks) {
+      const mockData = getMockColonyMembers(targetColonyId);
+      setMembers(sortColonyMembers(mockData));
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const data = await listColonyMembers(targetColonyId);

@@ -1,4 +1,4 @@
-import { RelationshipItem, formatKinshipType } from "../types/relationship.type";
+import { RelationshipItem, formatKinshipType } from "@/features/management/user/userRelationship/types/relationship.type";
 
 export const getMockRelationships = (targetUserId: number): RelationshipItem[] => {
   const rawMocks: RelationshipItem[] = [
