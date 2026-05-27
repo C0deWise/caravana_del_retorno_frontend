@@ -42,7 +42,7 @@ export function useGrupo(liderId: number | undefined): UseGrupoReturn {
     }, [liderId]);
 
     useEffect(() => {
-        void fetchGrupo();
+        fetchGrupo();
     }, [fetchGrupo]);
 
     const createGrupo = useCallback(async (id: number) => {

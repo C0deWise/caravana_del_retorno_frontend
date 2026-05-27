@@ -1,5 +1,5 @@
 import { apiService } from '@/services/api.services';
-import type { ReturnUnregistrationApi, ReturnUnregistrationCreateRequest } from '../types/returnUnregistration.types';
+import type { ReturnUnregistrationCreateRequest } from '../types/returnUnregistration.types';
 import type { Retorno } from '../../../shared/types/retorno.types';
 
 const ACTIVE_RETURN_STATES = new Set([

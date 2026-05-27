@@ -45,7 +45,7 @@ export function useSentInvitations(grupoId: number | undefined): UseSentInvitati
     }, [grupoId]);
 
     useEffect(() => {
-        void fetchInvitations();
+        fetchInvitations();
     }, [fetchInvitations]);
 
     const hasPending = invitations.some(

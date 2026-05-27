@@ -8,7 +8,7 @@ interface UseListReturnReturn {
     refetch: () => Promise<Retorno[] | null>;
     returns: Retorno[];
     loading: boolean;
-    error: string | null;  
+    error: string | null;
 }
 
 export const useListReturn = (autoFetch = false): UseListReturnReturn => {
@@ -37,8 +37,8 @@ export const useListReturn = (autoFetch = false): UseListReturnReturn => {
     }, []);
 
     useEffect(() => {
-        if(autoFetch) {
-            void listReturns();
+        if (autoFetch) {
+            listReturns();
         }
     }, [autoFetch, listReturns]);
 
@@ -46,7 +46,7 @@ export const useListReturn = (autoFetch = false): UseListReturnReturn => {
         listReturns,
         refetch: listReturns,
         returns,
-        loading, 
+        loading,
         error
     };
 };

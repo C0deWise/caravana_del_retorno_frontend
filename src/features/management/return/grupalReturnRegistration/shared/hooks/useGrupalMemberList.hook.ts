@@ -36,7 +36,7 @@ export function useGrupalMembersList(grupoId: number | undefined): UseGrupalMemb
     }, [grupoId]);
 
     useEffect(() => {
-        void fetchMembers();
+        fetchMembers();
     }, [fetchMembers]);
 
     return {
