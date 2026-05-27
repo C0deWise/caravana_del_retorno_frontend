@@ -46,7 +46,12 @@ export function useExternedPerson(): UseExternalPersonReturn {
                 setStep("not_found")
             }
         } catch (err) {
-            setError(err instanceof ApiError ? err.message : "Error al buscar a la persona")
+            if (err instanceof ApiError && err.status === 404) {
+                setFoundPersona(null);
+                setStep("not_found");
+            } else {
+                setError(err instanceof ApiError ? err.message : "Error al buscar a la persona");
+            }
         } finally {
             setIsLoading(false);
         }
