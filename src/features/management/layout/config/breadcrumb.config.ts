@@ -12,6 +12,7 @@ export const breadcrumbLabels: Record<string, string> = {
   "/gestion/retorno": "Gestión de Retorno",
   "/gestion/retorno/crear": "Crear Retorno",
   "/gestion/retorno/registro": "Formulario de inscripción",
+  "/gestion/retorno/grupos": "Invitaciones a Grupos",
 
   "/gestion/publicaciones": "Gestión de Publicaciones",
   "/gestion/publicaciones/administrar": "Administrar Publicaciones",
