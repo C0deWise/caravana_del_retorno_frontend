@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { RequireAuth } from "@/auth/components/RequireAuth";
 import { useAuth } from "@/auth/context/AuthContext";
 import { ConfirmModal } from "@/components/feedback/confirmModal";
@@ -14,14 +15,18 @@ import { InviteMemberModal } from "../../features/invitateMembers/components/Inv
 import { ExternalPersonModal } from "../../features/externalPerson/components/ExternalPersonModal";
 import { SentInvitationsList } from "../../features/sentInvitations/components/SentInvitationsList";
 import { GrupalRegistrationForm } from "../../features/grupalRegistrationForm/components/GrupalRegistrationForm";
+import { EditGrupalReturnRegistrationForm } from "../../features/editGrupalReturnRegistration/components/EditGrupalReturnRegistrationForm";
+import { useLoadGrupalRegistration } from "../../features/editGrupalReturnRegistration/hooks/useLoadGrupalRegistration";
 import type { Retorno } from "../../../shared/types/retorno.types";
+import type { RegistroGrupoRetorno } from "../types/grupalReturnRegistration";
 import Spinner from "@/components/feedback/Spinner";
 import { retornoService } from "../../../shared/services/retorno.service";
 
-type View = "main" | "form";
+type View = "main" | "form" | "edit";
 
 function GrupalReturnRegistrationFeature() {
   const { user } = useAuth();
+  const router = useRouter();
   const [view, setView] = useState<View>("main");
   const [activeReturn, setActiveReturn] = useState<Retorno | null>(null);
   const [showInviteMember, setShowInviteMember] = useState(false);
@@ -34,15 +39,32 @@ function GrupalReturnRegistrationFeature() {
   const { cancelGroup, isLoading: cancelling, error: cancelError } = useCancelGroup();
   const { removeMember, isLoading: removingMember } = useRemoveMember();
   const { removeExternalPerson, isLoading: removingExternal } = useRemoveExternalPerson();
-
-  // TODO: Validar si un grupo ya está inscrito, editar una inscripción grupal y eliminar una inscripción grupal y/o un grupo
+  const [existingRegistration, setExistingRegistration] = useState<RegistroGrupoRetorno | null>(null);
+  const [activeReturnLoading, setActiveReturnLoading] = useState(true);
 
   // Resolver retorno activo una sola vez
   useEffect(() => {
-    retornoService.getActiveReturn().then(setActiveReturn).catch(() => setActiveReturn(null));
+    setActiveReturnLoading(true);
+    retornoService
+      .getActiveReturn()
+      .then(setActiveReturn)
+      .catch(() => setActiveReturn(null))
+      .finally(() => setActiveReturnLoading(false));
   }, []);
 
-  const canEnroll = !hasPending && members.length >= 1;
+  const { registration, loading: registrationLoading } = useLoadGrupalRegistration(
+    grupo?.gr_codigo ?? 0,
+    activeReturn?.codigo ?? 0,
+  );
+
+  useEffect(() => {
+    setExistingRegistration(registration);
+  }, [registration]);
+
+  const hasRegistration = existingRegistration !== null;
+  const isInitialLoading = activeReturnLoading || registrationLoading;
+
+  const canEnroll = !hasPending && members.length >= 1 && !hasRegistration;
 
   const handleRemoveInvitation = async (id: number, kind: "usuario" | "persona") => {
     if (!grupo) return;
@@ -59,9 +81,10 @@ function GrupalReturnRegistrationFeature() {
     if (!grupo) return;
     await cancelGroup(grupo.gr_codigo);
     setShowCancelConfirm(false);
+    router.push("/gestion/retorno/registro");
   };
 
-  if (grupoLoading) {
+  if (grupoLoading || (activeReturnLoading && !grupoError)) {
     return (
       <div className="flex justify-center py-20">
         <Spinner size="lg" />
@@ -89,14 +112,35 @@ function GrupalReturnRegistrationFeature() {
     );
   }
 
-  if (view === "form" && activeReturn) {
+  if (registrationLoading) {
+    return (
+      <div className="flex justify-center py-20">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (view === "form" && activeReturn && !isInitialLoading) {
     return (
       <div className="flex justify-center px-4 py-8">
         <GrupalRegistrationForm
           retornoId={activeReturn.codigo}
           grupoId={grupo.gr_codigo}
           retornoAnio={activeReturn.anio}
-          onSuccess={() => setView("main")}
+          onSuccess={(record) => { setExistingRegistration(record); setView("main"); }}
+        />
+      </div>
+    );
+  }
+
+  if (view === "edit" && activeReturn && existingRegistration && !isInitialLoading) {
+    return (
+      <div className="flex justify-center px-4 py-8">
+        <EditGrupalReturnRegistrationForm
+          registration={existingRegistration}
+          retornoAnio={activeReturn.anio}
+          onSuccess={(updated) => { setExistingRegistration(updated); setView("main"); }}
+          onCancel={() => setView("main")}
         />
       </div>
     );
@@ -119,23 +163,33 @@ function GrupalReturnRegistrationFeature() {
         )
       }
 
+      {hasRegistration && (
+        <div className="alert-info mt-0 mb-4">
+          <p className="alert-info-text text-sm">El grupo ya está inscrito. No se pueden agregar más miembros.</p>
+        </div>
+      )}
+
       {/* Acciones de invitación */}
-      <div className="flex gap-3">
-        <button
-          type="button"
-          className="btn-secondary flex-1 hover:opacity-90"
-          onClick={() => setShowInviteMember(true)}
-        >
-          Invitar miembro
-        </button>
-        <button
-          type="button"
-          className="btn-secondary flex-1 hover:opacity-90"
-          onClick={() => setShowInviteExternal(true)}
-        >
-          Invitar persona externa
-        </button>
-      </div>
+      {!hasRegistration && (
+        <div className="flex gap-3">
+          <button
+            type="button"
+            className="btn-secondary flex-1 hover:opacity-90"
+            onClick={() => setShowInviteMember(true)}
+            disabled={hasRegistration || isInitialLoading}
+          >
+            Invitar miembro
+          </button>
+          <button
+            type="button"
+            className="btn-secondary flex-1 hover:opacity-90"
+            onClick={() => setShowInviteExternal(true)}
+            disabled={hasRegistration || isInitialLoading}
+          >
+            Invitar persona externa
+          </button>
+        </div>
+      )}
 
       {/* Invitaciones enviadas */}
       <section>
@@ -149,29 +203,44 @@ function GrupalReturnRegistrationFeature() {
       </section>
 
       {/* Botón inscribir */}
-      <div className="justify-center border border-gray-200">
-        {hasPending && (
-          <p className="alert-info-text text-sm justify-center">
-            Hay invitaciones pendientes de aceptar.
-          </p>
-        )}
-        {members.length === 0 && !membersLoading && (
-          <p className="text-text-muted text-sm mr-4 self-center">
-            El grupo debe tener al menos un miembro.
-          </p>
-        )}
-      </div>
+      {(hasPending ?? members.length === 0) &&
+        (<div className="alert-info mt-0">
+          
+          {hasPending && (
+            <p className="text-text-muted text-sm justify-center">
+              No se puede realizar la inscripción porque hay invitaciones pendientes de aceptar.
+            </p>
+          )}
 
-      <div className="flex gap-3 justify-center">
+          {members.length === 0 && !membersLoading && (
+            <p className="text-text-muted text-sm mr-4 self-center">
+              El grupo debe tener al menos un miembro para realizar la inscripción.
+            </p>
+          )}
+        </div>)
+      }
+
+      <div className="flex gap-3 justify-center mt-8">
+        <button
+          type="button"
+          className="btn-danger hover:opacity-90"
+          onClick={() => setShowCancelConfirm(true)}
+          disabled={cancelling}
+        >
+          {cancelling ? <Spinner size="sm" /> : "Eliminar grupo"}
+        </button>
+
+        {isInitialLoading && <Spinner size="sm" />}
+        {!isInitialLoading && hasRegistration && (
           <button
             type="button"
-            className="btn-danger hover:opacity-90"
-            onClick={() => setShowCancelConfirm(true)}
-            disabled={cancelling}
+            className="btn-primary bg-secondary hover:opacity-90"
+            onClick={() => setView("edit")}
           >
-            {cancelling ? <Spinner size="sm" /> : "Eliminar grupo"}
+            Editar inscripción
           </button>
-
+        )}
+        {!isInitialLoading && !hasRegistration && (
           <button
             type="button"
             className="btn-primary bg-secondary hover:opacity-90"
@@ -180,7 +249,8 @@ function GrupalReturnRegistrationFeature() {
           >
             Inscribir grupo
           </button>
-        </div>
+        )}
+      </div>
 
       {/* Modales */}
       {
@@ -207,12 +277,12 @@ function GrupalReturnRegistrationFeature() {
 
       <ConfirmModal
         isOpen={showCancelConfirm}
-        title="¿Cancelar el grupo?"
+        title="Eliminar el grupo?"
         details={["Esta acción eliminará el grupo y desvinculará a todos sus miembros."]}
         onConfirm={handleCancelConfirm}
         onCancel={() => setShowCancelConfirm(false)}
         loading={cancelling}
-        confirmLabel="Sí, cancelar"
+        confirmLabel="Sí, eliminar"
         cancelLabel="Volver"
       />
     </div >
