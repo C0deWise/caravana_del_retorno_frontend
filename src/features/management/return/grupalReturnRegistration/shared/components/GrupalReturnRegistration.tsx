@@ -165,7 +165,7 @@ function GrupalReturnRegistrationFeature() {
 
       {hasRegistration && (
         <div className="alert-info mt-0 mb-4">
-          <p className="alert-info-text text-sm">El grupo ya está inscrito. No se pueden agregar más miembros.</p>
+          <p className="text-sm text-text-muted">El grupo ya está inscrito. No se pueden agregar más miembros.</p>
         </div>
       )}
 
