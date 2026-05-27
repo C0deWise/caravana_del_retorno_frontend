@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/auth/context/AuthContext";
 import { ReportParams, ReportType } from "../types/report.types";
-import { useListReturn } from "@/features/management/return/hooks/useListReturns";
+import { useListReturn } from "@/features/management/return/shared/hooks/useListReturns";
 import { UseGenerateReport } from "../hooks/useGenerateReport";
 import { useListColonies } from "@/features/management/colony/hooks/useListColonies";
 import { ColonyData } from "@/types/colony.types";
