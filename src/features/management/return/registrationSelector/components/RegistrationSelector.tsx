@@ -37,17 +37,17 @@ function RegistrationSelectorContent() {
                 <div className="grid gap-4 sm:grid-cols-2">
                     <button
                         type="button"
-                        className="btn-secondary flex flex-col items-start gap-2 rounded-xl p-6 text-left"
+                        className="btn-secondary group flex flex-col items-start gap-2 rounded-xl p-6 text-left"
                         onClick={selectIndividual}
                         disabled={isCreating}
                     >
-                        <span className="section-title">Individual</span>
+                        <span className="text-2xl font-bold mb-6 text-gray-500 group-hover:text-white">Individual</span>
                         <span className="text text-muted text-sm">Registra tu asistencia de forma personal</span>
                     </button>
 
                     <button
                         type="button"
-                        className="btn-secondary flex flex-col items-start gap-2 rounded-xl p-6 text-left"
+                        className="btn-secondary group flex flex-col items-start gap-2 rounded-xl p-6 text-left"
                         onClick={selectGrupal}
                         disabled={isCreating}
                     >
@@ -55,7 +55,7 @@ function RegistrationSelectorContent() {
                             <Spinner size="sm" />
                         ) : (
                             <>
-                                <span className="section-title">Grupal</span>
+                                <span className="text-2xl font-bold mb-6 text-gray-500 group-hover:text-white">Grupal</span>
                                 <span className="text text-muted text-sm">Crea un grupo y coordina el viaje con tu familia y amigos</span>
                             </>
                         )}
