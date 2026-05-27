@@ -8,7 +8,7 @@ import {
   useEffect,
 } from "react";
 import { UserApi, UserData, UserRole, CODE_TO_ROLE } from "@/types/user.types";
-import { buildMockUsers } from "@/features/dev/config/mockUsers";
+import { buildMockUsers } from "@/mocks/user.mock";
 import { useDev } from "@/features/dev/context/DevContext";
 
 const IS_DEV = process.env.NEXT_PUBLIC_DEV_TOOLS === "true";

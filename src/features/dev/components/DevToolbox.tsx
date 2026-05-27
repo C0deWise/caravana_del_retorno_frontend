@@ -24,13 +24,13 @@ function DevToolbox() {
   const { isDev } = useDev();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [buttonPosition, setButtonPosition] = useState<"top-left" | "top-right" | "bottom-left" | "bottom-right">("top-left");
-  
+  const [buttonPosition, setButtonPosition] = useState<"top-left" | "top-right" | "bottom-left" | "bottom-right">("top-right");
+
   const togglePanel = () => setIsOpen((prev) => !prev);
-  
+
   const { ref, pos, corner, hasMoved, isDragging, isReady } =
     useMagneticDraggable(setButtonPosition, buttonPosition);
-    
+
   const wasOpenRef = useRef(false);
   const prevDraggingRef = useRef(false);
 
