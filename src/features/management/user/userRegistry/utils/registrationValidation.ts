@@ -1,6 +1,7 @@
 import type { RegistrationFormData } from "../types/registro.types";
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// ✅ Sin backtracking — caracteres explícitos y disjuntos por segmento
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const DIGITS_ONLY_REGEX = /^\d+$/;
 const PASSPORT_REGEX = /^[A-Za-z0-9]+$/;
 const ALLOWED_NAME_CHARS = new Set(
@@ -62,7 +63,8 @@ const validateNombreField = (value: string): string | null => {
   return null;
 };
 
-const validateCorreoField = (value: string, data: RegistrationFormData): string | null => {
+// ✅ Parámetro "data" eliminado — no se usaba (evita S1172)
+const validateCorreoField = (value: string): string | null => {
   if (!EMAIL_REGEX.test(value)) return "Ingresa un correo electrónico válido";
   return null;
 };
@@ -105,18 +107,18 @@ const validateCelular = (value: string): string | null => {
 type FieldValidator = (value: string, data: RegistrationFormData) => string | null;
 
 const FIELD_VALIDATORS: Partial<Record<keyof RegistrationFormData, FieldValidator>> = {
-  nombre:          (v) => validateNombreField(v),
-  apellido:        (v) => validateNombreField(v),
-  correo:          (v, d) => validateCorreoField(v, d),
-  confirmEmail:    (v, d) => validateConfirmEmail(v, d),
-  contrasenia:     (v) => validateContrasenia(v),
-  confirmPassword: (_, d) => validateConfirmPassword(d),
-  fecha_nacimiento:(v) => validateFechaNacimiento(v),
-  celular:         (v) => validateCelular(v),
-  documento:       (_, d) => validateDocumentByType(d.tipo_doc, d.documento),
+  nombre:           (v) => validateNombreField(v),
+  apellido:         (v) => validateNombreField(v),
+  correo:           (v) => validateCorreoField(v), 
+  confirmEmail:     (v, d) => validateConfirmEmail(v, d),
+  contrasenia:      (v) => validateContrasenia(v),
+  confirmPassword:  (_, d) => validateConfirmPassword(d),
+  fecha_nacimiento: (v) => validateFechaNacimiento(v),
+  celular:          (v) => validateCelular(v),
+  documento:        (_, d) => validateDocumentByType(d.tipo_doc, d.documento),
 };
 
-// ── Validador principal — complejidad cognitiva mínima ────────────────────────
+// ── Validador principal ───────────────────────────────────────────────────────
 
 export const validateRegistrationField = (
   fieldName: keyof RegistrationFormData,
@@ -132,7 +134,7 @@ export const validateRegistrationField = (
   return validator ? validator(value, data) : null;
 };
 
-// ── Resto sin cambios ─────────────────────────────────────────────────────────
+// ── Normalización y validación completa ──────────────────────────────────────
 
 export const normalizeFormData = (
   data: RegistrationFormData,

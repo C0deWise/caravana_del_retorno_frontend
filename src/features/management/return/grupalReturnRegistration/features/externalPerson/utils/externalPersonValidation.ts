@@ -1,13 +1,17 @@
 import type { PersonaCreateRequest } from "../types/persona.types";
 
 const DIGITS_ONLY_REGEX = /^\d+$/;
+
 const ALLOWED_NAME_CHARS = new Set(
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" +
     "ÁÉÍÓÚáéíóúÑñÜü '-"
 );
+
 const isValidNameChar = (ch: string): boolean =>
     ALLOWED_NAME_CHARS.has(ch);
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Corregida: sin backtracking — partes del email bien delimitadas
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 export interface ExternalPersonErrors {
     pe_documento?: string;
@@ -23,15 +27,16 @@ export const hasExternalPersonErrors = (errors: ExternalPersonErrors): boolean =
 // ── Field validators ──────────────────────────────────────────────────────────
 
 export const validateDocumento = (value: string): string | undefined => {
-    if (!value.trim()) return "Este campo es obligatorio";
-    if (!DIGITS_ONLY_REGEX.test(value)) return "Solo se permiten números";
-    if (value.length < 5) return "Debe tener al menos 5 dígitos";
-    if (value.length > 15) return "No puede tener más de 15 dígitos";
+    const trimmed = value.trim();
+    if (!trimmed) return "Este campo es obligatorio";
+    if (!DIGITS_ONLY_REGEX.test(trimmed)) return "Solo se permiten números";
+    if (trimmed.length < 5) return "Debe tener al menos 5 dígitos";
+    if (trimmed.length > 15) return "No puede tener más de 15 dígitos";
     return undefined;
 };
 
 export const validateNombre = (value: string, label = "nombre"): string | undefined => {
-    const trimmed = value.trim(); // ← declarar la variable primero
+    const trimmed = value.trim();
     if (!trimmed) return "Este campo es obligatorio";
     if (trimmed.length < 2) return "Debe tener al menos 2 caracteres";
     if (![...trimmed].every(isValidNameChar))
@@ -40,8 +45,9 @@ export const validateNombre = (value: string, label = "nombre"): string | undefi
 };
 
 export const validateCorreo = (value: string): string | undefined => {
-    if (!value.trim()) return "Este campo es obligatorio";
-    if (!EMAIL_REGEX.test(value.trim()))
+    const trimmed = value.trim(); // ← evita llamar .trim() dos veces
+    if (!trimmed) return "Este campo es obligatorio";
+    if (!EMAIL_REGEX.test(trimmed))
         return "Ingresa un correo electrónico válido";
     return undefined;
 };
