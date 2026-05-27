@@ -18,7 +18,7 @@ interface CornerPosition {
   position: Position;
 }
 
-export function useDraggableAccessibility(
+export function useMagneticDraggable(
   onPositionChange: (corner: Corner) => void,
   initialCorner: Corner,
 ) {

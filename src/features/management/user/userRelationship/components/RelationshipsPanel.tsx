@@ -7,14 +7,14 @@ import { KinshipsList } from "../kinshipsList/KinshipsList";
 import { RequestsList } from "../relationshipsRequestList/RequestsList";
 import { RequestRelationshipButton } from "../relationshipRequest/components/RequestRelationshipButton";
 import { RequireAuth } from "@/auth/components/RequireAuth";
-import { FEATURE_FLAGS } from "@/config/featureFlags";
-
+import { useDev } from "@/features/dev/context/DevContext";
 function RelationshipsPanelComponent() {
   const { user } = useAuth();
+  const { featureFlags } = useDev();
   const targetUserId = user?.id ?? 0;
 
   const { relationships, loading, error, hasMore, loadMore, refetch, usedMocks } =
-    useListRelationships(targetUserId, FEATURE_FLAGS.USE_RELATIONSHIP_MOCKS);
+    useListRelationships(targetUserId, featureFlags.USE_RELATIONSHIP_MOCKS);
 
   const normalizeTabStatus = (status?: string) =>
     status?.trim().toLowerCase() ?? "";
