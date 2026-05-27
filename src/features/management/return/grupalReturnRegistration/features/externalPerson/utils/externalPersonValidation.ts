@@ -1,7 +1,12 @@
 import type { PersonaCreateRequest } from "../types/persona.types";
 
 const DIGITS_ONLY_REGEX = /^\d+$/;
-const NAME_REGEX = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s'-]+$/;
+const ALLOWED_NAME_CHARS = new Set(
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" +
+    "ÁÉÍÓÚáéíóúÑñÜü '-"
+);
+const isValidNameChar = (ch: string): boolean =>
+    ALLOWED_NAME_CHARS.has(ch);
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export interface ExternalPersonErrors {
@@ -26,9 +31,10 @@ export const validateDocumento = (value: string): string | undefined => {
 };
 
 export const validateNombre = (value: string, label = "nombre"): string | undefined => {
-    if (!value.trim()) return "Este campo es obligatorio";
-    if (value.trim().length < 2) return "Debe tener al menos 2 caracteres";
-    if (!NAME_REGEX.test(value.trim()))
+    const trimmed = value.trim(); // ← declarar la variable primero
+    if (!trimmed) return "Este campo es obligatorio";
+    if (trimmed.length < 2) return "Debe tener al menos 2 caracteres";
+    if (![...trimmed].every(isValidNameChar))
         return `El ${label} solo puede contener letras`;
     return undefined;
 };
