@@ -51,7 +51,7 @@ export function GrupalRegistrationForm({
     const { sendGrupalRegistration, isLoading, error } = useSendGrupalRegistration();
     const maxLength = 150;
     const { members } = useGrupalMembersList(grupoId);
-    const memberCount = members.length + 1; // +1 por el líder
+    const memberCount = members.length + 1; // +1 Por el líder
     const maxParqueadero = memberCount - (formData.transporte as number);
 
     const validateForm = (): boolean => {
