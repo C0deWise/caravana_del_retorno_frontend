@@ -19,6 +19,7 @@ interface UserSearchFieldProps {
   readonly initialMode?: UserSearchMode;
   readonly excludeIds?: number[];
   readonly showModeSelector?: boolean;
+  readonly coloniaId?: number | null;
 }
 
 export function UserSearchField({
@@ -32,6 +33,7 @@ export function UserSearchField({
   initialMode = "general",
   excludeIds = [],
   showModeSelector = false,
+  coloniaId,
 }: Readonly<UserSearchFieldProps>) {
   const { user: currentUser } = useAuth();
   const [searchType, setSearchType] = useState<UserSearchMode>(initialMode);
@@ -70,6 +72,7 @@ export function UserSearchField({
     if (u.id === currentUser?.id) return false;
     if (u.codigo_rol === 3) return false;
     if (excludeIds.includes(u.id)) return false;
+    if (coloniaId != null && u.codigo_colonia !== coloniaId) return false;
     return true;
   });
 
