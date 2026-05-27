@@ -4,7 +4,7 @@ import { MenuItem } from "@/features/management/layout/types/menu.types";
 import { UserData } from "@/types/user.types";
 
 export function getMenuByRole(user: UserData | null | undefined): MenuItem[] {
-  if (!user || !user.role) return [];
+  if (!user?.role) return [];
 
   const allowedRoutes = rolePermissions[user.role] ?? [];
 
@@ -16,6 +16,10 @@ export function getMenuByRole(user: UserData | null | undefined): MenuItem[] {
       if (user.codigo_colonia === null || user.codigo_colonia === undefined) {
         subitems = subitems.filter(
           (sub) => sub.href !== "/gestion/colonia/miembros"
+        );
+      } else {
+        subitems = subitems.filter(
+          (sub) => sub.href !== "/gestion/colonia/inscribir-colonia"
         );
       }
 

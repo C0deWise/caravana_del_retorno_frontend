@@ -3,7 +3,7 @@ import { ApiError } from "@/services/api.services";
 import { coloniaService } from "../services/colony.service";
 import type { ColonyData } from "@/types/colony.types";
 import { getMockColonies } from "@/mocks/colony.mock";
-import { FEATURE_FLAGS } from "@/config/featureFlags";
+import { useDev } from "@/features/dev/context/DevContext";
 
 interface UseGetColonyReturn {
   getColony: (codigo: number) => Promise<ColonyData | null>;
@@ -12,7 +12,10 @@ interface UseGetColonyReturn {
   error: string | null;
 }
 
-export const useGetColony = (useMocks = FEATURE_FLAGS.USE_COLONY_MOCKS): UseGetColonyReturn => {
+export const useGetColony = (useMocks?: boolean): UseGetColonyReturn => {
+  const { featureFlags } = useDev();
+  const effectiveUseMocks = useMocks ?? featureFlags.USE_COLONY_MOCKS;
+
   const [colony, setColony] = useState<ColonyData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +24,7 @@ export const useGetColony = (useMocks = FEATURE_FLAGS.USE_COLONY_MOCKS): UseGetC
     setLoading(true);
     setError(null);
 
-    if (useMocks) {
+    if (effectiveUseMocks) {
       const mockData = getMockColonies().find(c => c.codigo === codigo) ?? null;
       setColony(mockData);
       if (!mockData) setError("Colonia no encontrada (mock)");

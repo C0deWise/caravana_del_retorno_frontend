@@ -21,9 +21,9 @@ export const getMockColonies = (): ColonyData[] => {
     {
       codigo: 3,
       pais: "España",
-      departamento: "Madrid",
-      ciudad: "Madrid",
-      lider: 101,
+      departamento: null,
+      ciudad: null,
+      lider: null,
       estado: "inactiva"
     }
   ];

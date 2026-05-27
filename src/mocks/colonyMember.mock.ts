@@ -39,7 +39,7 @@ export const getMockColonyMembers = (targetColonyId: number): ColonyMember[] => 
       fecha_nacimiento: "1985-08-20",
       celular: "3101234567",
       correo: "carlos.lopez@example.com",
-      role: 1 // Miembro
+      role: 2 // Lider
     },
     {
       id: 104,

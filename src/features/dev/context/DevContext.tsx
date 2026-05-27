@@ -29,10 +29,26 @@ export function DevProvider({ children }: { readonly children: ReactNode }) {
   const [mockColoniaId, setMockColoniaId] = useState<number | null>(null);
   const [mockUserId, setMockUserId] = useState<number | null>(null);
   const [apiMode, setApiMode] = useState<boolean>(false);
-  const [featureFlags, setFeatureFlags] = useState(FEATURE_FLAGS);
+  const [featureFlags, setFeatureFlags] = useState(() => ({
+    ...FEATURE_FLAGS,
+    // Since apiMode starts as false, initialize these mock flags as true
+    USE_COLONY_MOCKS: true,
+    USE_COLONY_MEMBER_MOCKS: true,
+    USE_RELATIONSHIP_MOCKS: true,
+  }));
 
   const setFeatureFlag = (key: keyof typeof FEATURE_FLAGS, value: boolean) => {
     setFeatureFlags(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleSetApiMode = (mode: boolean) => {
+    setApiMode(mode);
+    setFeatureFlags(prev => ({
+      ...prev,
+      USE_COLONY_MOCKS: !mode,
+      USE_COLONY_MEMBER_MOCKS: !mode,
+      USE_RELATIONSHIP_MOCKS: !mode,
+    }));
   };
 
   const value = useMemo(
@@ -45,7 +61,7 @@ export function DevProvider({ children }: { readonly children: ReactNode }) {
       setMockUserId,
       isDev: IS_DEV,
       apiMode,
-      setApiMode,
+      setApiMode: handleSetApiMode,
       featureFlags,
       setFeatureFlag,
     }),

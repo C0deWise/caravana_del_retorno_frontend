@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { listRelationshipsWithUsersService } from "../services/relationship.service";
 import { ApiError } from "@/services/api.services";
 import { getMockRelationships } from "@/mocks/relationship.mock";
-import { FEATURE_FLAGS } from "@/config/featureFlags";
+import { useDev } from "@/features/dev/context/DevContext";
 import type {
   RelationshipItem,
   RelationshipStatus,
@@ -50,8 +50,11 @@ const resolveErrorMessage = (error: unknown): string => {
 
 export function useListRelationships(
   targetUserId: number,
-  useMocks = FEATURE_FLAGS.USE_RELATIONSHIP_MOCKS,
+  useMocks?: boolean,
 ): UseListRelationshipsReturn {
+  const { featureFlags } = useDev();
+  const effectiveUseMocks = useMocks ?? featureFlags.USE_RELATIONSHIP_MOCKS;
+
   const [allRelationships, setAllRelationships] = useState<RelationshipItem[]>(
     [],
   );
@@ -72,7 +75,7 @@ export function useListRelationships(
       return;
     }
 
-    if (useMocks) {
+    if (effectiveUseMocks) {
       setAllRelationships(getMockRelationships(targetUserId));
       setPage(1);
       setLoading(false);
@@ -110,7 +113,7 @@ export function useListRelationships(
     return () => {
       cancelled = true;
     };
-  }, [targetUserId, fetchVersion, useMocks]);
+  }, [targetUserId, fetchVersion, effectiveUseMocks]);
 
   const uniqueRelationships = useMemo(() => {
     const map = new Map<string, RelationshipItem>();
