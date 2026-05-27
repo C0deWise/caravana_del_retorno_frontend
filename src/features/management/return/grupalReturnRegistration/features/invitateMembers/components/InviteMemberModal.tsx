@@ -7,6 +7,7 @@ import { useInviteMember } from "../hooks/useInviteMember.hook";
 import { AnimatedModal } from "@/components/feedback/AnimatedModal";
 import { UserSearchField } from "@/components/forms/UserSearchField";
 import Spinner from "@/components/feedback/Spinner";
+import { useAuth } from "@/auth/context/AuthContext";
 
 interface InviteModalProps {
     readonly isOpen: boolean;
@@ -28,6 +29,7 @@ export function InviteMemberModal({
     const [selectedUser, setSelectedUser] = useState<UserSearchResult | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const { inviteMember, isLoading, errorMessage, reset } = useInviteMember(currentMembers);
+    const { user: currentUser } = useAuth();
 
     const handleClose = () => {
         setSelectedUser(null);
@@ -66,6 +68,7 @@ export function InviteMemberModal({
                     variant="autocomplete"
                     label="Buscar usuario de la colonia"
                     onSelect={handleSelect}
+                    coloniaId={currentUser?.codigo_colonia}
                 />
 
                 {selectedUser && (
