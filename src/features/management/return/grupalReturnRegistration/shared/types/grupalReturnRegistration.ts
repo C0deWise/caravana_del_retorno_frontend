@@ -41,14 +41,19 @@ export interface RegistroGrupoRetornoRequest {
 }
 
 export interface RegistroGrupoRetorno {
-    id: number;
+    regg_codigo: number;
     retorno: number;
-    grupoId: number;
+    cod_grupo: number;
     num_hospedaje: number;
     num_transporte: number;
     num_parqueadero_carro: number;
     num_parqueadero_moto: number;
     anotacion: string | null;
+}
+
+export interface EliminarGrupoRetornoRequest {
+    gr_codigo: number;
+    mensaje: string;
 }
 
 export type MiembroGrupo = Pick<

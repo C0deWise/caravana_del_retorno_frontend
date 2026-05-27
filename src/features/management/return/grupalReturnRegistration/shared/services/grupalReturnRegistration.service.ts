@@ -1,5 +1,6 @@
 import { apiService } from "@/services/api.services";
 import type {
+    EliminarGrupoRetornoRequest,
     GruposRetorno,
     GruposRetornoCreateRequest,
     MiembroGrupo,
@@ -40,6 +41,10 @@ class GrupalReturnRegistrationService {
 
     async getSolicitudes(grupo: number): Promise<SolicitudMiembro[]> {
         return apiService.get<SolicitudMiembro[]>(`${this.endpoint}/solicitudes/grupo/${grupo}`)
+    }
+
+    async deleteGroup(groupId: number): Promise<EliminarGrupoRetornoRequest> {
+        return apiService.delete<EliminarGrupoRetornoRequest>(`${this.endpoint}/eliminar-grupo/${groupId}`);
     }
 }
 

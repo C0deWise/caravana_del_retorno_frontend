@@ -2,6 +2,7 @@
 
 import { ApiError } from "@/services/api.services";
 import { useState } from "react";
+import { grupalReturnRegistrationService } from "../services/grupalReturnRegistration.service";
 
 interface UseCancelGroupReturn {
     cancelGroup: (grupoId: number) => Promise<void>;
@@ -18,8 +19,7 @@ export function useCancelGroup(): UseCancelGroupReturn {
         setError(null);
 
         try {
-            //TODO: Conectar cuando el endpoint esté disponible
-            await Promise.resolve();
+            await grupalReturnRegistrationService.deleteGroup(_grupoId);
         } catch (err){
             setError(err instanceof ApiError ? err.message : "Error al cancelar el grupo");
         } finally {
