@@ -21,7 +21,7 @@ export function RequireAuth({
   const { user, isAuthenticated, isHydrating, effectiveRole } = useAuth();
   const router = useRouter();
 
-  const hasRole = !roles || roles.includes(effectiveRole as UserRole);
+  const hasRole = !roles || (effectiveRole !== undefined && roles.includes(effectiveRole));
   const hasColony = !requireColony || !!user?.codigo_colonia;
   const hasAccess = isAuthenticated && hasRole && hasColony;
 
@@ -33,7 +33,7 @@ export function RequireAuth({
       return;
     }
 
-    if (roles && !roles.includes(effectiveRole as UserRole)) {
+    if (roles && (effectiveRole === undefined || !roles.includes(effectiveRole))) {
       router.replace("/gestion");
       return;
     }

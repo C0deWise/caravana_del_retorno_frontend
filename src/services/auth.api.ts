@@ -9,7 +9,7 @@
 
 
 import { apiService } from "@/services/api.services";
-import { UserData, UserRole, CODE_TO_ROLE } from "@/types/user.types";
+import { UserData, CODE_TO_ROLE } from "@/types/user.types";
 import { tokenStorage } from "@/auth/utils/tokenStorage";
 
 /**
@@ -44,7 +44,7 @@ type AuthApiResponse = {
  * Utiliza 'CODE_TO_ROLE' para normalizar el rol numérico a un valor tipado.
  */
 const mapSessionToUserData = (session: SessionApi): UserData => {
-  const role = CODE_TO_ROLE[session.codigo_rol] as UserRole;
+  const role = CODE_TO_ROLE[session.codigo_rol];
 
   return {
     id: session.id,
@@ -86,12 +86,12 @@ export const authApi = {
   },
 
   /**
-   * Solicita un uwu nuevo token utilizando las credenciales de sesión existentes.
+   * Renueva la sesión usando el refresh token de la cookie HttpOnly.
    */
-  async refresh(): Promise<string> {
+  async refresh(): Promise<UserData> {
     const response = await apiService.post<AuthApiResponse>("/api/v1/usuario/refresh");
     tokenStorage.setAccessToken(response.access_token);
-    return response.access_token;
+    return mapSessionToUserData(response.usuario);
   },
 
   /**

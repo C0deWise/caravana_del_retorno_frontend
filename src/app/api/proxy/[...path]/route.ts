@@ -8,7 +8,7 @@ interface FetchError extends Error {
   cause?: { code?: string };
 }
 
-function buildTargetUrl(base: string, pathSegments: string[]): string {
+function buildTargetUrl(base: string, pathSegments: string[], preserveTrailingSlash: boolean): string {
   const normalizedBase = base.replace(/\/+$/, "");
   let relativePath = pathSegments.join("/").replace(/^\/+/, "");
 
@@ -17,13 +17,27 @@ function buildTargetUrl(base: string, pathSegments: string[]): string {
     relativePath = relativePath.slice("api/v1/".length);
   }
 
-  return `${normalizedBase}/${relativePath}`;
+  let target = `${normalizedBase}/${relativePath}`;
+  if (preserveTrailingSlash && !target.endsWith("/")) {
+    target += "/";
+  }
+  return target;
+}
+
+function shouldForceCollectionTrailingSlash(method: string, pathSegments: string[]): boolean {
+  const isWriteMethod = method === "POST" || method === "PATCH" || method === "PUT" || method === "DELETE";
+  const isCollectionRoot =
+    pathSegments.length === 3 &&
+    pathSegments[0]?.toLowerCase() === "api" &&
+    pathSegments[1]?.toLowerCase() === "v1";
+
+  return isWriteMethod && isCollectionRoot;
 }
 
 async function fetchWithRetry(
   url: string,
   buildInit: (attempt: number) => RequestInit,
-  retries = 3,
+  retries: number,
 ) {
   let lastError: unknown;
 
@@ -134,8 +148,11 @@ async function forwardRequest(
     );
   }
 
-  const url = buildTargetUrl(API_BASE, path);
+  const preserveTrailingSlash =
+    request.nextUrl.pathname.endsWith("/") || shouldForceCollectionTrailingSlash(method, path);
+  const url = buildTargetUrl(API_BASE, path, preserveTrailingSlash);
   const isReadMethod = method === "GET" || method === "HEAD";
+  const retries = isReadMethod ? 3 : 1;
 
   // Copiar headers originales
   const headers = new Headers();
@@ -146,11 +163,11 @@ async function forwardRequest(
     }
   });
 
-  let rawBody: Uint8Array | undefined;
+  let rawBodyBytes: number[] | undefined;
   if (!isReadMethod) {
     const bodyBuffer = await request.arrayBuffer();
     if (bodyBuffer.byteLength > 0) {
-      rawBody = new Uint8Array(bodyBuffer);
+      rawBodyBytes = Array.from(new Uint8Array(bodyBuffer));
     }
   }
 
@@ -158,7 +175,7 @@ async function forwardRequest(
     const response = await fetchWithRetry(
       url,
       () => {
-        const body = rawBody ? new Uint8Array(rawBody) : undefined;
+        const body = rawBodyBytes ? Uint8Array.from(rawBodyBytes) : undefined;
         return {
           method,
           headers,
@@ -166,6 +183,7 @@ async function forwardRequest(
           redirect: "follow",
         };
       },
+      retries,
     );
 
     return handleApiResponse(response);

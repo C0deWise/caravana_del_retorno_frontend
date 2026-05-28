@@ -12,6 +12,7 @@ export class ApiError extends Error {
 
 class ApiService {
   private readonly baseURL: string;
+  private refreshPromise: Promise<string | null> | null = null;
 
   constructor() {
     const baseURL = process.env.NEXT_PUBLIC_API_URL;
@@ -112,21 +113,16 @@ class ApiService {
 
     return JSON.parse(text) as T;
   }
-/**
-   * Intenta refrescar el token de acceso utilizando una petición al backend.
-   * Si el refresco falla (ej. sesión expirada), invalida el almacenamiento local.
-   */
-  private async refreshAccessToken(): Promise<string | null> {
+  private async executeRefreshRequest(): Promise<string | null> {
     try {
       const response = await fetch(`${this.baseURL}/api/v1/usuario/refresh`, {
         method: "POST",
-        credentials: "include", // Incluye cookies (refresh token) para la validación
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
       });
 
-// Si el servidor rechaza el refresco, cerramos sesión de forma segura >:)
       if (!response.ok) {
         tokenStorage.clear();
         return null;
@@ -137,13 +133,24 @@ class ApiService {
         tokenStorage.clear();
         return null;
       }
-// Almacenamos el nuevo JWT y lo retornamos para reintentar la petición original
+
       tokenStorage.setAccessToken(data.access_token);
       return data.access_token;
     } catch {
       tokenStorage.clear();
       return null;
     }
+  }
+
+  /**
+   * Evita llamadas concurrentes de refresh con una sola promesa compartida.
+   */
+  private async refreshAccessToken(): Promise<string | null> {
+    this.refreshPromise ??= this.executeRefreshRequest().finally(() => {
+      this.refreshPromise = null;
+    });
+
+    return this.refreshPromise;
   }
 /**
    * Construye los headers necesarios para cada petición, inyectando el token JWT
@@ -157,10 +164,9 @@ class ApiService {
       method,
       credentials: "include",
     };
-// Obtención del token actual (JWT)
     const token = tokenStorage.getAccessToken();
     const headers: Record<string, string> = {};
-// Inyección de autorización (Bearer Token)
+
     if (token) {
       headers.Authorization = `Bearer ${token}`;
     }
@@ -181,7 +187,7 @@ class ApiService {
     return options;
   }
   /**
-   * Ejecuta peticiones uwu HTTP con lógica de reintento ante expiración del token. :3
+   * Ejecuta peticiones HTTP con reintento único cuando el access token expiró.
    */
   private async request<T>(
     method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE",
@@ -193,12 +199,10 @@ class ApiService {
       `${this.baseURL}${endpoint}`,
       this.buildRequestOptions(method, data),
     );
-// Detección de expiración de token (401)
     const isRefreshEndpoint = endpoint.includes("/api/v1/usuario/refresh");
     if (response.status === 401 && retryOnAuthFailure && !isRefreshEndpoint) {
       const newToken = await this.refreshAccessToken();
       if (newToken) {
-        // Reintento recursivo de la petición original con el nuevo token
         return this.request<T>(method, endpoint, data, false);
       }
     }
@@ -254,67 +258,76 @@ class ApiService {
     data: unknown,
     onProgress?: (percentage: number) => void,
   ): Promise<T> {
-    return new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", `${this.baseURL}${endpoint}`);
+    const executePost = () =>
+      new Promise<Response>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", `${this.baseURL}${endpoint}`);
+        xhr.withCredentials = true;
 
-      const isFormData = data instanceof FormData;
-      if (isFormData) {
-        console.log(`Sending FormData to ${endpoint}:`);
-        (data as FormData).forEach((value, key) => {
-          console.log(`  ${key}:`, value instanceof File ? `File(${value.name})` : value);
-        });
-      }
+        const token = tokenStorage.getAccessToken();
+        if (token) {
+          xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+        }
 
-      if (!isFormData) {
-        xhr.setRequestHeader("Content-Type", "application/json");
-      }
+        const isFormData = data instanceof FormData;
+        if (!isFormData) {
+          xhr.setRequestHeader("Content-Type", "application/json");
+        }
 
-      if (xhr.upload && onProgress) {
-        xhr.upload.onprogress = (event) => {
-          if (event.lengthComputable) {
-            const percentage = Math.round((event.loaded * 100) / event.total);
-            onProgress(percentage);
+        if (xhr.upload && onProgress) {
+          xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+              const percentage = Math.round((event.loaded * 100) / event.total);
+              onProgress(percentage);
+            }
+          };
+        }
+
+        xhr.onload = () => {
+          if (xhr.status === 0) {
+            reject(new Error("Error de conexión"));
+            return;
           }
+
+          const headers = new Headers();
+          const contentType = xhr.getResponseHeader("content-type");
+          const contentLength = xhr.getResponseHeader("content-length");
+
+          if (contentType) headers.set("content-type", contentType);
+          if (contentLength) headers.set("content-length", contentLength);
+
+          resolve(
+            new Response(xhr.responseText || null, {
+              status: xhr.status,
+              statusText: xhr.statusText,
+              headers,
+            }),
+          );
         };
-      }
 
-      xhr.onload = async () => {
-        if (xhr.status === 0) {
-          return reject(new Error("Error de conexión"));
+        xhr.onerror = () => {
+          reject(new Error("Error de conexión"));
+        };
+
+        if (isFormData) {
+          xhr.send(data);
+        } else {
+          xhr.send(JSON.stringify(data));
         }
+      });
 
-        const headers = new Headers();
-        const contentType = xhr.getResponseHeader("content-type");
-        const contentLength = xhr.getResponseHeader("content-length");
+    const firstResponse = await executePost();
+    const isRefreshEndpoint = endpoint.includes("/api/v1/usuario/refresh");
 
-        if (contentType) headers.set("content-type", contentType);
-        if (contentLength) headers.set("content-length", contentLength);
-
-        const response = new Response(xhr.responseText || null, {
-          status: xhr.status,
-          statusText: xhr.statusText,
-          headers: headers,
-        });
-
-        try {
-          const result = await this.handleResponse<T>(response);
-          resolve(result);
-        } catch (error) {
-          reject(error);
-        }
-      };
-
-      xhr.onerror = () => {
-        reject(new Error("Error de conexión"));
-      };
-
-      if (isFormData) {
-        xhr.send(data as FormData);
-      } else {
-        xhr.send(JSON.stringify(data));
+    if (firstResponse.status === 401 && !isRefreshEndpoint) {
+      const newToken = await this.refreshAccessToken();
+      if (newToken) {
+        const retriedResponse = await executePost();
+        return this.handleResponse<T>(retriedResponse);
       }
-    });
+    }
+
+    return this.handleResponse<T>(firstResponse);
   }
 }
 
