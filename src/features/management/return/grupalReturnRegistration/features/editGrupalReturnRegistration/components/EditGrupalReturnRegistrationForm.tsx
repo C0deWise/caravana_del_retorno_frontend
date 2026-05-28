@@ -8,6 +8,7 @@ import { useGrupalMembersList } from "../../../shared/hooks/useGrupalMemberList.
 import { useEditGrupalRegistration } from "../hooks/useEditGrupalRegistration";
 import { useRegistrationForm } from "../../../shared/hooks/useRegistrationForm.hook";
 import { StepperField } from "@/components/forms/StepperField";
+import { AnotacionField } from "@/components/forms/AnotationField";
 
 interface EditGrupalReturnRegistrationFormProps {
     readonly registration: RegistroGrupoRetorno;
@@ -131,24 +132,11 @@ export function EditGrupalReturnRegistrationForm({
                             </div>
                         )}
 
-                        <div>
-                            <label htmlFor="anotacion" className="label-primary mb-0">
-                                Notas adicionales{" "}
-                                <span className="validation-message validation-info mt-1">(Opcional)</span>
-                            </label>
-                            <textarea
-                                id="anotacion"
-                                className="textarea-base mt-2"
-                                rows={3}
-                                maxLength={maxLength}
-                                value={formData.anotacion}
-                                onChange={(e) => handleAnotacionChange(e.target.value)}
-                                placeholder={`Escribe aquí cualquier información relevante para tu grupo (máximo ${maxLength} caracteres)...`}
-                            />
-                            <p className="validation-message validation-info mt-1 text-right">
-                                {formData.anotacion.length}/{maxLength}
-                            </p>
-                        </div>
+                        <AnotacionField
+                            value={formData.anotacion}
+                            maxLength={maxLength}
+                            onChange={handleAnotacionChange}
+                        />
 
                         <div className="flex justify-center gap-4 pt-1">
                             <button type="button" className="btn-primary min-w-36 inline-flex items-center justify-center"
