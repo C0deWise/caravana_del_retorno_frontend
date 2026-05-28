@@ -1,5 +1,3 @@
-import React from "react";
-
 interface StepperFieldProps {
     readonly legend: string;
     readonly value: number;
@@ -7,6 +5,7 @@ interface StepperFieldProps {
     readonly onDecrement: () => void;
     readonly onIncrement: () => void;
     readonly error?: string;
+    readonly incrementDisabled?: boolean;
 }
 
 export function StepperField({
@@ -16,6 +15,7 @@ export function StepperField({
     onDecrement,
     onIncrement,
     error,
+    incrementDisabled = false,
 }: StepperFieldProps) {
     return (
         <fieldset>
@@ -41,7 +41,7 @@ export function StepperField({
                     <button
                         type="button"
                         onClick={onIncrement}
-                        disabled={value === max}
+                        disabled={value === max || incrementDisabled}
                         className="stepper-btn"
                     >
                         +

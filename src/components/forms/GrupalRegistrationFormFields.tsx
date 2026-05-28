@@ -39,6 +39,9 @@ export function RegistrationFormFields({
     onNumberChange,
     onAnotacionChange,
 }: RegistrationFormFieldsProps) {
+    const totalParqueadero = formData.parqueadero_carro + formData.parqueadero_moto;
+    const parqueaderoLleno = totalParqueadero >= maxParqueadero;
+
     return (
         <>
             <StepperField
@@ -64,6 +67,7 @@ export function RegistrationFormFields({
                         legend="¿El grupo necesita parqueadero para carro?"
                         value={formData.parqueadero_carro}
                         max={maxParqueadero}
+                        incrementDisabled={parqueaderoLleno}
                         onDecrement={() => onNumberChange("parqueadero_carro", String(formData.parqueadero_carro - 1))}
                         onIncrement={() => onNumberChange("parqueadero_carro", String(formData.parqueadero_carro + 1))}
                         error={fieldErrors.parqueadero_carro}
@@ -72,6 +76,7 @@ export function RegistrationFormFields({
                         legend="¿El grupo necesita parqueadero para moto?"
                         value={formData.parqueadero_moto}
                         max={maxParqueadero}
+                        incrementDisabled={parqueaderoLleno}
                         onDecrement={() => onNumberChange("parqueadero_moto", String(formData.parqueadero_moto - 1))}
                         onIncrement={() => onNumberChange("parqueadero_moto", String(formData.parqueadero_moto + 1))}
                         error={fieldErrors.parqueadero_moto}
