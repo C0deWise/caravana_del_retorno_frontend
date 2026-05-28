@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAccessibility } from "../context/AccessibilityContext";
 import { modulesRegistry } from "../config/registry";
-import { useDraggableAccessibility } from "../hooks/useDraggableAccessibility";
+import { useMagneticDraggable } from "@/hooks/useMagneticDraggable";
 import { getButtonStyle, getPanelStyle } from "./AccessibilityToolbox.styles";
 
 export default function AccessibilityToolbox() {
@@ -17,7 +17,7 @@ export default function AccessibilityToolbox() {
     updateButtonPosition,
   } = useAccessibility();
   const { ref, pos, corner, hasMoved, isDragging, isReady } =
-    useDraggableAccessibility(updateButtonPosition, buttonPosition);
+    useMagneticDraggable(updateButtonPosition, buttonPosition);
   const wasOpenRef = useRef(false);
   const prevDraggingRef = useRef(false);
 

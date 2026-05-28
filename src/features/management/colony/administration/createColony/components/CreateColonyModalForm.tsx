@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, forwardRef, useImperativeHandle } from "react";
+import { useState, useMemo, forwardRef, useImperativeHandle, useEffect } from "react";
 import { useCreateColony } from "../hooks/useCreateColony";
 import type { ColonyData } from "@/types/colony.types";
 import {
@@ -12,6 +12,7 @@ import CountrySelect from "@/components/forms/CountrySelect";
 import { ConfirmModal } from "@/components/feedback/confirmModal";
 import { SelectField } from "@/components/forms/SelectField";
 import { ExpandableContent } from "@/components/layout/ExpandableContent";
+import { useToast } from "@/components/feedback/Toast";
 
 type SelectOption = {
   value: string;
@@ -31,6 +32,14 @@ export const CreateColonyModalForm = forwardRef<
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [cities, setCities] = useState<City[]>([]);
   const [isAnimating, setIsAnimating] = useState(false);
+  const { showToast } = useToast();
+
+  useEffect(() => {
+    if (error) {
+      showToast(error, "error");
+      onCancel?.();
+    }
+  }, [error, showToast, onCancel]);
 
   const [coloniaData, setColoniaData] = useState<ColonyData>({
     codigo: 0,
@@ -116,6 +125,8 @@ export const CreateColonyModalForm = forwardRef<
 
   const handleConfirm = async () => {
     const response = await createColony(coloniaData);
+    setShowConfirmModal(false);
+    
     if (response) {
       setColoniaData({
         codigo: 0,
@@ -125,10 +136,13 @@ export const CreateColonyModalForm = forwardRef<
         lider: 0,
       });
       setCities([]);
+      const locationName = coloniaData.pais === "Colombia" 
+        ? `${coloniaData.ciudad}` 
+        : coloniaData.pais;
+      showToast(`¡Colonia en ${locationName} creada con éxito!`, "success");
 
       onSuccess?.();
     }
-    setShowConfirmModal(false);
   };
 
   const handleCancel = () => {
@@ -147,12 +161,6 @@ export const CreateColonyModalForm = forwardRef<
       <p className="text-sm text-text-muted mb-6">
         Seleccione la ubicación de la nueva colonia.
       </p>
-
-      {error && (
-        <div className="mb-4 p-3 rounded-lg bg-accent-red/10 border border-accent-red/20 text-accent-red text-sm">
-          {error}
-        </div>
-      )}
 
       <div className="space-y-6">
         {/* País */}

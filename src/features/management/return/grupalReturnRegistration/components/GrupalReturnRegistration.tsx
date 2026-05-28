@@ -123,14 +123,14 @@ function GrupalReturnRegistrationFeature() {
       <div className="flex gap-3">
         <button
           type="button"
-          className="btn-secondary flex-1"
+          className="btn-secondary flex-1 hover:opacity-90"
           onClick={() => setShowInviteMember(true)}
         >
           Invitar miembro
         </button>
         <button
           type="button"
-          className="btn-secondary flex-1"
+          className="btn-secondary flex-1 hover:opacity-90"
           onClick={() => setShowInviteExternal(true)}
         >
           Invitar persona externa
@@ -165,7 +165,7 @@ function GrupalReturnRegistrationFeature() {
       <div className="flex gap-3 justify-center">
           <button
             type="button"
-            className="btn-danger"
+            className="btn-danger hover:opacity-90"
             onClick={() => setShowCancelConfirm(true)}
             disabled={cancelling}
           >
@@ -174,7 +174,7 @@ function GrupalReturnRegistrationFeature() {
 
           <button
             type="button"
-            className="btn-primary"
+            className="btn-primary bg-secondary hover:opacity-90"
             disabled={!canEnroll || !activeReturn}
             onClick={() => setView("form")}
           >

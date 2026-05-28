@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { returnRegistrationService } from "../services/returnRegistration.service";
-import type { ReturnRegistrationApi, ReturnRegistrationCreateRequest } from "../types/returnRegistration.types";
+import type { ReturnRegistrationApi, ReturnRegistrationCreateRequest } from "../../types/returnRegistration.types";
 
 interface UseSendReturnRegistration {
     sendReturnRegistration:(data: ReturnRegistrationCreateRequest) => Promise<ReturnRegistrationApi | null>;

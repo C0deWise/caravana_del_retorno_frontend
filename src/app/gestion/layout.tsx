@@ -8,7 +8,7 @@ import ManagementFooter from "@/features/management/layout/footer/components/Man
 import PageTransition from "@/components/layout/PageTransition";
 import ErrorBoundary from "@/components/feedback/ErrorBoundary";
 import { usePathname } from "next/navigation";
-import { RoleSwitcherClient } from "@/auth/utils/RoleSwitcherClient-DEVTOOL";
+
 import { RequireAuth } from "@/auth/components/RequireAuth";
 
 export default function GestionLayout({
@@ -17,7 +17,7 @@ export default function GestionLayout({
   readonly children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  
+
   useEffect(() => {
     const originalBodyOverflow = document.body.style.overflow;
     const originalBodyOverscroll = document.body.style.overscrollBehavior;
@@ -59,7 +59,6 @@ export default function GestionLayout({
                   }
                 >
                   <>
-                    <RoleSwitcherClient />
                     {children}
                   </>
                 </ErrorBoundary>

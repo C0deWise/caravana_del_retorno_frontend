@@ -30,7 +30,7 @@ export function AssignLeaderButton({
     onRefresh?.();
   };
 
-  const hasLeader = colony.lider > 0;
+  const hasLeader = colony.lider !== null && colony.lider > 0;
   const textButton = hasLeader ? "Cambiar Líder" : "Asignar Líder";
 
   return (

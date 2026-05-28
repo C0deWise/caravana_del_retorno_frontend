@@ -27,6 +27,9 @@ export const metadata: Metadata = {
   },
 };
 
+import { DevProvider } from "@/features/dev/context/DevContext";
+import DevToolbox from "@/features/dev/components/DevToolbox";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -35,19 +38,22 @@ export default function RootLayout({
   return (
     <html lang="es" className={inter.variable}>
       <body className="antialiased">
-        <AuthWrapper>
-          <ToastProvider>
-            <ErrorBoundary
-              fallback={
-                <div className="flex justify-center items-center w-auto my-90 mx-200 h-auto p-4 bg-red-100 text-red-800 rounded-xl">
-                  Error en contenido
-                </div>
-              }
-            >
-              <AccessibilityWrapper>{children}</AccessibilityWrapper>
-            </ErrorBoundary>
-          </ToastProvider>
-        </AuthWrapper>
+        <DevProvider>
+          <AuthWrapper>
+            <DevToolbox />
+            <ToastProvider>
+              <ErrorBoundary
+                fallback={
+                  <div className="flex justify-center items-center w-auto my-90 mx-200 h-auto p-4 bg-red-100 text-red-800 rounded-xl">
+                    Error en contenido
+                  </div>
+                }
+              >
+                <AccessibilityWrapper>{children}</AccessibilityWrapper>
+              </ErrorBoundary>
+            </ToastProvider>
+          </AuthWrapper>
+        </DevProvider>
       </body>
     </html>
   );
