@@ -1,19 +1,13 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { ConfirmModal } from "@/components/feedback/confirmModal";
 import Spinner from "@/components/feedback/Spinner";
 import type { RegistroGrupoRetorno, RegistroGrupoRetornoRequest } from "../../../shared/types/grupalReturnRegistration";
 import { useGrupalMembersList } from "../../../shared/hooks/useGrupalMemberList.hook";
 import { useEditGrupalRegistration } from "../hooks/useEditGrupalRegistration";
-
-type FormErrors = {
-    hospedaje?: string;
-    transporte?: string;
-    parqueadero_carro?: string;
-    parqueadero_moto?: string;
-    parqueadero?: string;
-};
+import { useRegistrationForm } from "../../../shared/hooks/useRegistrationForm.hook";
+import { StepperField } from "@/components/forms/StepperField";
 
 interface EditGrupalReturnRegistrationFormProps {
     readonly registration: RegistroGrupoRetorno;
@@ -32,78 +26,23 @@ export function EditGrupalReturnRegistrationForm({
     const { members, isLoading: membersLoading } = useGrupalMembersList(registration.cod_grupo);
     const memberCount = members.length;
     const maxLength = 150;
-
-    const [formData, setFormData] = useState({
-        hospedaje: registration.num_hospedaje,
-        transporte: registration.num_transporte,
-        parqueadero_carro: registration.num_parqueadero_carro,
-        parqueadero_moto: registration.num_parqueadero_moto,
-        anotacion: registration.anotacion ?? "",
-    });
-
-    const [fieldErrors, setFieldErrors] = useState<FormErrors>({});
     const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-    const maxParqueadero = memberCount - formData.transporte;
-    const allHaveTransport = formData.transporte === memberCount;
-
-    const validateForm = (): boolean => {
-        const next: FormErrors = {};
-
-        if (formData.hospedaje < 0 || formData.hospedaje > memberCount)
-            next.hospedaje = `Ingresa un valor entre 0 y ${memberCount}`;
-        if (formData.transporte < 0 || formData.transporte > memberCount)
-            next.transporte = `Ingresa un valor entre 0 y ${memberCount}`;
-        if (formData.parqueadero_carro < 0)
-            next.parqueadero_carro = "Ingresa un valor válido";
-        if (formData.parqueadero_moto < 0)
-            next.parqueadero_moto = "Ingresa un valor válido";
-
-        if ((formData.parqueadero_carro + formData.parqueadero_moto) > maxParqueadero) {
-            next.parqueadero = `La suma del parqueadero no puede superar ${maxParqueadero} (personas sin transporte).`;
-        }
-
-        setFieldErrors(next);
-        return Object.keys(next).length === 0;
-    };
-
-    const handleNumberChange = (
-        field: "hospedaje" | "transporte" | "parqueadero_carro" | "parqueadero_moto",
-        value: string,
-    ) => {
-        const parsed = Math.min(Math.max(0, Number(value)), memberCount);
-        setFormData((prev) => {
-            const next = { ...prev, [field]: parsed };
-            if (field === "transporte") {
-                const newMax = memberCount - parsed;
-                next.parqueadero_carro = Math.min(prev.parqueadero_carro, newMax);
-                next.parqueadero_moto = Math.min(prev.parqueadero_moto, newMax);
-            }
-            return next;
-        });
-        setFieldErrors((prev) => ({
-            ...prev,
-            [field]: undefined,
-            ...(field === "transporte" && parsed === 0 ? { parqueadero: undefined } : {}),
-        }));
-    };
-
-    const confirmDetails = useMemo(
-        () => [
-            <span key="hospedaje"><strong>Hospedaje:</strong> {formData.hospedaje} personas</span>,
-            <span key="transporte"><strong>Transporte:</strong> {formData.transporte} personas</span>,
-            ...(formData.transporte < memberCount
-                ? [
-                    <span key="p-carro"><strong>Parqueadero carro:</strong> {formData.parqueadero_carro}</span>,
-                    <span key="p-moto"><strong>Parqueadero moto:</strong> {formData.parqueadero_moto}</span>,
-                ]
-                : []),
-            ...(formData.anotacion
-                ? [<span key="anotacion"><strong>Anotación:</strong> <em>{formData.anotacion}</em></span>]
-                : []),
-        ],
-        [formData, memberCount],
+    const {
+        formData, fieldErrors, maxParqueadero,
+        validateForm, handleNumberChange, handleAnotacionChange, confirmDetails,
+    } = useRegistrationForm(
+        {
+            hospedaje: registration.num_hospedaje,
+            transporte: registration.num_transporte,
+            parqueadero_carro: registration.num_parqueadero_carro,
+            parqueadero_moto: registration.num_parqueadero_moto,
+            anotacion: registration.anotacion ?? "",
+        },
+        memberCount,
     );
+
+    const allHaveTransport = formData.transporte === memberCount;
 
     const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -112,10 +51,7 @@ export function EditGrupalReturnRegistrationForm({
     };
 
     const handleConfirm = async () => {
-        if (!validateForm()) {
-            setShowConfirmModal(false);
-            return;
-        }
+        if (!validateForm()) { setShowConfirmModal(false); return; }
 
         const payload: RegistroGrupoRetornoRequest = {
             retorno: registration.retorno,
@@ -129,10 +65,7 @@ export function EditGrupalReturnRegistrationForm({
 
         const response = await editRegistration(payload, registration.regg_codigo);
         setShowConfirmModal(false);
-
-        if (response) {
-            onSuccess(response);
-        }
+        if (response) onSuccess(response);
     };
 
     return (
@@ -146,165 +79,50 @@ export function EditGrupalReturnRegistrationForm({
                 <h2 className="section-title">Actualiza las necesidades de tu grupo</h2>
 
                 {(isLoading || membersLoading) && (
-                    <div className="flex justify-center py-6">
-                        <Spinner size="lg" />
-                    </div>
+                    <div className="flex justify-center py-6"><Spinner size="lg" /></div>
                 )}
-
                 {error && (
-                    <div className="alert-error mt-4">
-                        <p className="alert-error-text">{error}</p>
-                    </div>
+                    <div className="alert-error mt-4"><p className="alert-error-text">{error}</p></div>
                 )}
 
                 {!membersLoading && (
                     <form className="mt-6 space-y-6" onSubmit={handleSubmit} noValidate>
-                        {/* Hospedaje */}
-                        <fieldset>
-                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                <legend className="label-primary mb-0">¿El grupo necesita hospedaje?</legend>
-                                <div className="stepper">
-                                    <button
-                                        type="button"
-                                        onClick={() => handleNumberChange("hospedaje", String(formData.hospedaje - 1))}
-                                        disabled={formData.hospedaje === 0}
-                                        className="stepper-btn"
-                                    >
-                                        -
-                                    </button>
-                                    <div className="stepper-display">
-                                        <span className="stepper-label">
-                                            {formData.hospedaje ? "Necesita" : "No necesita"}
-                                        </span>
-                                        <span className="stepper-value">
-                                            {formData.hospedaje}/{memberCount}
-                                        </span>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => handleNumberChange("hospedaje", String(formData.hospedaje + 1))}
-                                        disabled={formData.hospedaje === memberCount}
-                                        className="stepper-btn"
-                                    >
-                                        +
-                                    </button>
-                                </div>
-                            </div>
-                            {fieldErrors.hospedaje && (
-                                <p className="validation-error text-sm mt-1">{fieldErrors.hospedaje}</p>
-                            )}
-                        </fieldset>
+                        <StepperField
+                            legend="¿El grupo necesita hospedaje?"
+                            value={formData.hospedaje}
+                            max={memberCount}
+                            onDecrement={() => handleNumberChange("hospedaje", String(formData.hospedaje - 1))}
+                            onIncrement={() => handleNumberChange("hospedaje", String(formData.hospedaje + 1))}
+                            error={fieldErrors.hospedaje}
+                        />
+                        <StepperField
+                            legend="¿El grupo necesita transporte?"
+                            value={formData.transporte}
+                            max={memberCount}
+                            onDecrement={() => handleNumberChange("transporte", String(formData.transporte - 1))}
+                            onIncrement={() => handleNumberChange("transporte", String(formData.transporte + 1))}
+                            error={fieldErrors.transporte}
+                        />
 
-                        {/* Transporte */}
-                        <fieldset>
-                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                <legend className="label-primary mb-0">¿El grupo necesita transporte?</legend>
-                                <div className="stepper">
-                                    <button
-                                        type="button"
-                                        onClick={() => handleNumberChange("transporte", String(formData.transporte - 1))}
-                                        disabled={formData.transporte === 0}
-                                        className="stepper-btn"
-                                    >
-                                        -
-                                    </button>
-                                    <div className="stepper-display">
-                                        <span className="stepper-label">
-                                            {formData.transporte ? "Necesita" : "No necesita"}
-                                        </span>
-                                        <span className="stepper-value">
-                                            {formData.transporte}/{memberCount}
-                                        </span>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => handleNumberChange("transporte", String(formData.transporte + 1))}
-                                        disabled={formData.transporte === memberCount}
-                                        className="stepper-btn"
-                                    >
-                                        +
-                                    </button>
-                                </div>
-                            </div>
-                            {fieldErrors.transporte && (
-                                <p className="validation-error text-sm mt-1">{fieldErrors.transporte}</p>
-                            )}
-                        </fieldset>
-
-                        {/* Parqueadero carro */}
                         {formData.transporte < memberCount && (
-                            <fieldset>
-                                <div className="flex items-center justify-between gap-3">
-                                    <legend className="label-primary mb-0">¿El grupo necesita parqueadero para carro?</legend>
-                                    <div className="stepper">
-                                        <button
-                                            type="button"
-                                            onClick={() => handleNumberChange("parqueadero_carro", String(formData.parqueadero_carro - 1))}
-                                            disabled={formData.parqueadero_carro === 0}
-                                            className="stepper-btn"
-                                        >
-                                            -
-                                        </button>
-                                        <div className="stepper-display">
-                                            <span className="stepper-label">
-                                                {formData.parqueadero_carro ? "Necesita" : "No necesita"}
-                                            </span>
-                                            <span className="stepper-value">
-                                                {formData.parqueadero_carro}/{maxParqueadero}
-                                            </span>
-                                        </div>
-                                        <button
-                                            type="button"
-                                            onClick={() => handleNumberChange("parqueadero_carro", String(formData.parqueadero_carro + 1))}
-                                            disabled={formData.parqueadero_carro + formData.parqueadero_moto >= maxParqueadero}
-                                            className="stepper-btn"
-                                        >
-                                            +
-                                        </button>
-                                    </div>
-                                </div>
-                                {fieldErrors.parqueadero_carro && (
-                                    <p className="validation-error text-sm mt-1">{fieldErrors.parqueadero_carro}</p>
-                                )}
-                            </fieldset>
-                        )}
-
-                        {/* Parqueadero moto */}
-                        {formData.transporte < memberCount && (
-                            <fieldset>
-                                <div className="flex items-center justify-between gap-3">
-                                    <legend className="label-primary mb-0">¿El grupo necesita parqueadero para moto?</legend>
-                                    <div className="stepper">
-                                        <button
-                                            type="button"
-                                            onClick={() => handleNumberChange("parqueadero_moto", String(formData.parqueadero_moto - 1))}
-                                            disabled={formData.parqueadero_moto === 0}
-                                            className="stepper-btn"
-                                        >
-                                            -
-                                        </button>
-                                        <div className="stepper-display">
-                                            <span className="stepper-label">
-                                                {formData.parqueadero_moto ? "Necesita" : "No necesita"}
-                                            </span>
-                                            <span className="stepper-value">
-                                                {formData.parqueadero_moto}/{maxParqueadero}
-                                            </span>
-                                        </div>
-                                        <button
-                                            type="button"
-                                            onClick={() => handleNumberChange("parqueadero_moto", String(formData.parqueadero_moto + 1))}
-                                            disabled={formData.parqueadero_carro + formData.parqueadero_moto >= maxParqueadero}
-                                            className="stepper-btn"
-                                        >
-                                            +
-                                        </button>
-                                    </div>
-                                </div>
-                                {fieldErrors.parqueadero_moto && (
-                                    <p className="validation-error text-sm mt-1">{fieldErrors.parqueadero_moto}</p>
-                                )}
-                            </fieldset>
+                            <>
+                                <StepperField
+                                    legend="¿El grupo necesita parqueadero para carro?"
+                                    value={formData.parqueadero_carro}
+                                    max={maxParqueadero}
+                                    onDecrement={() => handleNumberChange("parqueadero_carro", String(formData.parqueadero_carro - 1))}
+                                    onIncrement={() => handleNumberChange("parqueadero_carro", String(formData.parqueadero_carro + 1))}
+                                    error={fieldErrors.parqueadero_carro}
+                                />
+                                <StepperField
+                                    legend="¿El grupo necesita parqueadero para moto?"
+                                    value={formData.parqueadero_moto}
+                                    max={maxParqueadero}
+                                    onDecrement={() => handleNumberChange("parqueadero_moto", String(formData.parqueadero_moto - 1))}
+                                    onIncrement={() => handleNumberChange("parqueadero_moto", String(formData.parqueadero_moto + 1))}
+                                    error={fieldErrors.parqueadero_moto}
+                                />
+                            </>
                         )}
 
                         {fieldErrors.parqueadero && (
@@ -313,7 +131,6 @@ export function EditGrupalReturnRegistrationForm({
                             </div>
                         )}
 
-                        {/* Anotación */}
                         <div>
                             <label htmlFor="anotacion" className="label-primary mb-0">
                                 Notas adicionales{" "}
@@ -325,7 +142,7 @@ export function EditGrupalReturnRegistrationForm({
                                 rows={3}
                                 maxLength={maxLength}
                                 value={formData.anotacion}
-                                onChange={(e) => setFormData((prev) => ({ ...prev, anotacion: e.target.value }))}
+                                onChange={(e) => handleAnotacionChange(e.target.value)}
                                 placeholder={`Escribe aquí cualquier información relevante para tu grupo (máximo ${maxLength} caracteres)...`}
                             />
                             <p className="validation-message validation-info mt-1 text-right">
@@ -334,19 +151,12 @@ export function EditGrupalReturnRegistrationForm({
                         </div>
 
                         <div className="flex justify-center gap-4 pt-1">
-                            <button
-                                type="button"
-                                className="btn-primary min-w-36 inline-flex items-center justify-center"
-                                onClick={onCancel}
-                                disabled={isLoading}
-                            >
+                            <button type="button" className="btn-primary min-w-36 inline-flex items-center justify-center"
+                                onClick={onCancel} disabled={isLoading}>
                                 Cancelar
                             </button>
-                            <button
-                                type="submit"
-                                className="btn-primary bg-secondary min-w-36 inline-flex items-center justify-center gap-2"
-                                disabled={isLoading}
-                            >
+                            <button type="submit" className="btn-primary bg-secondary min-w-36 inline-flex items-center justify-center gap-2"
+                                disabled={isLoading}>
                                 {isLoading ? <Spinner size="sm" /> : "Guardar cambios"}
                             </button>
                         </div>
@@ -357,7 +167,9 @@ export function EditGrupalReturnRegistrationForm({
             <ConfirmModal
                 isOpen={showConfirmModal}
                 title="¿Confirmas los cambios en el registro del grupo?"
-                details={confirmDetails}
+                details={confirmDetails.map(({ key, label, value }) => (
+                    <span key={key}><strong>{label}:</strong> {value}</span>
+                ))}
                 onConfirm={handleConfirm}
                 onCancel={() => setShowConfirmModal(false)}
                 loading={isLoading}
