@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TrashIcon } from "@heroicons/react/24/solid";
 import { ConfirmModal } from "@/components/feedback/confirmModal";
 import { useDeleteColony } from "../hooks/useDeleteColony";
+import { useToast } from "@/components/feedback/Toast";
 
 interface DeleteColonyButtonProps {
   readonly colonyId: number;
@@ -17,12 +18,18 @@ export function DeleteColonyButton({
   onSuccess,
 }: DeleteColonyButtonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { deleteColony, loading } = useDeleteColony();
+  const { deleteColony, loading, error } = useDeleteColony();
+  const { showToast } = useToast();
+
+  useEffect(() => {
+    if (error) showToast(error, "error");
+  }, [error, showToast]);
 
   const handleDelete = async () => {
     const success = await deleteColony(colonyId);
+    setIsModalOpen(false);
     if (success) {
-      setIsModalOpen(false);
+      showToast(`¡La colonia ${fullLocation} fue eliminada correctamente!`, "success");
       onSuccess?.();
     }
   };
