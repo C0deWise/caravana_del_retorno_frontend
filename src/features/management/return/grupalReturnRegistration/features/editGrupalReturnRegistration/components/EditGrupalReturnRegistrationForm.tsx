@@ -7,8 +7,7 @@ import type { RegistroGrupoRetorno, RegistroGrupoRetornoRequest } from "../../..
 import { useGrupalMembersList } from "../../../shared/hooks/useGrupalMemberList.hook";
 import { useEditGrupalRegistration } from "../hooks/useEditGrupalRegistration";
 import { useRegistrationForm } from "../../../shared/hooks/useRegistrationForm.hook";
-import { StepperField } from "@/components/forms/StepperField";
-import { AnotacionField } from "@/components/forms/AnotationField";
+import { RegistrationFormFields } from "@/components/forms/GrupalRegistrationFormFields";
 
 interface EditGrupalReturnRegistrationFormProps {
     readonly registration: RegistroGrupoRetorno;
@@ -88,56 +87,15 @@ export function EditGrupalReturnRegistrationForm({
 
                 {!membersLoading && (
                     <form className="mt-6 space-y-6" onSubmit={handleSubmit} noValidate>
-                        <StepperField
-                            legend="¿El grupo necesita hospedaje?"
-                            value={formData.hospedaje}
-                            max={memberCount}
-                            onDecrement={() => handleNumberChange("hospedaje", String(formData.hospedaje - 1))}
-                            onIncrement={() => handleNumberChange("hospedaje", String(formData.hospedaje + 1))}
-                            error={fieldErrors.hospedaje}
-                        />
-                        <StepperField
-                            legend="¿El grupo necesita transporte?"
-                            value={formData.transporte}
-                            max={memberCount}
-                            onDecrement={() => handleNumberChange("transporte", String(formData.transporte - 1))}
-                            onIncrement={() => handleNumberChange("transporte", String(formData.transporte + 1))}
-                            error={fieldErrors.transporte}
-                        />
-
-                        {formData.transporte < memberCount && (
-                            <>
-                                <StepperField
-                                    legend="¿El grupo necesita parqueadero para carro?"
-                                    value={formData.parqueadero_carro}
-                                    max={maxParqueadero}
-                                    onDecrement={() => handleNumberChange("parqueadero_carro", String(formData.parqueadero_carro - 1))}
-                                    onIncrement={() => handleNumberChange("parqueadero_carro", String(formData.parqueadero_carro + 1))}
-                                    error={fieldErrors.parqueadero_carro}
-                                />
-                                <StepperField
-                                    legend="¿El grupo necesita parqueadero para moto?"
-                                    value={formData.parqueadero_moto}
-                                    max={maxParqueadero}
-                                    onDecrement={() => handleNumberChange("parqueadero_moto", String(formData.parqueadero_moto - 1))}
-                                    onIncrement={() => handleNumberChange("parqueadero_moto", String(formData.parqueadero_moto + 1))}
-                                    error={fieldErrors.parqueadero_moto}
-                                />
-                            </>
-                        )}
-
-                        {fieldErrors.parqueadero && (
-                            <div className="alert-error mt-0">
-                                <p className="alert-error-text">{fieldErrors.parqueadero}</p>
-                            </div>
-                        )}
-
-                        <AnotacionField
-                            value={formData.anotacion}
+                        <RegistrationFormFields
+                            formData={formData}
+                            fieldErrors={fieldErrors}
+                            memberCount={memberCount}
+                            maxParqueadero={maxParqueadero}
                             maxLength={maxLength}
-                            onChange={handleAnotacionChange}
+                            onNumberChange={handleNumberChange}
+                            onAnotacionChange={handleAnotacionChange}
                         />
-
                         <div className="flex justify-center gap-4 pt-1">
                             <button type="button" className="btn-primary min-w-36 inline-flex items-center justify-center"
                                 onClick={onCancel} disabled={isLoading}>
