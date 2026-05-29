@@ -38,7 +38,7 @@ class ApiService {
 
   private buildErrorMessage(error: unknown, response: Response): string {
     if (response.status === 422) {
-      console.error("Validation Error (422) Detail:", JSON.stringify(error, null, 2));
+      // Return detail gracefully
     }
 
     if (
@@ -159,10 +159,10 @@ class ApiService {
 
     return this.refreshPromise;
   }
-/**
-   * Construye los headers necesarios para cada petición, inyectando el token JWT
-   * si existe en el almacenamiento.
-   */
+  /**
+     * Construye los headers necesarios para cada petición, inyectando el token JWT
+     * si existe en el almacenamiento.
+     */
   private buildRequestOptions(
     method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE",
     data?: unknown,

@@ -35,6 +35,15 @@ class RetornoService {
     if (Array.isArray(response)) return response.length > 0;
     return !!response;
   }
+
+  /**
+   * Actualiza el estado de un retorno
+   * @param codigo Código del retorno
+   * @param estado Nuevo estado ('ACTIVO', 'EN_CURSO', 'FINALIZADO')
+   */
+  async updateState(codigo: number, estado: string): Promise<Retorno> {
+    return apiService.patch<Retorno>(`${this.endpoint}${codigo}/estado`, { estado });
+  }
 }
 
 export const retornoService = new RetornoService();

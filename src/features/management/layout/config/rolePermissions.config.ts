@@ -3,7 +3,7 @@ import { UserRole } from "@/types/user.types";
 export const rolePermissions: Record<UserRole, string[]> = {
   admin: [
     "/gestion/colonia/administrar",
-    "/gestion/retorno/crear",
+    "/gestion/retorno/administrar",
     "/gestion/publicaciones/administrar",
     "/gestion/reportes",
   ],
