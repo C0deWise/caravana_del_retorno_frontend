@@ -1,7 +1,11 @@
+import { PublicPublicationsFeed } from "@/features/home/publications/components/PublicPublicationsFeed";
+
 export default function Inicio() {
   return (
-    <div className="flex justify-center items-center h-182 mx-10 mb-12 mt-16 border-4 border-accent-red">
-      Inicio Component
+    <div className="w-full min-h-screen bg-bg">
+      <div className="pt-8">
+        <PublicPublicationsFeed />
+      </div>
     </div>
   );
 }
