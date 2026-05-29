@@ -41,8 +41,8 @@ export const menuConfig: MenuItem[] = [
     icon: "userGroup",
     subitems: [
       {
-        label: "Crear Retorno",
-        href: "/gestion/retorno/crear",
+        label: "Administrar Retornos",
+        href: "/gestion/retorno/administrar",
       },
       {
         label: "Formulario de inscripción",

@@ -7,18 +7,18 @@ interface RequestsListProps {
   readonly receivedRequests: RelationshipItem[];
   readonly sentRequests: RelationshipItem[];
   readonly targetUserId: number;
-  readonly hasMore: boolean;
   readonly loading: boolean;
-  readonly onLoadMore: () => void;
+  readonly onApprove?: (relationshipId: string, userName: string) => void;
+  readonly onReject?: (relationshipId: string, userName: string) => void;
 }
 
 export function RequestsList({
   receivedRequests,
   sentRequests,
   targetUserId,
-  hasMore,
   loading,
-  onLoadMore,
+  onApprove,
+  onReject,
 }: RequestsListProps) {
   const [activeRequestTab, setActiveRequestTab] = useState<"received" | "sent">(
     "received",
@@ -74,9 +74,9 @@ export function RequestsList({
             : "No has enviado solicitudes de parentesco"
         }
         innerScrollClassName="px-6 lg:px-8 pb-6 lg:pb-8 pt-4"
-        hasMore={hasMore}
         loading={loading}
-        onLoadMore={onLoadMore}
+        onApprove={onApprove}
+        onReject={onReject}
       />
     </section>
   );

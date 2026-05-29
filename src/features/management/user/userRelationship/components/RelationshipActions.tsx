@@ -5,8 +5,8 @@ interface RelationshipActionsProps {
   readonly isPending: boolean;
   readonly codigo?: string;
   readonly displayUserName: string;
-  readonly onApprove?: (relationshipId: string) => void;
-  readonly onReject?: (relationshipId: string) => void;
+  readonly onApprove?: (relationshipId: string, userName: string) => void;
+  readonly onReject?: (relationshipId: string, userName: string) => void;
 }
 
 export function RelationshipActions({
@@ -22,7 +22,7 @@ export function RelationshipActions({
       <div className="flex items-center gap-3">
         <button
           type="button"
-          onClick={() => codigo && onApprove?.(codigo)}
+          onClick={() => codigo && onApprove?.(codigo, displayUserName)}
           className="flex w-[130px] items-center justify-center gap-2 rounded-xl bg-accent-green px-3 py-2 text-sm font-semibold text-white shadow-md transition-all hover:opacity-90 active:scale-95 cursor-pointer"
           aria-label={`Aceptar solicitud de parentesco con ${displayUserName}`}
         >
@@ -32,7 +32,7 @@ export function RelationshipActions({
 
         <button
           type="button"
-          onClick={() => codigo && onReject?.(codigo)}
+          onClick={() => codigo && onReject?.(codigo, displayUserName)}
           className="flex w-[130px] items-center justify-center gap-2 rounded-xl bg-accent-red px-3 py-2 text-sm font-semibold text-white shadow-md transition-all hover:opacity-90 active:scale-95 cursor-pointer"
           aria-label={`Rechazar solicitud de parentesco con ${displayUserName}`}
         >

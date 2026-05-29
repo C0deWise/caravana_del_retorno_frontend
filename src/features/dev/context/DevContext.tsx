@@ -28,14 +28,14 @@ export function DevProvider({ children }: { readonly children: ReactNode }) {
   );
   const [mockColoniaId, setMockColoniaId] = useState<number | null>(null);
   const [mockUserId, setMockUserId] = useState<number | null>(null);
-  const [apiMode, setApiMode] = useState<boolean>(false);
-  const [featureFlags, setFeatureFlags] = useState(() => ({
-    ...FEATURE_FLAGS,
-    // Since apiMode starts as false, initialize these mock flags as true
-    USE_COLONY_MOCKS: true,
-    USE_COLONY_MEMBER_MOCKS: true,
-    USE_RELATIONSHIP_MOCKS: true,
-  }));
+  const [apiMode, setApiMode] = useState<boolean>(!IS_DEV);
+  const [featureFlags, setFeatureFlags] = useState(() => {
+    const flags = { ...FEATURE_FLAGS };
+    (Object.keys(flags) as Array<keyof typeof FEATURE_FLAGS>).forEach((key) => {
+      flags[key] = IS_DEV;
+    });
+    return flags;
+  });
 
   const setFeatureFlag = (key: keyof typeof FEATURE_FLAGS, value: boolean) => {
     setFeatureFlags(prev => ({ ...prev, [key]: value }));
@@ -43,12 +43,13 @@ export function DevProvider({ children }: { readonly children: ReactNode }) {
 
   const handleSetApiMode = (mode: boolean) => {
     setApiMode(mode);
-    setFeatureFlags(prev => ({
-      ...prev,
-      USE_COLONY_MOCKS: !mode,
-      USE_COLONY_MEMBER_MOCKS: !mode,
-      USE_RELATIONSHIP_MOCKS: !mode,
-    }));
+    setFeatureFlags(prev => {
+      const nextFlags = { ...prev };
+      (Object.keys(nextFlags) as Array<keyof typeof FEATURE_FLAGS>).forEach((key) => {
+        nextFlags[key] = !mode;
+      });
+      return nextFlags;
+    });
   };
 
   const value = useMemo(

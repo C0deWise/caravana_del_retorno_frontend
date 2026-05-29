@@ -8,8 +8,8 @@ interface RelationshipCardProps {
   readonly relationship: RelationshipItem;
   readonly index: number;
   readonly targetUserId: number;
-  readonly onApprove?: (relationshipId: string) => void;
-  readonly onReject?: (relationshipId: string) => void;
+  readonly onApprove?: (relationshipId: string, userName: string) => void;
+  readonly onReject?: (relationshipId: string, userName: string) => void;
 }
 
 import { RelationshipStatusTag } from "./RelationshipStatusTag";

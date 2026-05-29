@@ -30,4 +30,13 @@ export const FEATURE_FLAGS = {
    * @default false
    */
   USE_COLONY_MEMBER_MOCKS: false,
+
+  /**
+   * Toggles the use of mock data for notifications.
+   * If `true`, the UI will render predefined mock notifications
+   * instead of fetching them from the backend.
+   * 
+   * @default false
+   */
+  USE_NOTIFICATION_MOCKS: false,
 };

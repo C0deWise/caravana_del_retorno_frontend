@@ -6,7 +6,7 @@ import { useAuth } from "@/auth/context/AuthContext";
 import { authService } from "../services/auth.service";
 
 interface UseLoginReturn {
-  loginUser: (correo: string, contrasenia: string) => Promise<void>;
+  loginUser: (correo: string, contrasenia: string) => Promise<boolean>;
   isLoading: boolean;
   error: string;
   setError: React.Dispatch<React.SetStateAction<string>>;
@@ -18,11 +18,11 @@ export const useLogin = (): UseLoginReturn => {
   const router = useRouter();
   const { login } = useAuth();
 
-  const loginUser = async (correo: string, contrasenia: string): Promise<void> => {
+  const loginUser = async (correo: string, contrasenia: string): Promise<boolean> => {
     const correoNormalizado = correo.trim().toLowerCase();
     const contraseniaNormalizada = contrasenia.trim();
 
-    if (!correoNormalizado || !contraseniaNormalizada || isLoading) return;
+    if (!correoNormalizado || !contraseniaNormalizada || isLoading) return false;
 
     setIsLoading(true);
     setError("");
@@ -31,8 +31,10 @@ export const useLogin = (): UseLoginReturn => {
       const userData = await authService.login(correoNormalizado, contraseniaNormalizada);
       login(userData);
       router.push("/gestion");
+      return true;
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error desconocido");
+      return false;
     } finally {
       setIsLoading(false);
     }

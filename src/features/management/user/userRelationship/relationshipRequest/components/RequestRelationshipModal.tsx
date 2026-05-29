@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { XMarkIcon, UserPlusIcon, UserIcon } from "@heroicons/react/24/outline";
 import {
   KINSHIP_TYPE_OPTIONS,
@@ -12,6 +12,7 @@ import Spinner from "@/components/feedback/Spinner";
 import { UserSearchField } from "@/components/forms/UserSearchField";
 import { AnimatedModal } from "@/components/feedback/AnimatedModal";
 import { SelectField } from "@/components/forms/SelectField";
+import { useToast } from "@/components/feedback/Toast";
 
 interface RequestRelationshipModalProps {
   readonly isOpen: boolean;
@@ -29,29 +30,20 @@ export function RequestRelationshipModal({
   const [selectedUserId, setSelectedUserId] = useState<number | "">("");
   const [selectedUser, setSelectedUser] = useState<UserSearchResult | null>(null);
   const [selectedKinship, setSelectedKinship] = useState<KinshipType | "">("");
+  const { showToast } = useToast();
 
-  const { isSubmitting, error, success, requestRelationship, reset } =
+  const { isSubmitting, requestRelationship, reset } =
     useRequestRelationship();
 
-  useEffect(() => {
-    if (isOpen) {
+  const handleClose = () => {
+    onClose();
+    setTimeout(() => {
       reset();
       setSelectedUserId("");
       setSelectedUser(null);
       setSelectedKinship("");
-    }
-  }, [isOpen, reset]);
-
-  useEffect(() => {
-    if (!success) return;
-
-    const timer = setTimeout(() => {
-      onSuccess();
-      onClose();
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, [success, onSuccess, onClose]);
+    }, 300);
+  };
 
   const handleSelectUser = (user: UserSearchResult) => {
     setSelectedUserId(user.id);
@@ -65,12 +57,22 @@ export function RequestRelationshipModal({
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!selectedUserId || !selectedKinship) return;
-    await requestRelationship(solicitanteId, Number(selectedUserId), selectedKinship);
+    if (!selectedUserId || !selectedKinship || !selectedUser) return;
+
+    const fullName = `${selectedUser.nombre} ${selectedUser.apellido}`.trim();
+    const result = await requestRelationship(solicitanteId, Number(selectedUserId), selectedKinship, fullName);
+
+    if (result.success) {
+      showToast(`La solicitud a ${selectedUser.nombre} ${selectedUser.apellido} se ha enviado con éxito`, "success");
+      onSuccess();
+    } else {
+      showToast(result.errorMsg || "Error al enviar la solicitud", "error");
+    }
+    handleClose();
   };
 
   return (
-    <AnimatedModal isOpen={isOpen} onBackdropClick={onClose}>
+    <AnimatedModal isOpen={isOpen} onBackdropClick={handleClose}>
       <div className="rounded-2xl bg-bg-card shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
@@ -79,7 +81,7 @@ export function RequestRelationshipModal({
           </h2>
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className="rounded-lg p-1.5 text-text-muted transition-colors hover:bg-gray-100 hover:text-text"
             aria-label="Cerrar modal"
           >
@@ -134,34 +136,18 @@ export function RequestRelationshipModal({
             placeholder="Selecciona un tipo..."
           />
 
-          {/* Error */}
-          {error && (
-            <div className="rounded-xl border border-danger/30 bg-danger/10 px-4 py-3">
-              <p className="text-sm text-danger">{error}</p>
-            </div>
-          )}
-
-          {/* Success */}
-          {success && (
-            <div className="rounded-xl border border-accent-green/30 bg-accent-green/10 px-4 py-3">
-              <p className="text-sm text-accent-green">
-                ¡Solicitud enviada exitosamente!
-              </p>
-            </div>
-          )}
-
           {/* Actions */}
           <div className="flex items-center justify-end gap-3 pt-1">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="rounded-xl px-4 py-2 text-sm text-text-muted transition-colors hover:bg-gray-100 hover:text-text"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              disabled={!selectedUserId || !selectedKinship || isSubmitting || success}
+              disabled={!selectedUserId || !selectedKinship || isSubmitting}
               className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting ? (
