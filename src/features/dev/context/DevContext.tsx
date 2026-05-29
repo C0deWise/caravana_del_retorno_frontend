@@ -28,11 +28,11 @@ export function DevProvider({ children }: { readonly children: ReactNode }) {
   );
   const [mockColoniaId, setMockColoniaId] = useState<number | null>(null);
   const [mockUserId, setMockUserId] = useState<number | null>(null);
-  const [apiMode, setApiMode] = useState<boolean>(false);
+  const [apiMode, setApiMode] = useState<boolean>(!IS_DEV);
   const [featureFlags, setFeatureFlags] = useState(() => {
     const flags = { ...FEATURE_FLAGS };
-    Object.keys(flags).forEach((key) => {
-      flags[key as keyof typeof FEATURE_FLAGS] = true;
+    (Object.keys(flags) as Array<keyof typeof FEATURE_FLAGS>).forEach((key) => {
+      flags[key] = IS_DEV;
     });
     return flags;
   });
@@ -44,11 +44,11 @@ export function DevProvider({ children }: { readonly children: ReactNode }) {
   const handleSetApiMode = (mode: boolean) => {
     setApiMode(mode);
     setFeatureFlags(prev => {
-      const newFlags = { ...prev };
-      Object.keys(newFlags).forEach((key) => {
-        newFlags[key as keyof typeof FEATURE_FLAGS] = !mode;
+      const nextFlags = { ...prev };
+      (Object.keys(nextFlags) as Array<keyof typeof FEATURE_FLAGS>).forEach((key) => {
+        nextFlags[key] = !mode;
       });
-      return newFlags;
+      return nextFlags;
     });
   };
 
