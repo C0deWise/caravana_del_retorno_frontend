@@ -12,7 +12,7 @@ import type {
   ReturnRegistrationApi,
   ReturnRegistrationCreateRequest,
 } from "../../types/returnRegistration.types";
-import { retornoService } from "../../../services/retorno.service";
+import { retornoService } from "../../../shared/services/retorno.service";
 import { ReturnRegistrationManagement } from "../../returnRegistrationManagement/components/returnRegistrationManagement";
 import { useRouter } from "next/navigation";
 

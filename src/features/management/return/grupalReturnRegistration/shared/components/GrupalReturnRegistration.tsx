@@ -1,0 +1,298 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { RequireAuth } from "@/auth/components/RequireAuth";
+import { useAuth } from "@/auth/context/AuthContext";
+import { ConfirmModal } from "@/components/feedback/confirmModal";
+import { useGrupo } from "../../../shared/hooks/useGrupo.hook";
+import { useGrupalMembersList } from "../hooks/useGrupalMemberList.hook";
+import { useCancelGroup } from "../hooks/useCancelGroup.hook";
+import { useSentInvitations } from "../../features/sentInvitations/hooks/useSentInvitations.hook";
+import { useRemoveMember } from "../../features/invitateMembers/hooks/useRemoveMember.hook";
+import { useRemoveExternalPerson } from "../../features/externalPerson/hooks/useRemoveExternalPerson.hook";
+import { InviteMemberModal } from "../../features/invitateMembers/components/InviteMemberModal";
+import { ExternalPersonModal } from "../../features/externalPerson/components/ExternalPersonModal";
+import { SentInvitationsList } from "../../features/sentInvitations/components/SentInvitationsList";
+import { GrupalRegistrationForm } from "../../features/grupalRegistrationForm/components/GrupalRegistrationForm";
+import { EditGrupalReturnRegistrationForm } from "../../features/editGrupalReturnRegistration/components/EditGrupalReturnRegistrationForm";
+import { useLoadGrupalRegistration } from "../../features/editGrupalReturnRegistration/hooks/useLoadGrupalRegistration";
+import type { Retorno } from "../../../shared/types/retorno.types";
+import type { RegistroGrupoRetorno } from "../types/grupalReturnRegistration";
+import Spinner from "@/components/feedback/Spinner";
+import { retornoService } from "../../../shared/services/retorno.service";
+
+type View = "main" | "form" | "edit";
+
+function GrupalReturnRegistrationFeature() {
+  const { user } = useAuth();
+  const router = useRouter();
+  const [view, setView] = useState<View>("main");
+  const [activeReturn, setActiveReturn] = useState<Retorno | null>(null);
+  const [showInviteMember, setShowInviteMember] = useState(false);
+  const [showInviteExternal, setShowInviteExternal] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+
+  const { grupo, isLoading: grupoLoading, error: grupoError } = useGrupo(user?.id);
+  const { members, isLoading: membersLoading, refetch: refetchMembers } = useGrupalMembersList(grupo?.gr_codigo);
+  const { invitations, isLoading: invitationsLoading, error: invitationsError, hasPending, refetch: refetchInvitations } = useSentInvitations(grupo?.gr_codigo);
+  const { cancelGroup, isLoading: cancelling, error: cancelError } = useCancelGroup();
+  const { removeMember, isLoading: removingMember } = useRemoveMember();
+  const { removeExternalPerson, isLoading: removingExternal } = useRemoveExternalPerson();
+  const [existingRegistration, setExistingRegistration] = useState<RegistroGrupoRetorno | null>(null);
+  const [activeReturnLoading, setActiveReturnLoading] = useState(true);
+
+  // Resolver retorno activo una sola vez
+  useEffect(() => {
+    setActiveReturnLoading(true);
+    retornoService
+      .getActiveReturn()
+      .then(setActiveReturn)
+      .catch(() => setActiveReturn(null))
+      .finally(() => setActiveReturnLoading(false));
+  }, []);
+
+  const { registration, loading: registrationLoading } = useLoadGrupalRegistration(
+    grupo?.gr_codigo ?? 0,
+    activeReturn?.codigo ?? 0,
+  );
+
+  useEffect(() => {
+    setExistingRegistration(registration);
+  }, [registration]);
+
+  const hasRegistration = existingRegistration !== null;
+  const isInitialLoading = activeReturnLoading || registrationLoading;
+
+  const canEnroll = !hasPending && members.length >= 1 && !hasRegistration;
+
+  const handleRemoveInvitation = async (id: number, kind: "usuario" | "persona") => {
+    if (!grupo) return;
+    if (kind === "usuario") {
+      await removeMember(id, grupo.gr_codigo);
+    } else {
+      await removeExternalPerson(id, grupo.gr_codigo);
+    }
+    void refetchMembers();
+    void refetchInvitations();
+  };
+
+  const handleCancelConfirm = async () => {
+    if (!grupo) return;
+    await cancelGroup(grupo.gr_codigo);
+    setShowCancelConfirm(false);
+    router.push("/gestion/retorno/registro");
+  };
+
+  if (grupoLoading || (activeReturnLoading && !grupoError)) {
+    return (
+      <div className="flex justify-center py-20">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (grupoError) {
+    return (
+      <div className="flex justify-center py-12">
+        <div className="alert-error max-w-md">
+          <p className="alert-error-text">{grupoError}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!grupo) {
+    return (
+      <div className="flex justify-center py-12">
+        <div className="alert-error max-w-md">
+          <p className="alert-error-text">No se encontró un grupo asociado.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (registrationLoading) {
+    return (
+      <div className="flex justify-center py-20">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (view === "form" && activeReturn && !isInitialLoading) {
+    return (
+      <div className="flex justify-center px-4 py-8">
+        <GrupalRegistrationForm
+          retornoId={activeReturn.codigo}
+          grupoId={grupo.gr_codigo}
+          retornoAnio={activeReturn.anio}
+          onSuccess={(record) => { setExistingRegistration(record); setView("main"); }}
+        />
+      </div>
+    );
+  }
+
+  if (view === "edit" && activeReturn && existingRegistration && !isInitialLoading) {
+    return (
+      <div className="flex justify-center px-4 py-8">
+        <EditGrupalReturnRegistrationForm
+          registration={existingRegistration}
+          retornoAnio={activeReturn.anio}
+          onSuccess={(updated) => { setExistingRegistration(updated); setView("main"); }}
+          onCancel={() => setView("main")}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto w-full max-w-2xl px-4 py-8 space-y-2 rounded-xl border border-bg-border bg-bg-card ">
+      <div className="flex flex-1 items-start justify-center">
+        <div className="w-full max-w-md rounded-lg">
+          <h1 className="page-title">Registro Grupal</h1>
+          <h2 className="section-title">Gestiona tu grupo para el retorno</h2>
+        </div>
+      </div>
+
+      {
+        cancelError && (
+          <div className="alert-error">
+            <p className="alert-error-text">{cancelError}</p>
+          </div>
+        )
+      }
+
+      {hasRegistration && (
+        <div className="alert-info mt-0 mb-4">
+          <p className="text-sm text-text-muted">El grupo ya está inscrito. No se pueden agregar más miembros.</p>
+        </div>
+      )}
+
+      {/* Acciones de invitación */}
+      {!hasRegistration && (
+        <div className="flex gap-3">
+          <button
+            type="button"
+            className="btn-secondary flex-1 hover:opacity-90"
+            onClick={() => setShowInviteMember(true)}
+            disabled={hasRegistration || isInitialLoading}
+          >
+            Invitar miembro
+          </button>
+          <button
+            type="button"
+            className="btn-secondary flex-1 hover:opacity-90"
+            onClick={() => setShowInviteExternal(true)}
+            disabled={hasRegistration || isInitialLoading}
+          >
+            Invitar persona externa
+          </button>
+        </div>
+      )}
+
+      {/* Invitaciones enviadas */}
+      <section>
+        <SentInvitationsList
+          invitations={invitations}
+          isLoading={invitationsLoading}
+          error={invitationsError}
+          onRemove={handleRemoveInvitation}
+          isRemoving={removingMember || removingExternal}
+        />
+      </section>
+
+      {/* Botón inscribir */}
+      {(hasPending ?? members.length === 0) &&
+        (<div className="alert-info mt-0">
+          
+          {hasPending && (
+            <p className="text-text-muted text-sm justify-center">
+              No se puede realizar la inscripción porque hay invitaciones pendientes de aceptar.
+            </p>
+          )}
+
+          {members.length === 0 && !membersLoading && (
+            <p className="text-text-muted text-sm mr-4 self-center">
+              El grupo debe tener al menos un miembro para realizar la inscripción.
+            </p>
+          )}
+        </div>)
+      }
+
+      <div className="flex gap-3 justify-center mt-8">
+        <button
+          type="button"
+          className="btn-danger hover:opacity-90"
+          onClick={() => setShowCancelConfirm(true)}
+          disabled={cancelling}
+        >
+          {cancelling ? <Spinner size="sm" /> : "Eliminar grupo"}
+        </button>
+
+        {isInitialLoading && <Spinner size="sm" />}
+        {!isInitialLoading && hasRegistration && (
+          <button
+            type="button"
+            className="btn-primary bg-secondary hover:opacity-90"
+            onClick={() => setView("edit")}
+          >
+            Editar inscripción
+          </button>
+        )}
+        {!isInitialLoading && !hasRegistration && (
+          <button
+            type="button"
+            className="btn-primary bg-secondary hover:opacity-90"
+            disabled={!canEnroll || !activeReturn}
+            onClick={() => setView("form")}
+          >
+            Inscribir grupo
+          </button>
+        )}
+      </div>
+
+      {/* Modales */}
+      {
+        grupo && (
+          <>
+            <InviteMemberModal
+              isOpen={showInviteMember}
+              onClose={() => setShowInviteMember(false)}
+              grupoId={grupo.gr_codigo}
+              activeReturnCode={activeReturn?.codigo ?? null}
+              currentMembers={members}
+              onInviteSent={() => void refetchInvitations()}
+            />
+
+            <ExternalPersonModal
+              isOpen={showInviteExternal}
+              onClose={() => setShowInviteExternal(false)}
+              grupoId={grupo.gr_codigo}
+              onPersonaAdded={() => { void refetchMembers(); void refetchInvitations(); }}
+            />
+          </>
+        )
+      }
+
+      <ConfirmModal
+        isOpen={showCancelConfirm}
+        title="¿Eliminar el grupo?"
+        details={["Esta acción eliminará el grupo y desvinculará a todos sus miembros."]}
+        onConfirm={handleCancelConfirm}
+        onCancel={() => setShowCancelConfirm(false)}
+        loading={cancelling}
+        confirmLabel="Sí, eliminar"
+        cancelLabel="Volver"
+      />
+    </div >
+  );
+}
+
+export default function GrupalReturnRegistration() {
+  return (
+    <RequireAuth roles={["usuario", "lider_colonia"]}>
+      <GrupalReturnRegistrationFeature />
+    </RequireAuth>
+  );
+}

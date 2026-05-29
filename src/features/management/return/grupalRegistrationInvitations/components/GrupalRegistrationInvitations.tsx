@@ -201,7 +201,7 @@ export default function ListGrupalInscription() {
     );
   }
   return (
-    <RequireAuth roles={["usuario"]}>
+    <RequireAuth roles={["usuario", "lider_colonia"]}>
       <div className="flex w-full min-h-screen flex-col">
         <header className="sticky top-0 z-10 mx-10 rounded-xl bg-bg-card px-8 py-4 shadow-xl">
           <div className="flex items-end justify-between gap-6">

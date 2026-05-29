@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import Spinner from "@/components/feedback/Spinner";
 import { AnimatedList } from "@/components/common/AnimatedList";
-import { useListReturn } from "../../hooks/useListReturns";
+import { useListReturn } from "../../shared/hooks/useListReturns";
 import { RetornoCard } from "./RetornoCard";
 import { CreateRetornoButton } from "../../createReturn/components/CreateRetornoButton";
 

@@ -2,9 +2,9 @@
 
 import { useAuth } from "@/auth/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { useGrupo } from "../../grupalReturnRegistration/hooks/useGrupo.hook";
+import { useGrupo } from "../../shared/hooks/useGrupo.hook";
 import { useEffect, useState } from "react";
-import { retornoService } from "../../services/retorno.service";
+import { retornoService } from "../../shared/services/retorno.service";
 import { Retorno } from "@/types/retorno.types";
 
 interface UseRegistrationSelectorReturn {

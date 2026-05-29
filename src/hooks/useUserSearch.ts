@@ -4,7 +4,7 @@ import { userService } from "@/services/user.service";
 import type { UserSearchResult, UserSearchMode } from "@/types/user.types";
 
 interface UseUserSearchReturn {
-  search: (mode: UserSearchMode, value: string) => Promise<UserSearchResult[] | null>;
+  search: (mode: UserSearchMode, value: string, colonyId?: number | null) => Promise<UserSearchResult[] | null>;
   results: UserSearchResult[];
   loading: boolean;
   error: string | null;
@@ -33,7 +33,7 @@ export const useUserSearch = (): UseUserSearchReturn => {
   const lastRequestRef = useRef<number>(0);
 
   const search = useCallback(
-    async (mode: UserSearchMode, value: string): Promise<UserSearchResult[] | null> => {
+    async (mode: UserSearchMode, value: string, colonyId?: number | null): Promise<UserSearchResult[] | null> => {
       const trimmedValue = value.trim();
 
       if (!trimmedValue) {
@@ -47,7 +47,7 @@ export const useUserSearch = (): UseUserSearchReturn => {
       setError(null);
 
       try {
-        const response = await userService.createSearchFn(mode, value);
+        const response = await userService.createSearchFn(mode, value, colonyId);
         
         if (currentRequestId !== lastRequestRef.current) {
           return null;
