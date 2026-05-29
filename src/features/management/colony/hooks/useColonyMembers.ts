@@ -5,8 +5,10 @@ import { listColonyMembers } from "../services/colony-members.service";
 import { ApiError } from "@/services/api.services";
 import { useGetColony } from "./useGetColony";
 import { sortColonyMembers } from "../utils/member-sorter";
+import { getMockColonyMembers } from "@/mocks/colonyMember.mock";
+import { useDev } from "@/features/dev/context/DevContext";
 
-export function useColonyMembers(targetColonyId: number): {
+export function useColonyMembers(targetColonyId: number, useMocks?: boolean): {
 
   members: ColonyMember[];
   colonyLabel: string;
@@ -18,12 +20,15 @@ export function useColonyMembers(targetColonyId: number): {
   removeMemberLocally: (memberId: number) => void;
   refetchMembers: () => Promise<void>;
 } {
+  const { featureFlags } = useDev();
+  const effectiveUseMocks = useMocks ?? featureFlags.USE_COLONY_MEMBER_MOCKS;
+
   const { user } = useAuth();
   const [members, setMembers] = useState<ColonyMember[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { getColony, colony, loading: isLoadingColony } = useGetColony();
+  const { getColony, colony, loading: isLoadingColony } = useGetColony(effectiveUseMocks);
 
   useEffect(() => {
     if (targetColonyId) {
@@ -50,6 +55,13 @@ export function useColonyMembers(targetColonyId: number): {
     setIsLoading(true);
     setError(null);
 
+    if (effectiveUseMocks) {
+      const mockData = getMockColonyMembers(targetColonyId);
+      setMembers(sortColonyMembers(mockData));
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const data = await listColonyMembers(targetColonyId);
       setMembers(sortColonyMembers(data));
@@ -71,7 +83,7 @@ export function useColonyMembers(targetColonyId: number): {
     } finally {
       setIsLoading(false);
     }
-  }, [targetColonyId]);
+  }, [targetColonyId, effectiveUseMocks]);
 
   useEffect(() => {
     void fetchMembers();

@@ -8,7 +8,7 @@ export interface ColonyApi {
 }
 
 export type ColonyData = Omit<ColonyApi, "lider"> & {
-  lider: number;
+  lider: number | null;
 };
 
 export interface ColonyApiRequest {

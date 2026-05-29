@@ -32,7 +32,7 @@ interface ToastContextType {
   clearToasts: () => void;
 }
 
-const TOAST_DURATION = 5000;
+const TOAST_DURATION = 8000;
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
@@ -65,24 +65,28 @@ const getToastConfig = (type: ToastType) => ({
     colorClass: "bg-accent-green/10 text-accent-green",
     borderClass: "border-accent-green/20",
     iconColor: "text-accent-green",
+    progressClass: "bg-accent-green",
   },
   error: {
     icon: XCircleIcon,
     colorClass: "bg-accent-red/10 text-accent-red",
     borderClass: "border-accent-red/20",
     iconColor: "text-accent-red",
+    progressClass: "bg-accent-red",
   },
   warning: {
     icon: ExclamationCircleIcon,
-    colorClass: "bg-secondary/10 text-secondary",
-    borderClass: "border-secondary/20",
-    iconColor: "text-secondary",
+    colorClass: "bg-accent-yellow/10 text-accent-yellow",
+    borderClass: "border-accent-yellow/20",
+    iconColor: "text-accent-yellow",
+    progressClass: "bg-accent-yellow",
   },
   info: {
     icon: InformationCircleIcon,
-    colorClass: "bg-primary/10 text-primary",
-    borderClass: "border-primary/20",
-    iconColor: "text-primary",
+    colorClass: "bg-accent-yellow/10 text-accent-yellow",
+    borderClass: "border-accent-yellow/20",
+    iconColor: "text-accent-yellow",
+    progressClass: "bg-accent-yellow",
   },
 }[type]);
 
@@ -128,13 +132,6 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const showToast = useCallback(
     (message: string, type: ToastType = "info") => {
       setToasts((prev) => {
-        const existingToast = findExistingToast(prev, message, type);
-
-        if (existingToast) {
-          scheduleRemoval(existingToast.id);
-          return prev;
-        }
-
         const nextToast = createToast(message, type);
         scheduleRemoval(nextToast.id);
         return [...prev, nextToast];
@@ -165,8 +162,8 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     <ToastContext.Provider value={value}>
       {children}
 
-      <div className="fixed top-24 right-6 z-100 flex flex-col gap-3 pointer-events-none">
-        <AnimatePresence mode="popLayout">
+      <div className="fixed top-24 right-6 z-40 flex flex-col gap-3 pointer-events-none">
+        <AnimatePresence>
           {toasts.map((toast) => (
             <ToastItem
               key={toast.id}
@@ -200,19 +197,18 @@ const ToastItem: React.FC<{ toast: Toast; onClose: () => void }> = ({
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: -20, scale: 0.9, x: 20 }}
-      animate={{ opacity: 1, y: 0, scale: 1, x: 0 }}
+      initial={{ opacity: 0, x: 100 }}
+      animate={{ opacity: 1, x: 0 }}
       exit={{
         opacity: 0,
-        scale: 0.8,
-        x: 20,
-        transition: { duration: 0.2 },
+        x: 100,
+        transition: { duration: 0.3 },
       }}
-      className={`pointer-events-auto flex items-center gap-3 px-5 py-4 rounded-2xl shadow-lg border backdrop-blur-xl ${config.colorClass} ${config.borderClass} min-w-[320px] max-w-md`}
+      className={`relative overflow-hidden pointer-events-auto flex items-center gap-3 px-5 py-4 rounded-2xl shadow-lg border backdrop-blur-xl ${config.colorClass} ${config.borderClass} min-w-[320px] max-w-md`}
     >
-      <Icon className={`w-6 h-6 shrink-0 ${config.iconColor}`} />
+      <Icon className={`w-6 h-6 shrink-0 ${config.iconColor} z-10`} />
 
-      <p className="flex-1 font-semibold text-sm leading-snug">
+      <p className="flex-1 font-semibold text-sm leading-snug z-10">
         {toast.message}
       </p>
 
@@ -220,10 +216,17 @@ const ToastItem: React.FC<{ toast: Toast; onClose: () => void }> = ({
         type="button"
         onClick={onClose}
         aria-label="Cerrar notificación"
-        className="p-1.5 rounded-full hover:bg-black/5 transition-colors"
+        className="p-1.5 rounded-full hover:bg-black/5 transition-colors z-10"
       >
         <XMarkIcon className="w-4 h-4 opacity-70" />
       </button>
+
+      <motion.div
+        initial={{ width: "100%" }}
+        animate={{ width: "0%" }}
+        transition={{ duration: TOAST_DURATION / 1000, ease: "linear" }}
+        className={`absolute bottom-0 left-0 h-1.5 ${config.progressClass} opacity-80`}
+      />
     </motion.div>
   );
 };

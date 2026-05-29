@@ -9,6 +9,7 @@ import type { ColonyData } from "@/types/colony.types";
 import { ConfirmModal } from "@/components/feedback/confirmModal";
 import { UserSearchField } from "@/components/forms/UserSearchField";
 import { ExpandableContent } from "@/components/layout/ExpandableContent";
+import { useToast } from "@/components/feedback/Toast";
 
 interface AssignLeaderModalFormProps {
   readonly colony: ColonyData;
@@ -25,7 +26,6 @@ export function AssignLeaderModalForm({
     assignLeader,
     loading: assignLoading,
     error: assignError,
-    success,
   } = useAssignLeaderToColony();
 
   const {
@@ -34,15 +34,17 @@ export function AssignLeaderModalForm({
     loading: currentLeaderLoading,
   } = useGetUser();
 
+  const { showToast } = useToast();
+
   const [selectedUser, setSelectedUser] = useState<UserSearchResult | null>(
     null,
   );
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  const hasLeader = colony.lider > 0;
+  const hasLeader = colony.lider !== null && colony.lider > 0;
 
   useEffect(() => {
-    if (hasLeader) {
+    if (hasLeader && colony.lider !== null) {
       getUser(colony.lider);
     }
   }, [hasLeader, colony.lider, getUser]);
@@ -51,6 +53,10 @@ export function AssignLeaderModalForm({
     setSelectedUser(user);
   };
 
+  const fullLocation = colony.departamento
+    ? `${colony.ciudad}, ${colony.departamento}, ${colony.pais}`
+    : colony.pais;
+
   const handleModalConfirm = async () => {
     if (!selectedUser) return;
     const ok = await assignLeader({
@@ -58,17 +64,29 @@ export function AssignLeaderModalForm({
       liderId: selectedUser.id,
       isChange: hasLeader,
     });
+    
+    setShowConfirmModal(false);
+    
     if (ok) {
+      showToast(`¡Líder ${selectedUser.nombre} asignado a ${fullLocation} con éxito!`, "success");
       onSuccess?.();
     }
-    setShowConfirmModal(false);
   };
 
-  const error = assignError;
+  useEffect(() => {
+    if (assignError) {
+      if (selectedUser) {
+        showToast(
+          `El usuario ${selectedUser.nombre} ${selectedUser.apellido} no se pudo asignar como líder en la colonia de ${fullLocation}.`,
+          "error"
+        );
+      } else {
+        showToast(assignError, "error");
+      }
+      onCancel?.();
+    }
+  }, [assignError, showToast, selectedUser, fullLocation, onCancel]);
 
-  const fullLocation = colony.departamento
-    ? `${colony.ciudad}, ${colony.departamento}, ${colony.pais}`
-    : colony.pais;
 
   const getLeaderContent = () => {
     if (currentLeaderLoading) {
@@ -124,23 +142,14 @@ export function AssignLeaderModalForm({
         </div>
       )}
 
-      {error && (
-        <div className="mb-4 p-3 rounded-lg bg-accent-red/10 border border-accent-red/20 text-accent-red text-sm">
-          {error}
-        </div>
-      )}
 
-      {success && (
-        <div className="mb-4 p-3 rounded-lg bg-accent-green/10 border border-accent-green/20 text-accent-green text-sm font-medium">
-          Líder asignado exitosamente
-        </div>
-      )}
 
       <div className="space-y-6">
         <UserSearchField
           variant="autocomplete"
           onSelect={handleSelectUser}
           onModeChange={() => setSelectedUser(null)}
+          excludeIds={hasLeader && colony.lider !== null ? [colony.lider] : []}
         />
 
         <ExpandableContent isOpen={!!selectedUser}>

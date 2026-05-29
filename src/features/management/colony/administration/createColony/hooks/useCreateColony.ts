@@ -11,6 +11,23 @@ interface UseCreateColony {
   success: boolean;
 }
 
+const validateColonyData = (data: ColonyData): string | null => {
+  const isColombia = data.pais === "Colombia";
+  if (!data.pais || (isColombia && !data.departamento) || (isColombia && !data.ciudad)) {
+    return "Todos los campos son obligatorios para Colombia";
+  }
+  return null;
+};
+
+const resolveErrorMessage = (err: unknown): string => {
+  if (err instanceof ApiError) {
+    if (err.status === 409) return err.message || "Ya existe una colonia con la misma ubicación.";
+    if (err.status === 422) return "Datos inválidos o campos faltantes.";
+    return err.message;
+  }
+  return "No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo.";
+};
+
 export const useCreateColony = (): UseCreateColony => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,13 +36,9 @@ export const useCreateColony = (): UseCreateColony => {
   const resetError = () => setError(null);
 
   const createColony = async (data: ColonyData): Promise<ColonyApi | null> => {
-    const isColombia = data.pais === "Colombia";
-    if (
-      !data.pais ||
-      (isColombia && !data.departamento) ||
-      (isColombia && !data.ciudad)
-    ) {
-      setError("Todos los campos son obligatorios para Colombia");
+    const validationError = validateColonyData(data);
+    if (validationError) {
+      setError(validationError);
       return null;
     }
 
@@ -38,19 +51,7 @@ export const useCreateColony = (): UseCreateColony => {
       setSuccess(true);
       return response;
     } catch (err) {
-      if (err instanceof ApiError) {
-        if (err.status === 409) {
-          setError("Ya existe una colonia con la misma ubicación.");
-        } else if (err.status === 422) {
-          setError("Datos inválidos o campos faltantes.");
-        } else {
-          setError(err.message);
-        }
-      } else {
-        setError(
-          err instanceof Error ? err.message : "Error al crear la colonia",
-        );
-      }
+      setError(resolveErrorMessage(err));
       return null;
     } finally {
       setLoading(false);

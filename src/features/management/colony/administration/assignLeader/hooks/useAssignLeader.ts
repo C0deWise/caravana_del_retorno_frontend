@@ -47,7 +47,7 @@ export const useAssignLeaderToColony = (): UseAssignLeader => {
           setError(err.message);
         }
       } else {
-        setError("Error de conexión, intenta de nuevo");
+        setError("No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo.");
       }
       return null;
     } finally {

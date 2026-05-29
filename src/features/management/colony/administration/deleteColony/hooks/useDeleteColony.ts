@@ -39,9 +39,7 @@ export const useDeleteColony = (): UseDeleteColonyReturn => {
             setError(err.message || "Error inesperado al intentar desactivar la colonia.");
         }
       } else {
-        setError(
-          err instanceof Error ? err.message : "Error de conexión con el servidor",
-        );
+        setError("No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo.");
       }
       return false;
     } finally {

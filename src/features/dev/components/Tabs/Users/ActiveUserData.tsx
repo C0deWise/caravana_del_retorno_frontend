@@ -12,25 +12,20 @@ interface ActiveUserDataProps {
 export function ActiveUserData({ user, apiMode, loadingColony, fetchedColony }: ActiveUserDataProps) {
   if (!user) return null;
 
-  const getColonyDisplayString = () => {
-    if (!apiMode) return "Colonia Simulada";
-    if (loadingColony) return "Cargando...";
-    if (fetchedColony) {
-      return [fetchedColony.ciudad, fetchedColony.departamento, fetchedColony.pais]
-        .filter(Boolean)
-        .join(", ");
-    }
-    return "Desconocida";
+  const getColonyBaseName = () => {
+    if (!fetchedColony) return null;
+    const isColombia = fetchedColony.pais.toLowerCase() === "colombia";
+    const parts = isColombia 
+      ? [fetchedColony.ciudad, fetchedColony.departamento, fetchedColony.pais] 
+      : [fetchedColony.pais];
+    return parts.filter(Boolean).join(", ");
   };
 
-  const getColonyTitleString = () => {
-    if (!apiMode) return "Colonia Simulada (Mock)";
-    if (fetchedColony) {
-      return [fetchedColony.ciudad, fetchedColony.departamento, fetchedColony.pais]
-        .filter(Boolean)
-        .join(", ");
-    }
-    return "Cargando...";
+  const getColonyDisplayString = () => {
+    if (loadingColony) return "Cargando...";
+    const name = getColonyBaseName();
+    if (name) return apiMode ? name : `${name} (Mock)`;
+    return "Desconocida";
   };
 
   return (
@@ -93,7 +88,7 @@ export function ActiveUserData({ user, apiMode, loadingColony, fetchedColony }: 
                 {key === "codigo_colonia" && value !== null && (
                   <div className="flex justify-between items-center group border-b border-zinc-800/30 pb-1 last:border-0 bg-amber-500/5 px-1 rounded">
                     <span className="text-zinc-500 group-hover:text-amber-500/70 transition-colors uppercase whitespace-nowrap text-[9px]">↳ COLONIA:</span>
-                    <span className="text-amber-400 font-mono text-right truncate max-w-[65%] text-[9px]" title={getColonyTitleString()}>
+                    <span className="text-amber-400 font-mono text-right truncate max-w-[65%] text-[9px]" title={getColonyDisplayString()}>
                       {getColonyDisplayString()}
                     </span>
                   </div>

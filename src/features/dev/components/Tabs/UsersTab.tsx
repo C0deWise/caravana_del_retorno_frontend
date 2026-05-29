@@ -23,10 +23,10 @@ export function UsersTab() {
   } = useDev();
 
   useEffect(() => {
-    if (user?.codigo_colonia && apiMode) {
+    if (user?.codigo_colonia) {
       getColony(user.codigo_colonia);
     }
-  }, [user?.codigo_colonia, getColony, apiMode]);
+  }, [user?.codigo_colonia, getColony]);
 
   return (
     <>
@@ -35,7 +35,10 @@ export function UsersTab() {
         onToggle={() => {
           const newMode = !apiMode;
           setApiMode(newMode);
-          if (!newMode) logout();
+          if (!newMode) {
+            logout();
+            setRoleOverride("usuario");
+          }
         }}
       />
 

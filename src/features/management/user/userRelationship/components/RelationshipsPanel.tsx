@@ -7,14 +7,13 @@ import { KinshipsList } from "../kinshipsList/KinshipsList";
 import { RequestsList } from "../relationshipsRequestList/RequestsList";
 import { RequestRelationshipButton } from "../relationshipRequest/components/RequestRelationshipButton";
 import { RequireAuth } from "@/auth/components/RequireAuth";
-import { useDev } from "@/features/dev/context/DevContext";
+
 function RelationshipsPanelComponent() {
   const { user } = useAuth();
-  const { featureFlags } = useDev();
   const targetUserId = user?.id ?? 0;
 
-  const { relationships, loading, error, hasMore, loadMore, refetch, usedMocks } =
-    useListRelationships(targetUserId, featureFlags.USE_RELATIONSHIP_MOCKS);
+  const { relationships, loading, error, hasMore, loadMore, refetch } =
+    useListRelationships(targetUserId);
 
   const normalizeTabStatus = (status?: string) =>
     status?.trim().toLowerCase() ?? "";
@@ -47,11 +46,6 @@ function RelationshipsPanelComponent() {
                 Parentescos
               </h1>
             </div>
-            {usedMocks && (
-              <span className="ml-4 rounded-full bg-accent-yellow/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-accent-yellow border border-accent-yellow/20 animate-pulse">
-                Mock Mode
-              </span>
-            )}
           </div>
 
           <div className="flex flex-1 items-center justify-end">
@@ -63,7 +57,7 @@ function RelationshipsPanelComponent() {
         </div>
       </header>
 
-      {error && !usedMocks && (
+      {error && (
         <div className="shrink-0 mx-10 rounded-xl border border-danger/30 bg-danger/10 px-6 py-4">
           <p className="text-sm font-medium text-danger">{error}</p>
         </div>
