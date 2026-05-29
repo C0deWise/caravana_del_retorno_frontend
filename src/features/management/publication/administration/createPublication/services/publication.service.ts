@@ -14,10 +14,10 @@ export const createPublicationService = async (
   formData.append("autor", payload.autor.toString());
   formData.append("titulo", payload.titulo);
   formData.append("resena", payload.resena);
-  
+
   payload.archivos.forEach((file) => {
     formData.append("archivos", file);
   });
 
-  return apiService.postWithProgress<PublicationData>("/api/v1/crear-publicacion", formData, onProgress);
+  return apiService.postWithProgress<PublicationData>("/api/v1/crear-publicacion/", formData, onProgress);
 };

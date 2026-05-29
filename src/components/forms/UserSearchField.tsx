@@ -19,6 +19,7 @@ interface UserSearchFieldProps {
   readonly initialMode?: UserSearchMode;
   readonly excludeIds?: number[];
   readonly showModeSelector?: boolean;
+  readonly coloniaId?: number | null;
 }
 
 export function UserSearchField({
@@ -32,6 +33,7 @@ export function UserSearchField({
   initialMode = "general",
   excludeIds = [],
   showModeSelector = false,
+  coloniaId,
 }: Readonly<UserSearchFieldProps>) {
   const { user: currentUser } = useAuth();
   const [searchType, setSearchType] = useState<UserSearchMode>(initialMode);
@@ -52,21 +54,22 @@ export function UserSearchField({
       }
 
       if (action === "input-change" && query.length === 0) {
-        search(searchType, "");
+        search(searchType, "", coloniaId);
         return;
       }
 
       if (query.length >= 2) {
         debounceTimerRef.current = setTimeout(() => {
-          search(searchType, query);
+          search(searchType, query, coloniaId);
           onSearch?.(query, searchType);
         }, 500);
       }
     },
-    [search, searchType, onSearch],
+    [search, searchType, onSearch, coloniaId],
   );
 
   const filteredResults = results.filter((u) => {
+    console.log("Filtrando resultados para", u);
     if (u.id === currentUser?.id) return false;
     if (u.codigo_rol === 3) return false;
     if (excludeIds.includes(u.id)) return false;

@@ -1,6 +1,6 @@
 import { apiService } from '@/services/api.services';
 import type { ReturnUnregistrationCreateRequest } from '../types/returnUnregistration.types';
-import type { Retorno } from '../../../types/retorno.types';
+import type { Retorno } from '../../../shared/types/retorno.types';
 
 const ACTIVE_RETURN_STATES = new Set([
     'activo',
@@ -50,7 +50,7 @@ class ReturnUnregistrationService {
      * @returns Una promesa que se resuelve con la respuesta de la API o se rechaza con un error.
      */
     async deleteReturnRegistration(data: ReturnUnregistrationCreateRequest): Promise<string> {
-        return apiService.delete<string>(`${this.retornosEndpoint}/darse-de-baja`, data);
+        return apiService.delete<string>(`${this.retornosEndpoint}darse-de-baja`, data);
     }
 }
 

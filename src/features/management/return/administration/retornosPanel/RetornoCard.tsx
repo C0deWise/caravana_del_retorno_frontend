@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { ArrowPathIcon, CalendarDaysIcon } from "@heroicons/react/24/solid";
 import type { Retorno } from "@/types/retorno.types";
 import ListCard from "@/components/common/ListCard";
-import { useUpdateReturnState } from "../../hooks/useUpdateReturnState";
+import { useUpdateReturnState } from "../../shared/hooks/useUpdateReturnState";
 import { ConfirmModal } from "@/components/feedback/confirmModal";
 import { useToast } from "@/components/feedback/Toast";
 import { ConfiguredTag, type TagConfigRecord } from "@/components/common/Tag";
