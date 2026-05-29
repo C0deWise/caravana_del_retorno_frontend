@@ -54,25 +54,25 @@ export function UserSearchField({
       }
 
       if (action === "input-change" && query.length === 0) {
-        search(searchType, "");
+        search(searchType, "", coloniaId);
         return;
       }
 
       if (query.length >= 2) {
         debounceTimerRef.current = setTimeout(() => {
-          search(searchType, query);
+          search(searchType, query, coloniaId);
           onSearch?.(query, searchType);
         }, 500);
       }
     },
-    [search, searchType, onSearch],
+    [search, searchType, onSearch, coloniaId],
   );
 
   const filteredResults = results.filter((u) => {
+    console.log("Filtrando resultados para", u);
     if (u.id === currentUser?.id) return false;
     if (u.codigo_rol === 3) return false;
     if (excludeIds.includes(u.id)) return false;
-    if (coloniaId != null && u.codigo_colonia !== coloniaId) return false;
     return true;
   });
 

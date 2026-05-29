@@ -1,5 +1,6 @@
 import { apiService, ApiError } from "@/services/api.services";
-import type { UserSearchResult } from "@/types/user.types";
+import type { UserApi, UserSearchResult } from "@/types/user.types";
+import { listColonyMembers } from "./colony.service";
 
 const userCache = new Map<number, UserSearchResult>();
 const pendingRequests = new Map<number, Promise<UserSearchResult>>();
@@ -57,8 +58,31 @@ export const userService = {
   createSearchFn: async (
     mode: string,
     value: string,
+    colonyId?: number | null,
   ): Promise<UserSearchResult[]> => {
     const trimmed = value.trim();
+
+    if (colonyId != null) {
+      const colonyUsers = await listColonyMembers(colonyId);
+      const mapped: UserSearchResult[] = colonyUsers.map((u) => ({
+        ...u,
+        codigo_rol: u.role as UserApi["codigo_rol"],
+        fecha_creacion: "",
+        codigo_retorno: null,
+        pais: "",
+        departamento: null,
+        ciudad: null,
+      }));
+
+      return mapped.filter((u) => {
+        const fullName = `${u.nombre} ${u.apellido}`.toLowerCase();
+        const doc = u.documento ?? "";
+        const q = trimmed.toLowerCase();
+        if (mode === "documento") return doc.includes(q);
+        if (mode === "nombre") return fullName.includes(q);
+        return fullName.includes(q) || doc.includes(q);
+      });
+    }
 
     if (mode === "nombre") {
       return userService.searchByName(trimmed);

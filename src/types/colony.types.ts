@@ -1,3 +1,5 @@
+import { UserApi } from "./user.types";
+
 export interface ColonyApi {
   codigo: number;
   pais: string;
@@ -17,3 +19,8 @@ export interface ColonyApiRequest {
   ciudad: string | null;
   lider: number | null;
 }
+
+export interface ColonyMember extends Omit<UserApi, "codigo_rol"> {
+  role: number;
+}
+
