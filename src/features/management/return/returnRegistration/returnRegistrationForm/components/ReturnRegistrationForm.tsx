@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { RequireAuth } from "@/auth/components/RequireAuth";
 import { useAuth } from "@/auth/context/AuthContext";
 import { ConfirmModal } from "@/components/feedback/confirmModal";
+import { useToast } from "@/components/feedback/Toast";
 import Spinner from "@/components/feedback/Spinner";
 import { useSendReturnRegistration } from "../hooks/useSendReturnRegistration";
 import type { UserData } from "@/types/user.types";
@@ -15,6 +16,7 @@ import type {
 import { retornoService } from "../../../shared/services/retorno.service";
 import { ReturnRegistrationManagement } from "../../returnRegistrationManagement/components/returnRegistrationManagement";
 import { useRouter } from "next/navigation";
+import { SelectField } from "@/components/forms/SelectField";
 
 type ParkingOption = "none" | "car" | "bike";
 
@@ -159,6 +161,7 @@ function ReturnRegistrationFormContent() {
   const { sendReturnRegistration, loading, error } =
     useSendReturnRegistration();
   const router = useRouter();
+  const { showToast } = useToast();
 
   const [formData, setFormData] = useState(initialForm);
   const [fieldErrors, setFieldErrors] = useState<FormErrors>({});
@@ -271,7 +274,7 @@ function ReturnRegistrationFormContent() {
 
   const handleRadioChange = (
     field: "accomodation" | "transport",
-    value: ReturnRegistrationAnswer,
+    value: ReturnRegistrationAnswer | "",
   ) => {
     setFormData((prev) => {
       const next = { ...prev, [field]: value };
@@ -359,6 +362,9 @@ function ReturnRegistrationFormContent() {
 
     if (response) {
       setAlreadyRegistered(true);
+      showToast("Asistencia registrada exitosamente", "success");
+    } else {
+      showToast("No se pudo registrar la asistencia, intenta nuevamente", "error");
     }
   };
 
@@ -382,14 +388,14 @@ function ReturnRegistrationFormContent() {
   if (guardView) return guardView;
 
   return (
-    <div className="bg-white px-4 py-6">
-      <div className="mx-auto w-full max-w-2xl rounded-2xl bg-bg p-6 shadow-md sm:p-8">
-        <h1 className="page-title">
+    <div className="flex flex-col h-full w-full items-center justify-start pt-8 px-4 bg-bg">
+      <div className="w-full max-w-3xl rounded-3xl border border-bg-border bg-bg p-6 shadow-xl sm:p-8">
+        <h1 className="page-title text-center mb-1">
           {activeReturnYear
             ? ` Registro de Asistencia para El Retorno ${activeReturnYear}`
             : ` El Retorno #${activeReturnCode}`}
         </h1>
-        <h2 className="section-title">
+        <h2 className="section-title text-center mb-6">
           Confirma tu disponibilidad de viaje
         </h2>
 
@@ -399,136 +405,87 @@ function ReturnRegistrationFormContent() {
           </div>
         )}
 
-        <form className="mt-6 space-y-6" onSubmit={handleSubmit} noValidate>
-          <fieldset>
-            <div className="flex flex-col gap-3 px-6 py-1 sm:flex-row sm:items-center sm:justify-between">
-              <legend className="label-primary mb-0">¿Tiene hospedaje?</legend>
-              <div
-                className={`inline-flex items-center gap-5 rounded-lg px-3 py-2 ${fieldErrors.accomodation ? "border border-danger" : "border border-transparent"}`}
-              >
-                <label className="inline-flex items-center gap-2 text-text">
-                  <input
-                    type="radio"
-                    name="accomodation"
-                    value="si"
-                    checked={formData.accomodation === 1}
-                    onChange={() => handleRadioChange("accomodation", 1)}
-                  />Sí</label>
-                <label className="inline-flex items-center gap-2 text-text">
-                  <input
-                    type="radio"
-                    name="accomodation"
-                    value="no"
-                    checked={formData.accomodation === 0}
-                    onChange={() => handleRadioChange("accomodation", 0)}
-                  />No</label>
-              </div>
-            </div>
-            {fieldErrors.accomodation && (
-              <p className="validation-message validation-error">
-                {fieldErrors.accomodation}
-              </p>
-            )}
-          </fieldset>
-
-          <fieldset>
-            <div className="flex flex-col gap-3 px-6 py-1 sm:flex-row sm:items-center sm:justify-between">
-              <legend className="label-primary mb-0">¿Tiene transporte?</legend>
-              <div
-                className={`inline-flex items-center gap-5 rounded-lg px-3 py-2 ${fieldErrors.transport ? "border border-danger" : "border border-transparent"}`}
-              >
-                <label className="inline-flex items-center gap-2 text-text">
-                  <input
-                    type="radio"
-                    name="transport"
-                    value="si"
-                    checked={formData.transport === 1}
-                    onChange={() => handleRadioChange("transport", 1)}
-                  />Sí</label>
-                <label className="inline-flex items-center gap-2 text-text">
-                  <input
-                    type="radio"
-                    name="transport"
-                    value="no"
-                    checked={formData.transport === 0}
-                    onChange={() => handleRadioChange("transport", 0)}
-                  />No</label>
-              </div>
-            </div>
-            {fieldErrors.transport && (
-              <p className="validation-message validation-error">
-                {fieldErrors.transport}
-              </p>
-            )}
-          </fieldset>
-
-          {formData.transport === 1 && (
-            <div className="flex flex-col gap-3 mr-6 sm:flex-row sm:items-center sm:justify-between">
-              <label htmlFor="parking" className="label-primary mb-0 ml-6 ">
-                ¿Necesita parqueadero?
-              </label>
-              <select
-                id="parking"
-                name="parking"
-                className={`select-base w-auto self-start sm:self-auto${fieldErrors.parking ? " border-danger" : ""}`}
-                value={formData.parking}
-                onChange={(e) => handleParkingChange(e.target.value as ParkingOption | "")}
-              >
-                <option value="" disabled>Selecciona</option>
-                <option value="none">No</option>
-                <option value="car">Sí, para carro</option>
-                <option value="bike">Sí, para moto</option>
-              </select>
-              {fieldErrors.parking && (
-                <p className="validation-message validation-error">
-                  {fieldErrors.parking}
-                </p>
-              )}
-            </div>
-          )}
-
-          <div>
-            <label htmlFor="note" className="label-primary mb-0">
-              Notas adicionales
-            </label>
-            <p className="validation-message validation-info mt-1">
-              Opcional. Puedes indicar información adicional relevante para tu asistencia.
-            </p>
-            <textarea
-              id="note"
-              name="note"
-              className="textarea-base mt-2"
-              rows={3}
-              maxLength={maxLength}
-              placeholder={`Escribe aquí cualquier información adicional (máximo ${maxLength} caracteres)...`}
-              value={formData.note}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, note: e.target.value }))
-              }
+        <form className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch" onSubmit={handleSubmit} noValidate>
+          <div className="space-y-4 flex flex-col justify-between">
+            <SelectField
+              label="¿Tiene hospedaje?"
+              options={[
+                { value: 1, label: "Sí" },
+                { value: 0, label: "No" },
+              ]}
+              value={formData.accomodation !== "" ? { value: formData.accomodation, label: formData.accomodation === 1 ? "Sí" : "No" } : null}
+              onChange={(option) => handleRadioChange("accomodation", option ? (option.value as ReturnRegistrationAnswer) : "")}
+              error={fieldErrors.accomodation}
             />
 
-            <p className="validation-message validation-info mt-1 text-right">
-              {formData.note.length} / {maxLength} caracteres
-            </p>
+            <SelectField
+              label="¿Tiene transporte?"
+              options={[
+                { value: 1, label: "Sí" },
+                { value: 0, label: "No" },
+              ]}
+              value={formData.transport !== "" ? { value: formData.transport, label: formData.transport === 1 ? "Sí" : "No" } : null}
+              onChange={(option) => handleRadioChange("transport", option ? (option.value as ReturnRegistrationAnswer) : "")}
+              error={fieldErrors.transport}
+            />
+
+            <SelectField
+              label="¿Necesita parqueadero?"
+              options={[
+                { value: "none", label: "No" },
+                { value: "car", label: "Sí, para carro" },
+                { value: "bike", label: "Sí, para moto" },
+              ]}
+              value={
+                formData.parking !== ""
+                  ? { value: formData.parking, label: parkingOptionLabel(formData.parking) }
+                  : null
+              }
+              onChange={(option) => handleParkingChange(option ? (option.value as ParkingOption) : "")}
+              error={fieldErrors.parking}
+              isDisabled={formData.transport !== 1}
+            />
           </div>
 
-          <div className="flex justify-center gap-4 pt-1">
-            <button
-              type="button"
-              className="btn-secondary min-w-32"
-              onClick={() => router.push("/gestion/retorno/registro")}
-              disabled={loading}
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="btn-primary bg-secondary min-w-48 inline-flex items-center justify-center gap-2 hover:opacity-90"
-              disabled={loading}
-            >
-              {loading && <Spinner size="sm" />}
-              {loading ? "Enviando..." : "Registrar asistencia"}
-            </button>
+          <div className="flex flex-col justify-between h-full">
+            <div className="flex-1 flex flex-col">
+              <label htmlFor="note" className="block text-sm font-medium text-text mb-1.5">
+                Notas adicionales <span className="text-xs text-text-muted font-normal">(Opcional)</span>
+              </label>
+              <textarea
+                id="note"
+                name="note"
+                className="textarea-base w-full resize-none flex-1 min-h-[140px]"
+                maxLength={maxLength}
+                placeholder="Indica información adicional relevante para tu asistencia..."
+                value={formData.note}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, note: e.target.value }))
+                }
+              />
+              <p className="text-[10px] text-text-muted text-right mt-1">
+                {formData.note.length} / {maxLength} caracteres
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4">
+              <button
+                type="button"
+                className="btn-secondary px-6 py-2 text-sm"
+                onClick={() => router.push("/gestion/retorno/registro")}
+                disabled={loading}
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                className="btn-primary bg-secondary px-6 py-2 text-sm inline-flex items-center justify-center gap-2 hover:opacity-90"
+                disabled={loading}
+              >
+                {loading && <Spinner size="sm" />}
+                {loading ? "Enviando..." : "Registrar asistencia"}
+              </button>
+            </div>
           </div>
         </form>
       </div>

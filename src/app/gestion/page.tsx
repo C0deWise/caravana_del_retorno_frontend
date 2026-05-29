@@ -27,6 +27,8 @@ export default function Gestion() {
 
   const managementModules = getMenuByRole(user);
 
+  const tieneColonia = Boolean(user?.codigo_colonia);
+
   // Flatten all subitems into a single array for direct access
   const allRoutes = managementModules.flatMap(module =>
     (module.subitems || []).map(subitem => ({
@@ -34,7 +36,12 @@ export default function Gestion() {
       category: module.label,
       icon: module.icon
     }))
-  );
+  ).filter(route => {
+    if (route.href === "/gestion/retorno/registro" || route.href === "/gestion/retorno/grupos") {
+      return tieneColonia;
+    }
+    return true;
+  });
 
   return (
     <section className="w-full h-full rounded-2xl bg-bg-separator shadow-lg p-8 md:p-10">
@@ -47,7 +54,7 @@ export default function Gestion() {
             Selecciona el módulo al que deseas acceder para continuar.
           </p>
         </header>
-
+ 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {allRoutes.map((route) => (
             <Link

@@ -1,11 +1,15 @@
-import type { StylesConfig } from "react-select";
+import type { StylesConfig, GroupBase } from "react-select";
 
-type SelectOption = {
-  value: string;
+export type SelectOption = {
+  value: unknown;
   label: string;
 };
 
-export const selectStyles: StylesConfig<SelectOption, false> = {
+export const getSelectStyles = <
+  Option = SelectOption,
+  IsMulti extends boolean = false,
+  Group extends GroupBase<Option> = GroupBase<Option>
+>(): StylesConfig<Option, IsMulti, Group> => ({
   control: (base, state) => ({
     ...base,
     backgroundColor: "var(--color-bg)",
@@ -83,4 +87,4 @@ export const selectStyles: StylesConfig<SelectOption, false> = {
     ...base,
     zIndex: 9999,
   }),
-};
+});
