@@ -277,7 +277,7 @@ function GrupalReturnRegistrationFeature() {
 
       <ConfirmModal
         isOpen={showCancelConfirm}
-        title="Eliminar el grupo?"
+        title="¿Eliminar el grupo?"
         details={["Esta acción eliminará el grupo y desvinculará a todos sus miembros."]}
         onConfirm={handleCancelConfirm}
         onCancel={() => setShowCancelConfirm(false)}
