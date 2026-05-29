@@ -158,7 +158,7 @@ export default function AuthUserRegistration() {
   };
 
   return (
-    <div className="min-h-screen bg-white p-8">
+    <div className="min-h-screen bg-white pb-20">
       <div className="max-w-7xl mx-auto">
         <h1 className="page-title">Registro de usuario</h1>
 
@@ -409,6 +409,7 @@ export default function AuthUserRegistration() {
                       />
                       <button
                         type="button"
+                        tabIndex={-1}
                         onClick={() => setShowPassword((prev) => !prev)}
                         aria-label={
                           showPassword
@@ -489,7 +490,7 @@ export default function AuthUserRegistration() {
 
           {/* Botón de Envío */}
           <div className="mt-8 flex justify-center">
-            <button type="submit" disabled={loading || !isFormValid} className="btn-primary">
+            <button type="submit" disabled={loading} className="btn-primary">
               {loading ? "Registrando..." : "Registrarse"}
             </button>
           </div>
