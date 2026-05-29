@@ -226,8 +226,8 @@ class ApiService {
     return this.request<T>("PUT", endpoint, data);
   }
 
-  public async delete<T>(endpoint: string): Promise<T> {
-    return this.request<T>("DELETE", endpoint);
+  public async delete<T>(endpoint: string, data?: unknown): Promise<T> {
+    return this.request<T>("DELETE", endpoint, data);
   }
 
   public async getBlob(endpoint: string): Promise<Blob> {

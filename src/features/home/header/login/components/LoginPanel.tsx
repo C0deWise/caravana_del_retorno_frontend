@@ -1,12 +1,9 @@
 
-
-
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/auth/context/AuthContext";
-import { authService } from "@/features/home/header/login/services/auth.service";
 import { useRouter } from "next/navigation";
+import { useLogin } from "../hooks/useLogin";
 
 interface LoginPanelProps {
   readonly onClose: () => void;
@@ -15,32 +12,16 @@ interface LoginPanelProps {
 export default function LoginPanel({ onClose }: LoginPanelProps) {
   const [correo, setCorreo] = useState("");
   const [contrasenia, setContrasenia] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
   const router = useRouter();
-  const { login } = useAuth();
+  const { loginUser, isLoading, error, setError } = useLogin();
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    const correoNormalizado = correo.trim().toLowerCase();
-    const contraseniaNormalizada = contrasenia.trim();
-    if (!correoNormalizado || !contraseniaNormalizada || isLoading) return;
-
-    setIsLoading(true);
-    setError("");
-
-    try {
-      const userData = await authService.login(correoNormalizado, contraseniaNormalizada);
-      login(userData);
+    await loginUser(correo, contrasenia);
+    if (!error) {
       setCorreo("");
       setContrasenia("");
       onClose();
-      router.push("/gestion");
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Error desconocido");
-    } finally {
-      setIsLoading(false);
     }
   };
 
