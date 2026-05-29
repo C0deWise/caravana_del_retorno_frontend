@@ -7,6 +7,7 @@ import { ApiError } from "@/services/api.services";
 import type { RegistrationRequest } from "../types/registro.types";
 import { useAuth } from "@/auth/context/AuthContext";
 import { CODE_TO_ROLE, UserApi } from "@/types/user.types";
+import { authApi } from "@/services/auth.api";
 
 interface UseRegisterUserReturn {
   registerUser: (data: RegistrationRequest) => Promise<void>;
@@ -29,28 +30,9 @@ export const useRegisterUser = (): UseRegisterUserReturn => {
 
     try {
       await registrationService.userRegistration(data);
+      const userData = await authApi.login(data.correo, data.contrasenia);
 
-      const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "";
-      const res = await fetch(`${baseURL}/api/v1/usuario/todos`);
-
-      if (!res.ok) {
-        throw new Error("No se pudo consultar la sesión");
-      }
-
-      const usuarios: UserApi[] = await res.json();
-      const found = usuarios.find((u) => u.documento === data.documento);
-
-      if (!found) {
-        throw new Error("Usuario no encontrado");
-      }
-
-      const { codigo_rol, ...rest } = found;
-
-      login({
-        ...rest,
-        role: CODE_TO_ROLE[codigo_rol],
-      });
-
+      login(userData);
       setSuccess(true);
       setTimeout(() => router.push("/gestion"), 1500);
     } catch (err) {

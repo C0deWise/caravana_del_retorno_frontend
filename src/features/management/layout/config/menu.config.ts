@@ -18,12 +18,8 @@ export const menuConfig: MenuItem[] = [
     icon: "home",
     subitems: [
       {
-        label: "Crear Colonia",
-        href: "/gestion/colonia/crear",
-      },
-      {
-        label: "Asignar lider de Colonia",
-        href: "/gestion/colonia/asignar-lider",
+        label: "Administrar Colonias",
+        href: "/gestion/colonia/administrar",
       },
       {
         label: "Inscribirse a una Colonia",
@@ -42,16 +38,33 @@ export const menuConfig: MenuItem[] = [
   {
     label: "Gestión Retorno",
     href: "/gestion/retorno",
-    icon: "arrowTurnLeft",
+    icon: "userGroup",
     subitems: [
       {
-        label: "Crear Retorno",
-        href: "/gestion/retorno/crear",
+        label: "Administrar Retornos",
+        href: "/gestion/retorno/administrar",
       },
       {
-        label: "Registrar Formulario de inscripción",
+        label: "Formulario de inscripción",
         href: "/gestion/retorno/registro",
+      },
+      {
+        label: "Grupos de Retorno",
+        href: "/gestion/retorno/grupos",
+      }
+    ],
+  },
+
+
+  {
+    label: "Gestión Publicaciones",
+    href: "/gestion/publicaciones",
+    icon: "newspaper",
+    subitems: [
+      {
+        label: "Administrar Publicaciones",
+        href: "/gestion/publicaciones/administrar",
       },
     ],
   },
-];
+]

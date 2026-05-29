@@ -1,5 +1,5 @@
 import type { UserRole } from "@/types/user.types";
-import { ColonyMember } from "../types/colony-members.types";
+import { ColonyMember } from "../../types/colony-members.types";
 
 export const getVisibleMemberData = (
   member: ColonyMember,

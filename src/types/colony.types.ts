@@ -1,10 +1,17 @@
+import { UserApi } from "./user.types";
+
 export interface ColonyApi {
-  co_codigo: number;
-  co_pais: string;
-  co_departamento: string | null;
-  co_ciudad: string | null;
-  lider: number;
+  codigo: number;
+  pais: string;
+  departamento: string | null;
+  ciudad: string | null;
+  lider: number | null;
+  estado?: string;
 }
+
+export type ColonyData = Omit<ColonyApi, "lider"> & {
+  lider: number | null;
+};
 
 export interface ColonyApiRequest {
   pais: string;
@@ -13,11 +20,7 @@ export interface ColonyApiRequest {
   lider: number | null;
 }
 
-export type ColonyData = Pick<ColonyApi, "lider"> & {
-  codigo: number;
-  pais: string;
-  departamento: string | null;
-  ciudad: string | null;
-};
+export interface ColonyMember extends Omit<UserApi, "codigo_rol"> {
+  role: number;
+}
 
-export type ColonyItem = ColonyData;

@@ -1,23 +1,36 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ApiError } from "@/services/api.services";
 import { coloniaService } from "../services/colony.service";
-import type { ColonyItem } from "@/types/colony.types";
+import type { ColonyData } from "@/types/colony.types";
+import { getMockColonies } from "@/mocks/colony.mock";
+import { useDev } from "@/features/dev/context/DevContext";
 
 interface UseListColoniesReturn {
-  listColonies: () => Promise<ColonyItem[] | null>;
-  colonies: ColonyItem[];
+  listColonies: () => Promise<ColonyData[] | null>;
+  refetch: () => Promise<ColonyData[] | null>;
+  colonies: ColonyData[];
   loading: boolean;
   error: string | null;
 }
 
-export const useListColonies = (): UseListColoniesReturn => {
-  const [colonies, setColonies] = useState<ColonyItem[]>([]);
+export const useListColonies = (autoFetch = false, useMocks?: boolean): UseListColoniesReturn => {
+  const { featureFlags } = useDev();
+  const effectiveUseMocks = useMocks ?? featureFlags.USE_COLONY_MOCKS;
+
+  const [colonies, setColonies] = useState<ColonyData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const listColonies = useCallback(async (): Promise<ColonyItem[] | null> => {
+  const listColonies = useCallback(async (): Promise<ColonyData[] | null> => {
     setLoading(true);
     setError(null);
+
+    if (effectiveUseMocks) {
+      const mockData = getMockColonies();
+      setColonies(mockData);
+      setLoading(false);
+      return mockData;
+    }
 
     try {
       const response = await coloniaService.getColonias();
@@ -27,13 +40,19 @@ export const useListColonies = (): UseListColoniesReturn => {
       if (err instanceof ApiError) {
         setError(err.message);
       } else {
-        setError("Error de conexión, intenta de nuevo");
+        setError("Error al cargar las colonias");
       }
       return null;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [effectiveUseMocks]);
 
-  return { listColonies, colonies, loading, error };
+  useEffect(() => {
+    if (autoFetch) {
+      void listColonies();
+    }
+  }, [autoFetch, effectiveUseMocks]);
+
+  return { listColonies, refetch: listColonies, colonies, loading, error };
 };

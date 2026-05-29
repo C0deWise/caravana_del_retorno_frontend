@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { iconMap } from "../../config/icons";
 import { useSidebarContext } from "./SidebarContext";
@@ -63,7 +64,7 @@ export default function SidebarMenuItem({
         >
           {item.icon && (
             <span className="w-5 h-5 flex items-center justify-center shrink-0 text-lg relative z-20">
-              {iconMap[item.icon]}
+              {iconMap[item.icon] && React.createElement(iconMap[item.icon], { className: "w-5 h-5 shrink-0" })}
             </span>
           )}
           <span

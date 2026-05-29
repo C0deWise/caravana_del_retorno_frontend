@@ -4,16 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useListColonies } from "../../hooks/useListColonies";
 import { useSignupColony } from "../hooks/useSignupColony";
 import { useAuth } from "@/auth/context/AuthContext";
-import type { ColonyItem } from "@/types/colony.types";
-import { ConfirmModal } from "@/components/confirmModal";
+import type { ColonyData } from "@/types/colony.types";
+import { ConfirmModal } from "@/components/feedback/confirmModal";
 import { RequireAuth } from "@/auth/components/RequireAuth";
-import { Search } from "lucide-react";
-
-const normalizarTexto = (valor: string): string =>
-  valor
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
+import { normalizeText } from "@/utils/formatting";
+import { Autocomplete } from "@/components/forms/Autocomplete";
+import { useToast } from "@/components/feedback/Toast";
 
 function InscripcionColoniaFormFeature() {
   const { user } = useAuth();
@@ -29,11 +25,10 @@ function InscripcionColoniaFormFeature() {
     error: errorSignup,
   } = useSignupColony();
 
+  const { showToast } = useToast();
   const [busqueda, setBusqueda] = useState("");
-  const [seleccionada, setSeleccionada] = useState<ColonyItem | null>(null);
-  const [mostrarLista, setMostrarLista] = useState(false);
+  const [seleccionada, setSeleccionada] = useState<ColonyData | null>(null);
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
-  const [mostrarMensajeEspera, setMostrarMensajeEspera] = useState(false);
 
   const yaPertenecAColonia = Boolean(user?.codigo_colonia);
   const esAdmin = Boolean(user?.role === "admin");
@@ -46,26 +41,25 @@ function InscripcionColoniaFormFeature() {
   }, [listColonies, yaPertenecAColonia]);
 
   const coloniasFiltradas = useMemo(() => {
-    const termino = normalizarTexto(busqueda.trim());
+    const termino = normalizeText(busqueda.trim());
     if (!termino) return colonies;
     return colonies.filter((colonia) => {
       const etiqueta = colonia.departamento
         ? `${colonia.pais} ${colonia.departamento} ${colonia.ciudad}`
         : colonia.pais;
-      return normalizarTexto(etiqueta).includes(termino);
+      return normalizeText(etiqueta).includes(termino);
     });
   }, [busqueda, colonies]);
 
   const sinColoniasDisponibles = !loading && !error && colonies.length === 0;
 
-  const seleccionarColonia = (colonia: ColonyItem) => {
+  const seleccionarColonia = (colonia: ColonyData) => {
     setSeleccionada(colonia);
     setBusqueda(
       colonia.departamento
         ? `${colonia.pais} - ${colonia.departamento} - ${colonia.ciudad}`
         : colonia.pais,
     );
-    setMostrarLista(false);
   };
 
   const confirmarInscripcion = async () => {
@@ -74,12 +68,13 @@ function InscripcionColoniaFormFeature() {
     const ok = await signupColony(user.id, seleccionada.codigo);
 
     if (ok) {
-      setMostrarMensajeEspera(true);
+      showToast("¡Solicitud enviada! Espera a que el líder de la colonia la apruebe.", "success");
+      setMostrarConfirmacion(false);
     }
   };
 
   return (
-    <div className="flex flex-col min-h-screen w-full items-center px-4 py-6 bg-bg">
+    <div className="flex flex-col h-full w-full items-center justify-center px-4 bg-bg">
       <div className="rounded-lg shadow-xl w-full max-w-lg p-8 bg-bg">
         <h1 className="page-title">Inscribirse a una colonia</h1>
         <h2 className="section-title">
@@ -101,60 +96,38 @@ function InscripcionColoniaFormFeature() {
             </div>
           ) : (
             <>
-              <label className="label-base">Buscar colonia</label>
-              <div className="relative">
-                <Search
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted"
-                  size={20}
-                />
-                <input
-                  id="buscar-colonia"
-                  type="text"
-                  value={busqueda}
-                  onChange={(e) => {
-                    setBusqueda(e.target.value);
+              <Autocomplete
+                label="Buscar colonia"
+                placeholder="Buscar colonia..."
+                onSearch={(q) => {
+                  setBusqueda(q);
+                  const labelSeleccionada = seleccionada
+                    ? (seleccionada.departamento
+                      ? `${seleccionada.pais} - ${seleccionada.departamento} - ${seleccionada.ciudad}`
+                      : seleccionada.pais)
+                    : "";
+                  if (q !== labelSeleccionada) {
                     setSeleccionada(null);
-                    setMostrarLista(true);
-                  }}
-                  onFocus={() => setMostrarLista(true)}
-                  placeholder="Buscar colonia"
-                  className="w-full rounded-lg border border-bg-border bg-white px-4 py-3 text-lg text-text outline-none ring-primary transition focus:ring-2"
-                />
-
-                {mostrarLista && (
-                  <ul className="absolute z-20 mt-2 max-h-56 w-full overflow-auto rounded-lg border border-bg-border bg-white shadow-md">
-                    {loadingColonies && (
-                      <li className="px-4 py-3 text-sm text-text-muted">
-                        Cargando colonias...
-                      </li>
-                    )}
-                    {!loadingColonies && coloniasFiltradas.length === 0 && (
-                      <li className="px-4 py-3 text-sm text-text-muted">
-                        No hay colonias disponibles para esta búsqueda.
-                      </li>
-                    )}
-                    {!loadingColonies &&
-                      coloniasFiltradas.map((colonia, index) => (
-                        <li
-                          key={
-                            colonia.codigo ??
-                            `${colonia.pais}-${colonia.departamento}-${colonia.ciudad}-${index}`
-                          }
-                        >
-                          <button
-                            type="button"
-                            onClick={() => seleccionarColonia(colonia)}
-                            className="w-full px-4 py-3 text-left text-base text-text hover:bg-bg-separator"
-                          >
-                            {colonia.departamento
-                              ? `${colonia.pais} - ${colonia.departamento} - ${colonia.ciudad}`
-                              : colonia.pais}
-                          </button>
-                        </li>
-                      ))}
-                  </ul>
+                  }
+                }}
+                results={coloniasFiltradas}
+                loading={loadingColonies}
+                minLength={0}
+                onSelect={seleccionarColonia}
+                value={busqueda}
+                getDisplayValue={(c) =>
+                  c.departamento
+                    ? `${c.pais} - ${c.departamento} - ${c.ciudad}`
+                    : c.pais
+                }
+                renderItem={(c) => (
+                  <div className="px-4 py-3 text-sm text-left">
+                    {c.departamento
+                      ? `${c.pais} - ${c.departamento} - ${c.ciudad}`
+                      : c.pais}
+                  </div>
                 )}
-              </div>
+              />
 
               {error && <p className="mt-3 text-sm text-danger">{error}</p>}
 
@@ -198,18 +171,6 @@ function InscripcionColoniaFormFeature() {
         onCancel={() => setMostrarConfirmacion(false)}
         loading={loadingSignup}
       />
-
-      <ConfirmModal
-        isOpen={mostrarMensajeEspera}
-        title="Solicitud enviada"
-        details={[
-          "Debes esperar a que el líder de colonia apruebe tu solicitud para unirte.",
-        ]}
-        onConfirm={() => setMostrarMensajeEspera(false)}
-        onCancel={() => setMostrarMensajeEspera(false)}
-        confirmLabel="Entendido"
-        cancelLabel="Cerrar"
-      />
     </div>
   );
 }
@@ -221,3 +182,4 @@ export default function InscripcionColoniaForm() {
     </RequireAuth>
   );
 }
+

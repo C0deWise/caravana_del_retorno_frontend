@@ -1,12 +1,5 @@
-import ListColonyMembers from "@/features/management/colony/colonyMembers/components/ListColonyMembers";
+import ColonyMembers from "@/features/management/colony/colonyMembers/components/ColonyMembers";
 
-interface Props {
-  searchParams: Promise<{ colonyId?: string }>;
-}
-
-export default async function Page({ searchParams }: Props) {
-  const params = await searchParams;
-  const paramsId = params?.colonyId ? Number(params.colonyId) : undefined;
-
-  return <ListColonyMembers paramsId={paramsId} />;
+export default function Page() {
+  return <ColonyMembers />;
 }

@@ -1,15 +1,30 @@
 "use client";
+
 import { UserGroupIcon } from "@heroicons/react/24/outline";
-import { ColonyMember } from "../types/colony-members.types";
+import { AnimatedList } from "@/components/common/AnimatedList";
+import { ColonyMember } from "../../types/colony-members.types";
 import { UserRole } from "@/types/user.types";
 import { MemberCard } from "./MemberCard";
 
 interface MemberListProps {
-  members: ColonyMember[];
-  userRole: UserRole;
+  readonly members: ColonyMember[];
+  readonly userRole: UserRole;
+  readonly colonyName?: string;
+  readonly onRemove?: (memberId: number) => Promise<void>;
+  readonly isRemoving?: boolean;
+  readonly currentUserId?: number;
 }
 
-export function MemberList({ members, userRole }: MemberListProps) {
+
+export function MemberList({
+  members,
+  userRole,
+  colonyName,
+  onRemove,
+  isRemoving,
+  currentUserId,
+}: MemberListProps) {
+
   if (members.length === 0) {
     return (
       <div className="text-center py-20">
@@ -19,21 +34,28 @@ export function MemberList({ members, userRole }: MemberListProps) {
         <h3 className="text-xl font-bold text-text mb-2">
           No se encontraron miembros
         </h3>
-        <p className="text-text-muted">Esta colonia no tiene miembros aun.</p>
+        <p className="text-text-muted">Esta colonia no tiene miembros aún.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {members.map((member, index) => (
+    <AnimatedList
+      items={members}
+      keyExtractor={(member) => member.id}
+      renderItem={(member, index) => (
         <MemberCard
-          key={member.id}
           member={member}
           userRole={userRole}
-          index={index + 1}
+          index={index}
+          colonyName={colonyName}
+          onRemove={onRemove}
+          isRemoving={isRemoving}
+          currentUserId={currentUserId}
         />
-      ))}
-    </div>
+
+      )}
+      emptyMessage="Esta colonia no tiene miembros aún."
+    />
   );
 }

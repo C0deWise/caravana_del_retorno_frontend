@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ApiError } from "@/services/api.services";
-import { retornoService } from "../services/retorno.service";
-import type { Retorno, RetornoCreateRequest } from "../../types/retorno.types";
+import { retornoService } from "../../shared/services/retorno.service";
+import type { Retorno, RetornoCreateRequest } from "../../shared/types/retorno.types";
 
 interface UseCreateRetornoReturn {
   createRetorno: (data: RetornoCreateRequest) => Promise<Retorno | null>;
@@ -48,12 +48,12 @@ export const useCreateRetorno = (): UseCreateRetornoReturn => {
         switch (err.status) {
           case 409:
             setError(
-              "Ya existe un evento de El Retorno para el año seleccionado.",
+              `Ya existe un retorno para el año ${data.anio}`,
             );
             break;
 
           case 422:
-            setError("Año anterior al año actual del sistema.");
+            setError("No se puede crear un retorno de un año anterior");
             break;
 
           default:

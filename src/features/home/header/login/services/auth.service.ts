@@ -1,33 +1,37 @@
-import { apiService, ApiError } from "@/services/api.services";
-import { UserApi, UserData, CODE_TO_ROLE } from "@/types/user.types";
+import { ApiError } from "@/services/api.services";
+import { UserData } from "@/types/user.types";
+import { authApi } from "@/services/auth.api";
 
-const mapFromApi = (apiUser: UserApi): UserData => {
-  const { codigo_rol, ...rest } = apiUser;
-  return {
-    ...rest,
-    role: CODE_TO_ROLE[codigo_rol],
-  };
-};
-
+/**
+ * Servicio de Autenticación de alto nivel.
+ * Implementa validaciones de entrada y normalización antes de llamar a la API.
+ */
 export const authService = {
-  loginByDocument: async (document: string): Promise<UserData> => {
-    const normalizedDocument = document.trim();
+  /**
+   * Procesa el intento de inicio de sesión.
+   * Aplica saneamiento básico (trim/lowercase) y validación de campos requeridos.
+   * 
+   * @param correo - Correo electrónico del usuario.
+   * @param contrasenia - uwu Contraseña del usuario.
+   * @returns Promesa que resuelve en los datos del usuario logueado (UserData).
+   * @throws {ApiError} - Lanzado si faltan campos o si la autenticación falla.
+   */
+  login: async (correo: string, contrasenia: string): Promise<UserData> => {
+    // Normalización: Asegura que el correo no tenga espacios y sea consistente en minúsculas
+    const normalizedCorreo = correo.trim().toLowerCase();
+    // Normalización: Limpieza de espacios accidentales en la contraseña
+    const normalizedPassword = contrasenia.trim();
 
-    if (!normalizedDocument) {
-      throw new ApiError(400, "Debes ingresar un número de documento");
+    // Validación de entrada: Evita peticiones innecesarias al servidor si los campos están vacíos
+    if (!normalizedCorreo) {
+      throw new ApiError(400, "Debes ingresar un correo");
     }
 
-    const usuarios = await apiService.get<UserApi[]>("/api/v1/usuario/todos");
-
-    const found = usuarios.find((u) => u.documento === normalizedDocument);
-
-    if (!found) {
-      throw new ApiError(
-        404,
-        "No se encontró ningún usuario con ese documento",
-      );
+    if (!normalizedPassword) {
+      throw new ApiError(400, "Debes ingresar una contraseña");
     }
 
-    return mapFromApi(found);
+    // Delegación: Llama al servicio de API real solo si los datos están validados
+    return authApi.login(normalizedCorreo, normalizedPassword);
   },
 };
