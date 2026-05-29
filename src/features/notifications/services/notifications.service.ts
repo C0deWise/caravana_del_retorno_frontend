@@ -1,16 +1,26 @@
-import { NotificationItem } from "@/types/notifications.types";
+import { NotificationItem, NotificationApi } from "@/types/notifications.types";
+import { apiService } from "@/services/api.services";
+
+const mapNotification = (n: NotificationApi): NotificationItem => ({
+  id: n.codigo.toString(),
+  title: n.evento?.nombre || "Notificación",
+  message: n.mensaje,
+  date: new Date(n.time_stamp).toLocaleDateString("es-CO", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }),
+  read: n.estado === "Leída",
+  type: "info",
+});
 
 export const notificationsService = {
-  getNotifications: async (): Promise<NotificationItem[]> => {
-    // TODO: Implement actual API call here
-    return [];
+  getUnreadNotifications: async (userId: number): Promise<NotificationItem[]> => {
+    const data = await apiService.get<NotificationApi[]>(`/api/v1/notificaciones/usuario/${userId}/no-leidas`);
+    return Array.isArray(data) ? data.map(mapNotification) : [];
   },
 
-  markAsRead: async (id: string): Promise<void> => {
-    // TODO: Implement actual API call here
+  markAsRead: async (id: number): Promise<void> => {
+    await apiService.put(`/api/v1/notificaciones/${id}/marcar-leida`);
   },
 
-  markAllAsRead: async (): Promise<void> => {
-    // TODO: Implement actual API call here
+  markAllAsRead: async (userId: number): Promise<void> => {
+    await apiService.put(`/api/v1/notificaciones/usuario/${userId}/marcar-leidas`);
   },
 };

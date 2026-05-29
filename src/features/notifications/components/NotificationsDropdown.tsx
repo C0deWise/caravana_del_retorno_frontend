@@ -129,14 +129,6 @@ export default function NotificationsDropdown() {
             <div className="max-h-[60vh] overflow-y-auto overscroll-contain">
               {renderContent()}
             </div>
-            
-            {notifications.length > 0 && (
-              <div className="p-2 border-t border-bg-border bg-bg-card">
-                <button className="w-full py-2 text-sm font-medium text-center text-primary rounded-lg hover:bg-bg transition-colors">
-                  Ver todas las notificaciones
-                </button>
-              </div>
-            )}
           </motion.div>
         )}
       </AnimatePresence>
