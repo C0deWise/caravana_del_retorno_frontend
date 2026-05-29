@@ -1,16 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Select, { components, ClearIndicatorProps, DropdownIndicatorProps, IndicatorsContainerProps, Props as SelectProps } from "react-select";
+import Select, { components, ClearIndicatorProps, DropdownIndicatorProps, IndicatorsContainerProps, Props as SelectProps, GroupBase } from "react-select";
 import { ChevronDownIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { selectStyles } from "./select.styles";
+import { getSelectStyles, SelectOption } from "./select.styles";
 
-interface SelectFieldProps extends Omit<SelectProps<any, boolean>, "styles"> {
+interface SelectFieldProps<
+  Option = SelectOption,
+  IsMulti extends boolean = false,
+  Group extends GroupBase<Option> = GroupBase<Option>
+> extends Omit<SelectProps<Option, IsMulti, Group>, "styles"> {
   readonly label?: string;
   readonly error?: string;
 }
 
-const DropdownIndicator = (props: DropdownIndicatorProps<any, boolean>) => {
+const DropdownIndicator = <Option, IsMulti extends boolean, Group extends GroupBase<Option>>(
+  props: DropdownIndicatorProps<Option, IsMulti, Group>
+) => {
   return (
     <div className="flex items-center justify-center px-2 pointer-events-none">
       <ChevronDownIcon
@@ -22,7 +28,9 @@ const DropdownIndicator = (props: DropdownIndicatorProps<any, boolean>) => {
   );
 };
 
-const ClearIndicator = (props: ClearIndicatorProps<any, boolean>) => {
+const ClearIndicator = <Option, IsMulti extends boolean, Group extends GroupBase<Option>>(
+  props: ClearIndicatorProps<Option, IsMulti, Group>
+) => {
   return (
     <components.ClearIndicator {...props}>
       <XMarkIcon className="h-4 w-4 text-text-muted hover:text-danger transition-colors" />
@@ -30,7 +38,9 @@ const ClearIndicator = (props: ClearIndicatorProps<any, boolean>) => {
   );
 };
 
-const IndicatorsContainer = (props: IndicatorsContainerProps<any, boolean>) => {
+const IndicatorsContainer = <Option, IsMulti extends boolean, Group extends GroupBase<Option>>(
+  props: IndicatorsContainerProps<Option, IsMulti, Group>
+) => {
   const { selectProps, hasValue } = props;
   const showCustomClear = selectProps.isClearable && !hasValue && selectProps.inputValue;
 
@@ -57,15 +67,20 @@ const IndicatorsContainer = (props: IndicatorsContainerProps<any, boolean>) => {
   );
 };
 
-export function SelectField({ label, error, ...props }: Readonly<SelectFieldProps>) {
+export function SelectField<
+  Option = SelectOption,
+  IsMulti extends boolean = false,
+  Group extends GroupBase<Option> = GroupBase<Option>
+>({ label, error, ...props }: Readonly<SelectFieldProps<Option, IsMulti, Group>>) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
   return (
-    <div className="space-y-1.5">
+    <div className={`space-y-1.5 transition-opacity duration-300 ${props.isDisabled ? "opacity-40 pointer-events-none select-none" : ""}`}>
       {label && (
         <label
           htmlFor={props.inputId || props.id}
@@ -75,7 +90,7 @@ export function SelectField({ label, error, ...props }: Readonly<SelectFieldProp
         </label>
       )}
       <Select
-        styles={selectStyles}
+        styles={getSelectStyles<Option, IsMulti, Group>()}
         placeholder="Selecciona..."
         noOptionsMessage={() => "Sin opciones"}
         menuPortalTarget={mounted ? document.body : null}
