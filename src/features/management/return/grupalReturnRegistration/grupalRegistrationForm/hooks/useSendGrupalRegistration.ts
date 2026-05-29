@@ -32,7 +32,11 @@ export function useSendGrupalRegistration(): UseSendGrupalRegistrationReturn {
       setSuccess(true);
       return response;
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Error al inscribir el grupo.");
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError("Error al inscribir al grupo");
+      }
       return null;
     } finally {
       setIsLoading(false);
