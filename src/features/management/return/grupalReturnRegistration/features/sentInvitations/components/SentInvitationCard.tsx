@@ -6,11 +6,9 @@ import { RequestStatusTag } from "@/features/management/components/RequestStatus
 interface SentInvitationCardProps {
     readonly invitation: EntradaInvitacion;
     readonly index: number;
-    readonly onRemove: (id: number, kind: "usuario" | "persona") => void;
-    readonly isRemoving?: boolean;
 }
 
-export function SentInvitationCard({ invitation, index, onRemove, isRemoving }: SentInvitationCardProps) {
+export function SentInvitationCard({ invitation, index }: SentInvitationCardProps) {
     const isUsuario = invitation.kind === "usuario";
     const title = isUsuario
         ? invitation.data.correo_usuario
@@ -33,15 +31,6 @@ export function SentInvitationCard({ invitation, index, onRemove, isRemoving }: 
             actions={
                 <div className="flex items-center gap-2">
                     <RequestStatusTag status={estado} />
-                    <button
-                        type="button"
-                        className="btn-ghost text-accent-red hover:text-accent-red/80"
-                        onClick={() => onRemove(removeId, invitation.kind)}
-                        disabled={isRemoving}
-                        title="Eliminar del grupo"
-                    >
-                        <TrashIcon className="h-4 w-4" />
-                    </button>
                 </div>
             }
         />

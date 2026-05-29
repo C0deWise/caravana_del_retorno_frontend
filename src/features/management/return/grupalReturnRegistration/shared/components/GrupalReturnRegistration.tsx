@@ -197,8 +197,6 @@ function GrupalReturnRegistrationFeature() {
           invitations={invitations}
           isLoading={invitationsLoading}
           error={invitationsError}
-          onRemove={handleRemoveInvitation}
-          isRemoving={removingMember || removingExternal}
         />
       </section>
 
