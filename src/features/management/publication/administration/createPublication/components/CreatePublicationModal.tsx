@@ -81,9 +81,16 @@ export function CreatePublicationModal({ isOpen, onClose, onRefresh, fixedRetorn
 
   const isLoading = isCreating;
 
+  let currentStatus: "uploading" | "success" | "idle" = "idle";
+  if (isCreating) {
+    currentStatus = "uploading";
+  } else if (success) {
+    currentStatus = "success";
+  }
+
   const uploadStates = items.reduce((acc, it) => {
     acc[it.id] = {
-      status: isCreating ? "uploading" : (success ? "success" : "idle"),
+      status: currentStatus,
       progress: uploadProgress
     };
     return acc;

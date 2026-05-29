@@ -14,6 +14,7 @@ export const selectStyles: StylesConfig<SelectOption, false> = {
       : "var(--color-bg-border)",
     borderRadius: "0.75rem",
     padding: "0.2rem",
+    minHeight: "46px",
     fontSize: "0.875rem",
     boxShadow: state.isFocused ? "0 0 0 2px rgba(2, 64, 89, 0.1)" : "none",
     transition: "all 0.2s ease",

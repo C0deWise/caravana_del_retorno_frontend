@@ -78,20 +78,34 @@ export function PublicationsPanel() {
       <header className="mx-10 px-8 py-4 rounded-xl shadow-xl bg-bg-card sticky top-0 z-20 border border-bg-border/50 backdrop-blur-md">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex flex-col md:flex-row md:items-center gap-6 flex-1">
-            <div className="shrink-0">
+            <div className="shrink-0 flex flex-col">
               <span className="text-sm font-medium text-text-muted uppercase tracking-wide mb-1 block">
                 Administración
               </span>
-              <h1 className="text-3xl font-bold text-primary leading-none">
-                Publicaciones
-              </h1>
+              <div className="h-[46px] flex items-center">
+                <h1 className="text-3xl font-bold text-primary leading-none">
+                  Publicaciones
+                </h1>
+              </div>
+            </div>
+
+            <div className="hidden md:block w-px h-12 bg-bg-separator shrink-0" />
+
+            <div className="text-left hidden lg:flex flex-col shrink-0">
+              <span className="text-sm font-medium text-text-muted uppercase tracking-wide mb-1 block">
+                Total Registros
+              </span>
+              <div className="h-[46px] flex items-center">
+                <span className="text-3xl font-bold text-secondary leading-none block">
+                  {filteredPublications.length}
+                </span>
+              </div>
             </div>
 
             <div className="hidden md:block w-px h-12 bg-bg-separator shrink-0" />
 
             <div className="shrink-0 min-w-[220px]">
               <SelectField
-                label="Seleccionar Retorno"
                 options={retornos.map((r) => ({
                   label: `Caravana ${r.anio} (${r.estado})`,
                   value: r.codigo,
@@ -118,11 +132,8 @@ export function PublicationsPanel() {
             <div className="hidden md:block w-px h-12 bg-bg-separator shrink-0" />
 
             <div className="flex-1 max-w-md">
-              <span className="text-sm font-medium text-text-muted uppercase tracking-wide mb-1 block">
-                Buscar Contenido
-              </span>
               <SearchInput
-                placeholder="Título o reseña..."
+                placeholder="Buscar por título..."
                 onSearch={handleSearch}
                 value={searchQuery}
                 loading={loading}
@@ -133,14 +144,6 @@ export function PublicationsPanel() {
           </div>
 
           <div className="shrink-0 flex items-center gap-8">
-            <div className="text-right hidden lg:block">
-              <span className="text-sm font-medium text-text-muted uppercase tracking-wide mb-1 block">
-                Resultados
-              </span>
-              <span className="text-2xl font-black text-secondary leading-none block">
-                {filteredPublications.length}
-              </span>
-            </div>
             <CreatePublicationButton 
               onRefresh={refetch} 
               retornoId={selectedRetornoId} 
