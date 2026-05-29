@@ -97,7 +97,7 @@ export function PublicPublicationCard({ publication }: PublicPublicationCardProp
               {publication.titulo}
             </h3>
             <p className="text-white/80 text-sm mt-2 font-medium">
-              Por: Usuario #{publication.autor}
+              Por: {publication.nombre_autor || `Usuario #${publication.autor}`}
             </p>
           </div>
         </div>
@@ -127,7 +127,7 @@ export function PublicPublicationCard({ publication }: PublicPublicationCardProp
           <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col overflow-y-auto custom-scrollbar">
             <h2 className="text-4xl font-black text-text mb-3 leading-[1.1] tracking-tight">{publication.titulo}</h2>
             <p className="text-sm text-text-muted mb-8 pb-5 border-b border-bg-border/40">
-              Escrito por <span className="font-bold text-primary">Usuario #{publication.autor}</span> • {new Date(publication.fecha_creacion).toLocaleDateString("es-CO", { month: "long", day: "numeric", year: "numeric" })}
+              Escrito por <span className="font-bold text-primary">{publication.nombre_autor || `Usuario #${publication.autor}`}</span> • {new Date(publication.fecha_creacion).toLocaleDateString("es-CO", { month: "long", day: "numeric", year: "numeric" })}
             </p>
 
             <div className="flex-1">

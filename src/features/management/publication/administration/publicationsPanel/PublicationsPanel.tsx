@@ -62,7 +62,8 @@ export function PublicationsPanel() {
       const filtered = publications.filter(
         (p) =>
           p.titulo?.toLowerCase().includes(lowerQuery) ||
-          p.resena?.toLowerCase().includes(lowerQuery),
+          p.resena?.toLowerCase().includes(lowerQuery) ||
+          p.nombre_autor?.toLowerCase().includes(lowerQuery)
       );
       setFilteredPublications(filtered);
     },
@@ -133,7 +134,7 @@ export function PublicationsPanel() {
 
             <div className="flex-1 max-w-md">
               <SearchInput
-                placeholder="Buscar por título..."
+                placeholder="Buscar por título, autor..."
                 onSearch={handleSearch}
                 value={searchQuery}
                 loading={loading}

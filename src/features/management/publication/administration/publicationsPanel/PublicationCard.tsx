@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 import { NewspaperIcon, EyeIcon } from "@heroicons/react/24/solid";
 import ListCard from "@/components/common/ListCard";
 import { PublicationData, PublicationMultimedia } from "@/types/publication.types";
-import { userService } from "@/services/user.service";
 import { AnimatedModal } from "@/components/feedback/AnimatedModal";
 import { MarqueeText } from "@/components/common/MarqueeText";
 
@@ -49,27 +48,9 @@ const renderFilePreview = (file: PublicationMultimedia) => {
 };
 
 export function PublicationCard({ publication, index }: PublicationCardProps) {
-  const cachedUser = userService.getUserFromCache(publication.autor);
-  const [fetchedName, setFetchedName] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const authorName = cachedUser
-    ? `${cachedUser.nombre} ${cachedUser.apellido}`
-    : fetchedName || "Cargando...";
-
-  useEffect(() => {
-    if (cachedUser) return;
-
-    const fetchAuthor = async () => {
-      try {
-        const userData = await userService.getUserById(publication.autor);
-        setFetchedName(`${userData.nombre} ${userData.apellido}`);
-      } catch {
-        setFetchedName(`ID: ${publication.autor}`);
-      }
-    };
-    fetchAuthor();
-  }, [publication.autor, cachedUser]);
+  const authorName = publication.nombre_autor || "Desconocido";
 
   const formattedDate = publication.fecha_creacion 
     ? new Date(publication.fecha_creacion).toLocaleDateString('es-ES', {

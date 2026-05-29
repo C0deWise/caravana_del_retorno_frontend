@@ -11,6 +11,7 @@ export interface PublicationApi {
   codigo: number;
   retorno: number;
   autor: number;
+  nombre_autor: string;
   titulo: string;
   resena: string;
   fecha_creacion: string;
