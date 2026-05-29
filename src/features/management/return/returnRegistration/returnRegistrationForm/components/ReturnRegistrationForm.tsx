@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { RequireAuth } from "@/auth/components/RequireAuth";
 import { useAuth } from "@/auth/context/AuthContext";
 import { ConfirmModal } from "@/components/feedback/confirmModal";
+import { useToast } from "@/components/feedback/Toast";
 import Spinner from "@/components/feedback/Spinner";
 import { useSendReturnRegistration } from "../hooks/useSendReturnRegistration";
 import type { UserData } from "@/types/user.types";
@@ -160,6 +161,7 @@ function ReturnRegistrationFormContent() {
   const { sendReturnRegistration, loading, error } =
     useSendReturnRegistration();
   const router = useRouter();
+  const { showToast } = useToast();
 
   const [formData, setFormData] = useState(initialForm);
   const [fieldErrors, setFieldErrors] = useState<FormErrors>({});
@@ -360,6 +362,9 @@ function ReturnRegistrationFormContent() {
 
     if (response) {
       setAlreadyRegistered(true);
+      showToast("Asistencia registrada exitosamente", "success");
+    } else {
+      showToast("No se pudo registrar la asistencia, intenta nuevamente", "error");
     }
   };
 
