@@ -3,15 +3,19 @@
 import Link from "next/link";
 import { useAuth } from "@/auth/context/AuthContext";
 import { getMenuByRole } from "@/features/management/layout/utils/getMenuByRole";
-import { MenuItem } from "@/features/management/layout/types/menu.types";
 import { iconMap } from "@/features/management/layout/config/icons";
 import React from "react";
 
 const descriptionByHref: Record<string, string> = {
-  "/gestion/usuario":
-    "Administra información relacionada con usuarios y configuraciones asociadas.",
-  "/gestion/colonia": "Crea colonias y asigna líderes.",
-  "/gestion/retorno": "Administra la creación de retornos.",
+  "/gestion/usuario/parentesco": "Gestiona y visualiza tu red de vínculos familiares.",
+  "/gestion/colonia/administrar": "Crea nuevas colonias y edita su información principal.",
+  "/gestion/colonia/inscribir-colonia": "Busca y envia una solicitud para unirte a una colonia existente.",
+  "/gestion/colonia/miembros": "Administra los miembros actuales de tu colonia.",
+  "/gestion/colonia/solicitudes-ingreso": "Revisa, aprueba o rechaza peticiones para unirse a tu colonia.",
+  "/gestion/retorno/administrar": "Organiza los eventos de retorno, ajustando fechas y detalles.",
+  "/gestion/retorno/registro": "Llena el formulario para asegurar tu cupo en un retorno.",
+  "/gestion/retorno/grupos": "Administra la logística de los grupos formados para el retorno.",
+  "/gestion/publicaciones/administrar": "Crea reseñas, sube multimedia y compártelas en la página de inicio.",
 };
 
 export default function Gestion() {
@@ -23,65 +27,55 @@ export default function Gestion() {
 
   const managementModules = getMenuByRole(user);
 
+  // Flatten all subitems into a single array for direct access
+  const allRoutes = managementModules.flatMap(module =>
+    (module.subitems || []).map(subitem => ({
+      ...subitem,
+      category: module.label,
+      icon: module.icon
+    }))
+  );
+
   return (
-    <section className="w-full min-h-168 rounded-2xl bg-bg-separator shadow-lg p-8 md:p-10">
-      <div className="max-w-6xl mx-auto space-y-8">
-        <header className="space-y-2">
-          <h1 className="text-3xl md:text-4xl font-bold text-primary">
-            Panel de gestión
+    <section className="w-full h-full rounded-2xl bg-bg-separator shadow-lg p-8 md:p-10">
+      <div className="max-w-7xl mx-auto space-y-10">
+        <header className="space-y-3">
+          <h1 className="text-3xl md:text-4xl font-black text-primary tracking-tight">
+            ¡Bienvenido, {user?.nombre}!
           </h1>
-          <p className="text-lg text-text-muted max-w-3xl">
-            Accede a las funcionalidades disponibles de cada módulo desde este
-            panel principal, o desde el panel lateral.
+          <p className="text-lg text-text-muted max-w-3xl font-medium">
+            Selecciona el módulo al que deseas acceder para continuar.
           </p>
         </header>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          {managementModules.map((module: MenuItem) => (
-            <article
-              key={module.href}
-              className="rounded-2xl border border-gray-200 bg-white/70 shadow-md hover:shadow-lg transition-all duration-300"
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {allRoutes.map((route) => (
+            <Link
+              key={route.href}
+              href={route.href}
+              className="group flex flex-col rounded-3xl border border-bg-border bg-white shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
             >
-              <div className="p-6 border-b border-gray-200 space-y-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-                    {module.icon ? (
-                      <div className="w-8 h-8 text-primary">
-                        {iconMap[module.icon] && React.createElement(iconMap[module.icon], { className: "w-8 h-8" })}
-                      </div>
-                    ) : null}
-                  </div>
-
-                  <div>
-                    <h2 className="text-xl font-semibold text-primary">
-                      {module.label}
-                    </h2>
+              <div className="p-6 flex flex-col h-full relative">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 group-hover:bg-primary group-hover:text-white transition-colors duration-300 text-primary">
+                    {route.icon && iconMap[route.icon] && React.createElement(iconMap[route.icon], { className: "w-8 h-8" })}
                   </div>
                 </div>
 
-                <p className="text-text-muted leading-relaxed">
-                  {descriptionByHref[module.href]}
-                </p>
-              </div>
+                <div className="flex-1 space-y-3">
+                  <h2 className="text-xl font-black text-primary leading-tight group-hover:text-secondary transition-colors">
+                    {route.label}
+                  </h2>
+                  <p className="text-sm text-text-muted font-medium leading-relaxed">
+                    {descriptionByHref[route.href] || "Accede a esta funcionalidad del sistema."}
+                  </p>
+                </div>
 
-              <div className="p-6 space-y-3">
-                <h3 className="text-sm font-semibold uppercase tracking-wide text-text-muted">
-                  Funcionalidades disponibles
-                </h3>
-
-                <div className="space-y-2">
-                  {module.subitems?.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className="block rounded-xl px-4 py-3 text-primary bg-gray-50 hover:bg-gray-100 hover:text-secondary transition-all"
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
+                <div className="mt-6 flex items-center text-sm font-bold text-secondary opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                  Ingresar al módulo <span className="ml-2">→</span>
                 </div>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       </div>

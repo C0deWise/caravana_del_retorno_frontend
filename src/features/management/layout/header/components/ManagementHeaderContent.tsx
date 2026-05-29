@@ -38,23 +38,23 @@ export default function ManagementHeaderContent() {
 
       {/* Info del usuario + logout */}
       {user && (
-        <div className="flex items-center gap-4">
-          <NotificationsDropdown />
-          
-          <div className="flex flex-col items-end gap-1">
-            <span className="text-md font-medium text-text-inverse leading-tight">
+        <div className="flex items-center gap-8">
+          <div className="flex flex-col items-end justify-center h-full gap-1.5">
+            <span className="text-xl font-bold text-text-inverse leading-none drop-shadow-sm">
               {user.nombre} {user.apellido}
             </span>
-            <span className="text-md font-medium text-primary bg-bg px-2 rounded-full leading-tight">
+            <span className="text-xs font-black text-primary bg-white px-3 py-1 rounded-full leading-none shadow-sm uppercase tracking-wide">
               {ROLE_LABEL[user.role] ?? user.role}
             </span>
           </div>
 
+          <NotificationsDropdown />
+
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1.5 text-xl font-medium px-3 py-2 bg-accent-yellow rounded-lg text-text-inverse transition-all hover:brightness-110 active:scale-[0.98]"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent-red text-white font-black hover:brightness-110 transition-all shadow-sm active:scale-95 border-none"
           >
-            <ArrowLeftEndOnRectangleIcon className="w-8 h-8" />
+            <ArrowLeftEndOnRectangleIcon className="w-6 h-6 stroke-[2.5]" />
             Cerrar sesión
           </button>
         </div>

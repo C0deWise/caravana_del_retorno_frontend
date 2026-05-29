@@ -22,12 +22,12 @@ export const UseGenerateReport = (): UseGenerateReportReturn => {
                 const blob = await reportService.getReport(params);
                 return blob;
             } catch (error) {
+                let errorMessage = "Error al generar el reporte";
                 if (error instanceof ApiError) {
-                    setError(error.message);
-                } else {
-                    setError("Error al generar el reporte");
+                    errorMessage = error.message;
                 }
-                return null;
+                setError(errorMessage);
+                throw new Error(errorMessage);
             } finally {
                 setLoading(false);
             }

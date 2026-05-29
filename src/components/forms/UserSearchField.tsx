@@ -69,7 +69,6 @@ export function UserSearchField({
   );
 
   const filteredResults = results.filter((u) => {
-    console.log("Filtrando resultados para", u);
     if (u.id === currentUser?.id) return false;
     if (u.codigo_rol === 3) return false;
     if (excludeIds.includes(u.id)) return false;

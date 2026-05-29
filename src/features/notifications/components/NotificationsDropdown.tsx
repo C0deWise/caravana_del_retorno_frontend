@@ -90,18 +90,18 @@ export default function NotificationsDropdown() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-full transition-colors hover:bg-white/10 active:scale-95"
+        className="relative p-2.5 rounded-full transition-colors hover:bg-white/10 active:scale-95"
         aria-label="Notificaciones"
       >
         {unreadCount > 0 ? (
           <>
-            <BellIconSolid className="w-7 h-7 text-text-inverse" />
-            <span className="absolute top-1 right-1 flex items-center justify-center w-4 h-4 text-[10px] font-bold text-white bg-accent-red rounded-full">
+            <BellIconSolid className="w-8 h-8 text-text-inverse" />
+            <span className="absolute top-1.5 right-1.5 flex items-center justify-center w-5 h-5 text-[11px] font-bold text-white bg-accent-red rounded-full border-2 border-primary">
               {unreadCount}
             </span>
           </>
         ) : (
-          <BellIcon className="w-7 h-7 text-text-inverse" />
+          <BellIcon className="w-8 h-8 text-text-inverse" />
         )}
       </button>
 

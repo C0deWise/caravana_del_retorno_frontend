@@ -27,7 +27,7 @@ export default function LoginPanel({ onClose }: LoginPanelProps) {
 
   return (
     <div className="absolute top-full -right-9 z-50 mt-2 w-80 rounded-b-xl bg-primary p-6 shadow-lg">
-      <h2 className="mb-4 text-xl font-semibold">Iniciar sesión</h2>
+      <h2 className="mb-4 text-xl font-bold text-center">¡Bienvenido de vuelta!</h2>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <label htmlFor="correo-login" className="text-sm font-medium">

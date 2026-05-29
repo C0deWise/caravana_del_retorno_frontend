@@ -9,6 +9,7 @@ import { ColonyData } from "@/types/colony.types";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/solid";
 import { SelectField } from "@/components/forms/SelectField";
 import { Autocomplete } from "@/components/forms/Autocomplete";
+import { useToast } from "@/components/feedback/Toast";
 
 interface GenerateReportModalFormProps {
     readonly retornoId: number;
@@ -19,6 +20,7 @@ interface GenerateReportModalFormProps {
 export function GenerateReportModalForm({ retornoId, retornoAnio, onCancel }: GenerateReportModalFormProps) {
     const { user, effectiveRole } = useAuth();
     const isAdmin = effectiveRole === "admin";
+    const { showToast } = useToast();
 
     const [reportType, setReportType] = useState<ReportType>("general");
     const [selectedColony, setSelectedColony] = useState<number | null>(
@@ -27,11 +29,10 @@ export function GenerateReportModalForm({ retornoId, retornoAnio, onCancel }: Ge
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [colonySearch, setColonySearch] = useState("");
 
-    const { listColonies, colonies, loading: loadingColonies, error: errorColonies } = useListColonies();
-    const { generateReport, loading: loadingReport, error: errorReport } = UseGenerateReport();
+    const { listColonies, colonies, loading: loadingColonies } = useListColonies();
+    const { generateReport, loading: loadingReport } = UseGenerateReport();
 
     const loading = loadingColonies || loadingReport;
-    const error = errorColonies ?? errorReport;
     const userColony = colonies.find(c => c.codigo === selectedColony);
 
     useEffect(() => {
@@ -47,6 +48,12 @@ export function GenerateReportModalForm({ retornoId, retornoAnio, onCancel }: Ge
     }, [previewUrl]);
 
 
+
+    const formatColonyLabel = (c: ColonyData): string => {
+        return c.pais === "Colombia"
+            ? `${c.ciudad}, ${c.departamento}, ${c.pais}`
+            : `${c.pais}`;
+    };
 
     const handleGenerate = async () => {
         if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -65,13 +72,17 @@ export function GenerateReportModalForm({ retornoId, retornoAnio, onCancel }: Ge
             if (!blob) return;
             const url = URL.createObjectURL(blob);
             setPreviewUrl(url);
-        } catch { }
-    };
-
-    const formatColonyLabel = (c: ColonyData): string => {
-        return c.pais === "Colombia"
-            ? `${c.ciudad}, ${c.departamento}, ${c.pais}`
-            : `${c.pais}`;
+        } catch (error) {
+            onCancel?.();
+            
+            let customMessage = `Aún no hay nadie registrado para el Retorno ${retornoAnio}.`;
+            if (reportType === "colony") {
+                const colonyName = userColony ? formatColonyLabel(userColony) : "seleccionada";
+                customMessage = `La colonia ${colonyName} no tiene a nadie registrado para el Retorno ${retornoAnio}.`;
+            }
+            
+            showToast(customMessage, "error");
+        }
     };
 
     const filteredColonies = useMemo(() => {
@@ -156,12 +167,6 @@ export function GenerateReportModalForm({ retornoId, retornoAnio, onCancel }: Ge
                     </div>
                 )}
             </div>
-
-            {error && (
-                <div className="mb-4 rounded-lg bg-danger/10 p-3 text-sm text-danger">
-                    {error}
-                </div>
-            )}
 
             <div className="flex gap-3 mb-4">
                 <button

@@ -3,9 +3,9 @@
 import AnimatedLink from "@/components/layout/AnimatedLink";
 
 interface HomeNavLinkProps {
-  href: string;
-  label: string;
-  isActive: boolean;
+  readonly href: string;
+  readonly label: string;
+  readonly isActive: boolean;
 }
 
 export default function HomeNavLink({
@@ -13,14 +13,21 @@ export default function HomeNavLink({
   label,
   isActive,
 }: HomeNavLinkProps) {
+  const isUnimplemented = href === "/";
+
   return (
-    <AnimatedLink
-      href={href}
-      label={label}
-      linkClassName={`text-shadow-lg ${isActive ? "text-secondary" : ""}`}
-      textClassName={`text-text-inverse text-shadow-lg group-hover:text-secondary ${isActive ? "text-secondary" : ""}`}
-      underlineClassName={isActive ? "w-full" : "w-0 group-hover:w-full"}
-    />
+    <div
+      className={isUnimplemented ? "opacity-50 cursor-not-allowed" : ""}
+      title={isUnimplemented ? "Próximamente" : undefined}
+    >
+      <AnimatedLink
+        href={isUnimplemented ? "#" : href}
+        label={label}
+        linkClassName={`text-shadow-lg ${isActive ? "text-secondary" : ""} ${isUnimplemented ? "pointer-events-none" : ""}`}
+        textClassName={`text-text-inverse text-shadow-lg group-hover:text-secondary ${isActive ? "text-secondary" : ""}`}
+        underlineClassName={isActive ? "w-full" : "w-0 group-hover:w-full"}
+      />
+    </div>
   );
 }
 

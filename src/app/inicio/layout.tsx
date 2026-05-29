@@ -4,13 +4,15 @@ import HomeFooter from "@/features/home/footer/components/HomeFooter";
 export default function InicioLayout({
   children,
 }: {
-  children: React.ReactNode;
+  readonly children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col">
+    <div className="fixed inset-0 flex flex-col overflow-hidden bg-bg">
       <HomeHeader />
-      <main>{children}</main>
-      <HomeFooter />
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
+        <main className="flex-1 flex flex-col">{children}</main>
+        <HomeFooter />
+      </div>
     </div>
   );
 }
