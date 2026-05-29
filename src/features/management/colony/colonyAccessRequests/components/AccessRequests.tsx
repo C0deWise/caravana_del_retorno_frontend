@@ -12,11 +12,13 @@ import { RequestList } from "./RequestList";
 import Spinner from "@/components/feedback/Spinner";
 import { formatColonyLabel } from "../utils/formatters";
 import type { AccessRequest } from "../types/access-request.types";
+import { useToast } from "@/components/feedback/Toast";
 
 type PendingAction = "approve" | "reject" | null;
 
 export default function AccessRequests() {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const targetColonyId = user?.codigo_colonia ?? null;
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -81,17 +83,24 @@ export default function AccessRequests() {
 
   const handleModalConfirm = useCallback(async () => {
     if (!selectedRequest || !pendingAction) return;
-    if (pendingAction === "approve") {
-      await acceptRequest(selectedRequest.id);
-    } else {
-      await rejectRequest(selectedRequest.id);
+    try {
+      if (pendingAction === "approve") {
+        await acceptRequest(selectedRequest.id);
+        showToast(`${selectedRequest.fullName} fue aceptado en la colonia`, "success");
+      } else {
+        await rejectRequest(selectedRequest.id);
+        showToast(`${selectedRequest.fullName} fue rechazado de la colonia`, "warning");
+      }
+      removeRequestLocally(selectedRequest.id);
+      resetAccept();
+      resetReject();
+      setShowConfirmModal(false);
+      setSelectedRequest(null);
+      setPendingAction(null);
+    } catch (err) {
+      // El hook ya maneja el error internamente y lo coloca en el estado (acceptError / rejectError)
+      setShowConfirmModal(false);
     }
-    removeRequestLocally(selectedRequest.id);
-    resetAccept();
-    resetReject();
-    setShowConfirmModal(false);
-    setSelectedRequest(null);
-    setPendingAction(null);
   }, [
     selectedRequest,
     pendingAction,
@@ -100,6 +109,7 @@ export default function AccessRequests() {
     removeRequestLocally,
     resetAccept,
     resetReject,
+    showToast,
   ]);
 
   const colonyLabel = leaderColony

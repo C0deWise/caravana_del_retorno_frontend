@@ -30,10 +30,15 @@ export default function ColonyMembers() {
   const handleRemove = async (memberId: number) => {
     if (!targetColonyId) return;
 
+    const member = members.find((m) => m.id === memberId);
+    const nombreCompleto = member
+      ? `${member.nombre || ""} ${member.apellido || ""}`.trim() || "El miembro"
+      : "El miembro";
+
     try {
       await removeMember(targetColonyId, memberId);
       removeMemberLocally(memberId);
-      showToast("Miembro eliminado correctamente", "success");
+      showToast(`${nombreCompleto} fue retirado de la colonia`, "success");
       await refetchMembers();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Error al eliminar el miembro";
