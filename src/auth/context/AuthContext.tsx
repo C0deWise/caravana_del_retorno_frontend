@@ -10,6 +10,7 @@ import {
 } from "react";
 import { UserData, UserRole } from "@/types/user.types";
 import { authApi } from "@/services/auth.api";
+import { tokenStorage } from "@/auth/utils/tokenStorage";
 
 interface AuthContextType {
   user: UserData | null;
@@ -40,7 +41,13 @@ export function AuthProvider({ children }: { readonly children: ReactNode }) {
       setIsFetchingSession(true);
 
       try {
-        const sessionUser = await authApi.refresh();
+        const token = tokenStorage.getAccessToken();
+        if (!token) {
+          throw new Error("No token found");
+        }
+        
+        // Obtenemos el usuario actual. Si el token expiró, api.services se encarga del refresh automáticamente
+        const sessionUser = await authApi.me();
         setUser(sessionUser);
       } catch {
         authApi.logout();

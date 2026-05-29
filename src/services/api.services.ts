@@ -115,12 +115,19 @@ class ApiService {
   }
   private async executeRefreshRequest(): Promise<string | null> {
     try {
+      const refreshToken = tokenStorage.getRefreshToken();
+      if (!refreshToken) {
+        tokenStorage.clear();
+        return null;
+      }
+
       const response = await fetch(`${this.baseURL}/api/v1/usuario/refresh`, {
         method: "POST",
-        credentials: "include",
+        credentials: "omit",
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({ refresh_token: refreshToken }),
       });
 
       if (!response.ok) {
@@ -128,13 +135,13 @@ class ApiService {
         return null;
       }
 
-      const data = (await response.json()) as { access_token?: string };
-      if (!data.access_token) {
+      const data = (await response.json()) as { access_token?: string, refresh_token?: string };
+      if (!data.access_token || !data.refresh_token) {
         tokenStorage.clear();
         return null;
       }
 
-      tokenStorage.setAccessToken(data.access_token);
+      tokenStorage.setTokens(data.access_token, data.refresh_token);
       return data.access_token;
     } catch {
       tokenStorage.clear();

@@ -33,6 +33,7 @@ type SessionApi = {
  */
 type AuthApiResponse = {
   access_token: string;
+  refresh_token: string;
   token_type: string;
   expires_in: number;
   usuario: SessionApi;
@@ -81,7 +82,7 @@ export const authApi = {
       contrasenia,
     });
 
-    tokenStorage.setAccessToken(response.access_token);
+    tokenStorage.setTokens(response.access_token, response.refresh_token);
     return mapSessionToUserData(response.usuario);
   },
 
@@ -89,8 +90,15 @@ export const authApi = {
    * Renueva la sesión usando el refresh token de la cookie HttpOnly.
    */
   async refresh(): Promise<UserData> {
-    const response = await apiService.post<AuthApiResponse>("/api/v1/usuario/refresh");
-    tokenStorage.setAccessToken(response.access_token);
+    const refreshToken = tokenStorage.getRefreshToken();
+    if (!refreshToken) {
+      throw new Error("No refresh token available");
+    }
+
+    const response = await apiService.post<AuthApiResponse>("/api/v1/usuario/refresh", {
+      refresh_token: refreshToken
+    });
+    tokenStorage.setTokens(response.access_token, response.refresh_token);
     return mapSessionToUserData(response.usuario);
   },
 
