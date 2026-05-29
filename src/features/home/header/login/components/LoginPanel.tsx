@@ -17,8 +17,8 @@ export default function LoginPanel({ onClose }: LoginPanelProps) {
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await loginUser(correo, contrasenia);
-    if (!error) {
+    const success = await loginUser(correo, contrasenia);
+    if (success) {
       setCorreo("");
       setContrasenia("");
       onClose();
