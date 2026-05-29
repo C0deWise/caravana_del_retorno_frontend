@@ -16,8 +16,6 @@ export const breadcrumbLabels: Record<string, string> = {
 
   "/gestion/publicaciones": "Gestión de Publicaciones",
   "/gestion/publicaciones/administrar": "Administrar Publicaciones",
-
-  "/gestion/reportes": "Generar reportes",
 };
 
 export const nonClickableBreadcrumbRoutes = new Set<string>([
