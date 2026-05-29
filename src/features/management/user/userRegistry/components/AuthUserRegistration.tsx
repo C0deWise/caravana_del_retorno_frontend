@@ -158,7 +158,7 @@ export default function AuthUserRegistration() {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-20">
+    <div className="min-h-screen bg-white pb-36">
       <div className="max-w-7xl mx-auto">
         <h1 className="page-title">Registro de usuario</h1>
 

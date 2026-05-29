@@ -12,6 +12,8 @@ interface UseRegistrationSelectorReturn {
     isCreating: boolean;
     error: string | null;
     createError: string | null;
+    noColony: boolean;
+    noActiveReturn: boolean;
     selectIndividual: () => void;
     selectGrupal: () => Promise<void>;
 }
@@ -20,10 +22,12 @@ export function useRegistrationSelector(): UseRegistrationSelectorReturn {
     const router = useRouter();
     const { user } = useAuth();
     const { grupo, isLoading, error, createGrupo, isCreating, createError } = useGrupo(user?.id);
-    
+
     const [activeReturn, setActiveReturn] = useState<Retorno | null>(null);
     const [hasIndividualRegistration, setHasIndividualRegistration] = useState(false);
     const [isCheckingIndividual, setIsCheckingIndividual] = useState(true);
+    const [noColony, setNoColony] = useState(false);
+    const [noActiveReturn, setNoActiveReturn] = useState(false);
 
     useEffect(() => {
         if (!user) return;
@@ -34,10 +38,20 @@ export function useRegistrationSelector(): UseRegistrationSelectorReturn {
             setIsCheckingIndividual(true);
 
             try {
-                const retorno = await retornoService.getActiveReturn();
-                if(!isMounted || !retorno) return;
-                setActiveReturn(retorno);
+                if (!user?.codigo_colonia) {
+                    setNoColony(true);
+                    return;
+                }
 
+                const retorno = await retornoService.getActiveReturn();
+                if (!isMounted) return;
+
+                if (!retorno) {
+                    setNoActiveReturn(true);
+                    return;
+                }
+
+                setActiveReturn(retorno);
                 const hasReg = await retornoService.hasUserRegistrationInReturn(user.id, retorno.codigo);
                 if (!isMounted) return;
                 setHasIndividualRegistration(hasReg);
@@ -47,7 +61,7 @@ export function useRegistrationSelector(): UseRegistrationSelectorReturn {
         };
 
         void check();
-        return() => {isMounted = false};
+        return () => { isMounted = false };
     }, [user]);
 
     useEffect(() => {
@@ -75,6 +89,8 @@ export function useRegistrationSelector(): UseRegistrationSelectorReturn {
         isCreating,
         error,
         createError,
+        noColony,
+        noActiveReturn,
         selectIndividual,
         selectGrupal,
     };

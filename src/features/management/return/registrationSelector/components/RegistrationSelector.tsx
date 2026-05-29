@@ -6,12 +6,9 @@ import { RequireAuth } from "@/auth/components/RequireAuth";
 
 function RegistrationSelectorContent() {
     const {
-        isLoading,
-        isCreating,
-        error,
-        createError,
-        selectIndividual,
-        selectGrupal,
+        isLoading, isCreating, error, createError,
+        noColony, noActiveReturn,
+        selectIndividual, selectGrupal,
     } = useRegistrationSelector();
 
     if (isLoading) {
@@ -21,6 +18,26 @@ function RegistrationSelectorContent() {
             </div>
         );
     }
+
+    if (noColony) return (
+        <div className="flex items-center justify-center px-4 py-12">
+            <div className="w-full max-w-xl rounded-2xl bg-bg-card p-8 shadow-md text-center">
+                <h1 className="page-title">Registro al Retorno</h1>
+                <p className="text-text text-lg font-medium mt-4">No tienes colonia asignada.</p>
+                <p className="text-text-muted mt-2">Para registrarte debes hacer parte de una colonia.</p>
+            </div>
+        </div>
+    );
+
+    if (noActiveReturn) return (
+        <div className="flex items-center justify-center px-4 py-12">
+            <div className="w-full max-w-xl rounded-2xl bg-bg-card p-8 shadow-md text-center">
+                <h1 className="page-title">Registro al Retorno</h1>
+                <p className="text-text text-lg font-medium mt-4">No hay un retorno activo habilitado.</p>
+                <p className="text-text-muted mt-2">Cuando un retorno sea habilitado podrás completar tu registro.</p>
+            </div>
+        </div>
+    );
 
     return (
         <div className="flex items-center justify-center px-4 py-12">
