@@ -22,7 +22,7 @@ export interface Persona {
     pe_genero: Genero;
 }
 
-export interface PersonaGrupoAsociarRequest {
+export interface PersonaRequest {
     pe_codigo: number;
     gr_codigo: number;
 }

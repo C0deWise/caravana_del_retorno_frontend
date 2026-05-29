@@ -69,9 +69,9 @@ function GrupalReturnRegistrationFeature() {
   const handleRemoveInvitation = async (id: number, kind: "usuario" | "persona") => {
     if (!grupo) return;
     if (kind === "usuario") {
-      await removeMember(id, grupo.gr_codigo);
+      await removeMember({ usuario_id: id, grupo_id: grupo.gr_codigo });
     } else {
-      await removeExternalPerson(id, grupo.gr_codigo);
+      await removeExternalPerson({ pe_codigo: id, gr_codigo: grupo.gr_codigo });
     }
     void refetchMembers();
     void refetchInvitations();

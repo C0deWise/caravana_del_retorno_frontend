@@ -9,6 +9,7 @@ import type {
     SolicitudMiembro,
     SolicitudMiembroRequest,
 } from "../types/grupalReturnRegistration"
+import { RemoveMemberRequest } from "../../features/invitateMembers/types/inviteMember.types";
 
 class GrupalReturnRegistrationService {
     private readonly endpoint = "/api/v1/grupoRetorno";
@@ -37,6 +38,10 @@ class GrupalReturnRegistrationService {
 
     async getMiembros(grupo: number): Promise<MiembroGrupo[]> {
         return apiService.get<MiembroGrupo[]>(`${this.endpoint}/${grupo}/miembros`)
+    }
+
+    async removerMiembro(data: RemoveMemberRequest): Promise<boolean> {
+        return apiService.delete(`${this.endpoint}/eliminar-miembro`, data);
     }
 
     async getSolicitudes(grupo: number): Promise<SolicitudMiembro[]> {

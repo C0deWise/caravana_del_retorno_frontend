@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { grupalReturnRegistrationService } from "../../../shared/services/grupalReturnRegistration.service";
+import { RemoveMemberRequest } from "../types/inviteMember.types";
+import { ApiError } from "@/services/api.services";
 
 interface UseRemoveMemberReturn {
-  removeMember: (usuarioId: number, grupoId: number) => Promise<void>;
+  removeMember: (data: RemoveMemberRequest) => Promise<boolean | null>;
   isLoading: boolean;
   error: string | null;
 }
@@ -12,18 +15,27 @@ export function useRemoveMember(): UseRemoveMemberReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const removeMember = async (_usuarioId: number, _grupoId: number): Promise<void> => {
+  const removeMember = async (data: RemoveMemberRequest): Promise<boolean | null> => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // TODO: conectar cuando el endpoint esté disponible
-      // await grupalReturnRegistrationService.removeMember(_usuarioId, _grupoId);
-      await Promise.resolve();
-    } catch {
-      setError("Error al eliminar el miembro del grupo.");
+      console.log("Removiendo usuario", data);
+      const response = await grupalReturnRegistrationService.removerMiembro(data);
+      console.log(response);
+      if (!response) return null;
+      return response;
+    } catch (err) {
+      if (err instanceof ApiError) {
+        console.log(err.message);
+        setError(err.message);
+      } else {
+        setError("Error al eliminar el miembro del grupo.");
+      }
+      return null;
     } finally {
       setIsLoading(false);
+
     }
   };
 

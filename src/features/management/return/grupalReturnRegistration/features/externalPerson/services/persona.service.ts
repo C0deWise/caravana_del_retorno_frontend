@@ -3,7 +3,7 @@ import type {
     Persona,
     PersonaCreateRequest,
     PersonaGrupo,
-    PersonaGrupoAsociarRequest
+    PersonaRequest
 } from "../types/persona.types";
 
 class PersonaService {
@@ -13,7 +13,7 @@ class PersonaService {
         return apiService.post<Persona>(`${this.endpoint}/`, data);
     }
 
-    async asociarGrupo(data: PersonaGrupoAsociarRequest): Promise<PersonaGrupo> {
+    async asociarGrupo(data: PersonaRequest): Promise<PersonaGrupo> {
         return apiService.post<PersonaGrupo>(`${this.endpoint}/asociar-grupo`, data);
     }
 
@@ -23,6 +23,10 @@ class PersonaService {
 
     async getByDocumento(documento: string): Promise<Persona | null> {
         return await apiService.get<Persona>(`${this.endpoint}/documento/${documento}`);
+    }
+
+    async removerPersona(data: PersonaRequest): Promise<boolean> {
+        return await apiService.delete<boolean>(`${this.endpoint}/remover-persona-grupo/${data.pe_codigo}/${data.gr_codigo}`);
     }
 }
 

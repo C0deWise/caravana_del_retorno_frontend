@@ -9,3 +9,8 @@ export type InviteMemberError =
         user: UserSearchResult;
         error: InviteMemberError | null;
     }
+
+    export interface RemoveMemberRequest {
+        grupo_id: number,
+        usuario_id: number
+    }
