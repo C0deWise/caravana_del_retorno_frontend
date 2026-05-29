@@ -18,7 +18,7 @@ class RetornoService {
        * @returns El retorno activo o null si no hay retornos
   */
   async getActiveReturn(): Promise<Retorno | null> {
-    const response = await apiService.get<Retorno>(`${this.endpoint}/vigente`);
+    const response = await apiService.get<Retorno>(`${this.endpoint}vigente`);
     if (!response) return null;
     return response;
   }
@@ -30,7 +30,7 @@ class RetornoService {
   async hasUserRegistrationInReturn(_userCode: number, _returnCode: number): Promise<boolean> {
 
     const response = await apiService.get<boolean>(
-      `${this.endpoint}/esta-registrado-retorno/${_userCode}/${_returnCode}`,
+      `${this.endpoint}esta-registrado-retorno/${_userCode}/${_returnCode}`,
     );
     if (Array.isArray(response)) return response.length > 0;
     return !!response;
