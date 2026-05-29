@@ -7,6 +7,7 @@ import MainText from "@/components/common/MainText";
 import HeaderCurve from "@/components/layout/HeaderCurve";
 import Link from "next/link";
 import { ArrowLeftEndOnRectangleIcon } from "@heroicons/react/24/outline";
+import NotificationsDropdown from "@/features/notifications/components/NotificationsDropdown";
 
 const ROLE_LABEL: Record<string, string> = {
   admin: "Administrador",
@@ -38,6 +39,8 @@ export default function ManagementHeaderContent() {
       {/* Info del usuario + logout */}
       {user && (
         <div className="flex items-center gap-4">
+          <NotificationsDropdown />
+          
           <div className="flex flex-col items-end gap-1">
             <span className="text-md font-medium text-text-inverse leading-tight">
               {user.nombre} {user.apellido}
