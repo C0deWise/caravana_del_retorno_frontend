@@ -10,6 +10,8 @@ interface RelationshipListProps {
   readonly hasMore?: boolean;
   readonly loading?: boolean;
   readonly onLoadMore?: () => void;
+  readonly onApprove?: (relationshipId: string, userName: string) => void;
+  readonly onReject?: (relationshipId: string, userName: string) => void;
 }
 
 export function RelationshipList({
@@ -20,6 +22,8 @@ export function RelationshipList({
   hasMore = false,
   loading = false,
   onLoadMore = () => {},
+  onApprove,
+  onReject,
 }: RelationshipListProps) {
   return (
     <AnimatedList
@@ -36,6 +40,8 @@ export function RelationshipList({
           relationship={relationship}
           index={index}
           targetUserId={targetUserId}
+          onApprove={onApprove}
+          onReject={onReject}
         />
       )}
     />

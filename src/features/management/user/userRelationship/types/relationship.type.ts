@@ -40,10 +40,16 @@ export type RelationshipStatus =
 
 export type User = Pick<UserData, "id" | "nombre" | "apellido">;
 
+export interface ApiUser {
+  us_codigo: number;
+  us_nombre: string;
+  us_apellido: string;
+}
+
 export interface RelationshipApiItem {
   codigo: number;
-  codigo_solicitante: number;
-  codigo_destinatario: number;
+  solicitante: ApiUser;
+  destinatario: ApiUser;
   tipo_parentesco: string;
   estado: RelationshipStatus;
 }

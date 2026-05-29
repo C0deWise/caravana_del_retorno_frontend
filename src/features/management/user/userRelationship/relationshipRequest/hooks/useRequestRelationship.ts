@@ -13,7 +13,8 @@ interface UseRequestRelationshipReturn {
     solicitanteId: number,
     destinatarioId: number,
     tipoParentesco: KinshipType,
-  ) => Promise<boolean>;
+    targetName?: string,
+  ) => Promise<{ success: boolean; errorMsg?: string }>;
   reset: () => void;
 }
 
@@ -27,7 +28,8 @@ export function useRequestRelationship(): UseRequestRelationshipReturn {
       solicitanteId: number,
       destinatarioId: number,
       tipoParentesco: KinshipType,
-    ): Promise<boolean> => {
+      targetName?: string,
+    ): Promise<{ success: boolean; errorMsg?: string }> => {
       setIsSubmitting(true);
       setError(null);
       setSuccess(false);
@@ -39,23 +41,27 @@ export function useRequestRelationship(): UseRequestRelationshipReturn {
           tipo_parentesco: tipoParentesco,
         });
         setSuccess(true);
-        return true;
+        return { success: true };
       } catch (err) {
         const apiError = err as ApiError;
+        let errMsg = "";
         switch (apiError.status) {
           case 422:
-            setError("Datos inválidos. Revisa el destinatario y tipo de parentesco.");
+            errMsg = "Datos inválidos. Revisa el destinatario y tipo de parentesco.";
             break;
-          case 409:
-            setError("Ya existe una solicitud de parentesco con este usuario.");
+          case 400:
+            errMsg = targetName
+              ? `Ya tienes una relación de parentesco o solicitud pendiente con ${targetName}`
+              : "Ya existe una relación de parentesco con este usuario.";
             break;
           case 404:
-            setError("No se encontró el usuario destinatario.");
+            errMsg = "No se encontró el usuario destinatario.";
             break;
           default:
-            setError(apiError.message || "Error al enviar la solicitud.");
+            errMsg = apiError.message || "Error al enviar la solicitud.";
         }
-        return false;
+        setError(errMsg);
+        return { success: false, errorMsg: errMsg };
       } finally {
         setIsSubmitting(false);
       }

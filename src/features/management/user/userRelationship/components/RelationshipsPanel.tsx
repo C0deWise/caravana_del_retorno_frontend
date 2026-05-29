@@ -7,12 +7,15 @@ import { KinshipsList } from "../kinshipsList/KinshipsList";
 import { RequestsList } from "../relationshipsRequestList/RequestsList";
 import { RequestRelationshipButton } from "../relationshipRequest/components/RequestRelationshipButton";
 import { RequireAuth } from "@/auth/components/RequireAuth";
+import { acceptRelationshipService, rejectRelationshipService } from "../services/relationship.service";
+import { useToast } from "@/components/feedback/Toast";
 
 function RelationshipsPanelComponent() {
   const { user } = useAuth();
   const targetUserId = user?.id ?? 0;
+  const { showToast } = useToast();
 
-  const { relationships, loading, error, hasMore, loadMore, refetch } =
+  const { relationships, loading, error, refetch } =
     useListRelationships(targetUserId);
 
   const normalizeTabStatus = (status?: string) =>
@@ -25,13 +28,36 @@ function RelationshipsPanelComponent() {
   );
   const receivedRequests = allRelationships.filter(
     (r) =>
-      normalizeTabStatus(r.status) !== "aceptada" &&
-      r.relatedUser.id === targetUserId,
+      normalizeTabStatus(r.status) === "pendiente" &&
+      String(r.relatedUser.id) === String(targetUserId),
   );
   const sentRequests = allRelationships.filter(
     (r) =>
-      normalizeTabStatus(r.status) !== "aceptada" && r.user.id === targetUserId,
+      normalizeTabStatus(r.status) === "pendiente" &&
+      String(r.user.id) === String(targetUserId),
   );
+
+  const handleApprove = async (id: string, userName: string) => {
+    try {
+      await acceptRelationshipService(id);
+      showToast(`La solicitud de parentesco de ${userName} fue aceptada con éxito`, "success");
+      refetch();
+    } catch (err) {
+      console.error("Error al aceptar la solicitud:", err);
+      showToast(`Ocurrió un error al aceptar la solicitud de ${userName}`, "error");
+    }
+  };
+
+  const handleReject = async (id: string, userName: string) => {
+    try {
+      await rejectRelationshipService(id);
+      showToast(`Rechazaste la solicitud de parentesco de ${userName}`, "info");
+      refetch();
+    } catch (err) {
+      console.error("Error al rechazar la solicitud:", err);
+      showToast(`Ocurrió un error al rechazar la solicitud de ${userName}`, "error");
+    }
+  };
 
   return (
     <div className="w-full h-[calc(100vh-15.5rem)] flex flex-col space-y-6 pt-2 pb-4">
@@ -68,22 +94,20 @@ function RelationshipsPanelComponent() {
           <Spinner size="lg" />
         </div>
       ) : (
-        <main className="flex-1 min-h-0 mx-auto max-w-[90rem] w-full px-10 flex flex-col lg:flex-row gap-8 items-stretch pb-6">
+        <main className="flex-1 min-h-0 mx-auto max-w-360 w-full px-10 flex flex-col lg:flex-row gap-8 items-stretch pb-6">
           <KinshipsList
             relationships={myKinships}
             targetUserId={targetUserId}
-            hasMore={hasMore}
             loading={loading}
-            onLoadMore={loadMore}
           />
 
           <RequestsList
             receivedRequests={receivedRequests}
             sentRequests={sentRequests}
             targetUserId={targetUserId}
-            hasMore={hasMore}
             loading={loading}
-            onLoadMore={loadMore}
+            onApprove={handleApprove}
+            onReject={handleReject}
           />
         </main>
       )}

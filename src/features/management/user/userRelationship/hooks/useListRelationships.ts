@@ -13,12 +13,8 @@ interface UseListRelationshipsReturn {
   status: RelationshipStatus | null;
   loading: boolean;
   error: string | null;
-  hasMore: boolean;
-  loadMore: () => void;
   refetch: () => void;
 }
-
-const PAGE_SIZE = 20;
 
 const normalizeStatus = (status?: string): RelationshipStatus | null => {
   if (!status) return null;
@@ -58,7 +54,6 @@ export function useListRelationships(
   const [allRelationships, setAllRelationships] = useState<RelationshipItem[]>(
     [],
   );
-  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fetchVersion, setFetchVersion] = useState(0);
@@ -70,14 +65,12 @@ export function useListRelationships(
   useEffect(() => {
     if (!targetUserId) {
       setAllRelationships([]);
-      setPage(1);
       setError(null);
       return;
     }
 
     if (effectiveUseMocks) {
       setAllRelationships(getMockRelationships(targetUserId));
-      setPage(1);
       setLoading(false);
       setError(null);
       return;
@@ -94,7 +87,6 @@ export function useListRelationships(
 
         if (!cancelled) {
           setAllRelationships(data);
-          setPage(1);
         }
       } catch (err) {
         if (!cancelled) {
@@ -136,18 +128,6 @@ export function useListRelationships(
     [uniqueRelationships],
   );
 
-  const relationships = useMemo(() => {
-    const paginated = prioritizedRelationships.slice(0, page * PAGE_SIZE);
-    return paginated.length > 0 ? paginated : null;
-  }, [prioritizedRelationships, page]);
-
-  const hasMore = page * PAGE_SIZE < prioritizedRelationships.length;
-
-  const loadMore = useCallback(() => {
-    if (loading || !hasMore) return;
-    setPage((prev) => prev + 1);
-  }, [loading, hasMore]);
-
   const status = useMemo(() => {
     if (uniqueRelationships.length === 0) return null;
     const first = normalizeStatus(uniqueRelationships[0]?.status);
@@ -159,12 +139,10 @@ export function useListRelationships(
   }, [uniqueRelationships]);
 
   return {
-    relationships,
+    relationships: prioritizedRelationships,
     status,
     loading,
     error,
-    hasMore,
-    loadMore,
     refetch,
   };
 }
