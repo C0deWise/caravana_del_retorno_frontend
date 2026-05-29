@@ -10,7 +10,15 @@ import { CreateRetornoButton } from "../../createReturn/components/CreateRetorno
 export function RetornosPanel() {
   const { returns, loading, error, refetch } = useListReturn(true);
   const sortedReturns = useMemo(() => {
-    return [...returns].sort((a, b) => b.anio - a.anio);
+    return [...returns].sort((a, b) => {
+      const aIsActive = a.estado.toLowerCase() === "activo" || a.estado.toLowerCase() === "en_curso";
+      const bIsActive = b.estado.toLowerCase() === "activo" || b.estado.toLowerCase() === "en_curso";
+
+      if (aIsActive && !bIsActive) return -1;
+      if (!aIsActive && bIsActive) return 1;
+
+      return b.anio - a.anio;
+    });
   }, [returns]);
 
   return (

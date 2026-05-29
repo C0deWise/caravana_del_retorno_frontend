@@ -103,8 +103,11 @@ export function Autocomplete<T>({
     }
   };
 
+  const skipNextOpen = useRef(false);
+
   const handleSelect = useCallback(
     (item: T) => {
+      skipNextOpen.current = true;
       const displayValue = getDisplayValue(item);
       setInternalValue(clearOnSelect ? "" : displayValue);
       onSelect(item);
@@ -117,6 +120,11 @@ export function Autocomplete<T>({
   const handleSearchInternal = useCallback(
     (query: string) => {
       onSearch(query);
+      if (skipNextOpen.current) {
+        skipNextOpen.current = false;
+        return;
+      }
+      
       if (query.length >= minLength) {
         setHasSearched(true);
         if (showDropdown) setIsDropdownOpen(true);

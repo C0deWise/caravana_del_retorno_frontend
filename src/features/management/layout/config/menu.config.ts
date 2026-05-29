@@ -54,17 +54,7 @@ export const menuConfig: MenuItem[] = [
       }
     ],
   },
-  {
-    label: "Gestión de Reportes",
-    href: "/gestion/reportes/",
-    icon: "report",
-    subitems: [
-      {
-        label: "Generar reportes",
-        href: "/gestion/reportes",
-      }
-    ],
-  },
+
 
   {
     label: "Gestión Publicaciones",

@@ -8,6 +8,7 @@ import { useUpdateReturnState } from "../../hooks/useUpdateReturnState";
 import { ConfirmModal } from "@/components/feedback/confirmModal";
 import { useToast } from "@/components/feedback/Toast";
 import { ConfiguredTag, type TagConfigRecord } from "@/components/common/Tag";
+import { GenerateReportButton } from "@/features/management/reports/generateReports/components/GenerateReportButton";
 
 interface RetornoCardProps {
   readonly retorno: Retorno;
@@ -56,9 +57,8 @@ export function RetornoCard({ retorno, index, onRefresh }: RetornoCardProps) {
   };
 
   const handleOpenConfirm = () => {
-    if (nextState) {
-      setShowConfirmModal(true);
-    }
+    if (!nextState) return;
+    setShowConfirmModal(true);
   };
 
   const handleConfirm = async () => {
@@ -80,16 +80,19 @@ export function RetornoCard({ retorno, index, onRefresh }: RetornoCardProps) {
         title={`Retorno ${retorno.anio}`}
         subtitle={<ConfiguredTag value={retorno.estado} config={STATUS_CONFIG} />}
         actions={
-          nextState ? (
-            <button
-              onClick={handleOpenConfirm}
-              className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-text-inverse hover:opacity-90 rounded-xl text-sm font-semibold transition-all shadow-md active:scale-95 cursor-pointer"
-              title={`Cambiar estado a ${nextState}`}
-            >
-              <ArrowPathIcon className="w-5 h-5" />
-              <span>Modificar Estado</span>
-            </button>
-          ) : undefined
+          <div className="flex gap-3">
+            <GenerateReportButton retornoId={retorno.codigo} retornoAnio={retorno.anio} />
+            {nextState ? (
+              <button
+                onClick={handleOpenConfirm}
+                className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-text-inverse hover:opacity-90 rounded-xl text-sm font-semibold transition-all shadow-md active:scale-95 cursor-pointer"
+                title={`Cambiar estado a ${nextState}`}
+              >
+                <ArrowPathIcon className="w-5 h-5" />
+                <span>Modificar Estado</span>
+              </button>
+            ) : null}
+          </div>
         }
       />
 
