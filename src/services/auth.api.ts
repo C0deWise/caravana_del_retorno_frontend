@@ -39,6 +39,23 @@ type AuthApiResponse = {
   usuario: SessionApi;
 };
 
+type MessageApiResponse = {
+  mensaje?: string;
+  message?: string;
+};
+
+const resolveMessage = (response: MessageApiResponse, fallback: string): string => {
+  if (response.mensaje?.trim()) {
+    return response.mensaje;
+  }
+
+  if (response.message?.trim()) {
+    return response.message;
+  }
+
+  return fallback;
+};
+
 /**
  * Función transformadora (Mapeador)
  * Convierte el modelo de respuesta del API (`SessionApi`) al modelo de dominio `UserData`.
@@ -108,6 +125,31 @@ export const authApi = {
   async me(): Promise<UserData> {
     const response = await apiService.get<SessionApi>("/api/v1/usuario/me");
     return mapSessionToUserData(response);
+  },
+
+  async requestPasswordReset(correo: string): Promise<string> {
+    const response = await apiService.post<MessageApiResponse>("/api/v1/usuario/forgot-password", {
+      correo: correo.trim().toLowerCase(),
+    });
+
+    return resolveMessage(
+      response,
+      "Si el correo existe en el sistema, recibirás un enlace para restablecer tu contraseña.",
+    );
+  },
+
+  async resetPassword(
+    token: string,
+    nuevaContrasenia: string,
+    confirmarContrasenia: string,
+  ): Promise<string> {
+    const response = await apiService.post<MessageApiResponse>("/api/v1/usuario/reset-password", {
+      token: token.trim(),
+      nueva_contrasenia: nuevaContrasenia,
+      confirmar_contrasenia: confirmarContrasenia,
+    });
+
+    return resolveMessage(response, "Contraseña actualizada exitosamente.");
   },
 
   /**

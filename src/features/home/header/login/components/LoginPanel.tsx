@@ -98,6 +98,17 @@ export default function LoginPanel({ onClose }: LoginPanelProps) {
         >
           Registrarse
         </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            onClose();
+            router.push("/auth/recuperar-contrasena");
+          }}
+          className="text-sm font-medium text-text-inverse underline underline-offset-4 hover:opacity-90"
+        >
+          ¿Olvidaste tu contraseña?
+        </button>
       </form>
     </div>
   );
