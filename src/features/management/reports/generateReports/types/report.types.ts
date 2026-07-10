@@ -1,5 +1,5 @@
 
-const reporTypes = ["general", "colony"] as const;
+export const reporTypes = ["general", "colony"] as const;
 export type ReportType = typeof reporTypes[number];
 
 export interface GeneralReportParams {

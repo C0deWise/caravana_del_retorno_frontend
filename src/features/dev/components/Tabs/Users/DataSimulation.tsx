@@ -11,7 +11,7 @@ interface DataSimulationProps {
   readonly setMockColoniaId: (id: number | null) => void;
 }
 
-export function DataSimulation({ apiMode, roleOverride, mockUserId, setMockUserId, mockColoniaId, setMockColoniaId }: DataSimulationProps) {
+export function DataSimulation({ apiMode, roleOverride, mockColoniaId, setMockColoniaId }: DataSimulationProps) {
   if (apiMode || roleOverride === undefined) return null;
 
   const showColoniaPicker = roleOverride === "usuario" || roleOverride === "lider_colonia";

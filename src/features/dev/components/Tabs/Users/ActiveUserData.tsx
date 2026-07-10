@@ -6,7 +6,7 @@ interface ActiveUserDataProps {
   readonly user: UserData | null;
   readonly apiMode: boolean;
   readonly loadingColony: boolean;
-  readonly fetchedColony: any;
+  readonly fetchedColony: { pais?: string | null; departamento?: string | null; ciudad?: string | null; } | null;
 }
 
 export function ActiveUserData({ user, apiMode, loadingColony, fetchedColony }: ActiveUserDataProps) {
@@ -14,7 +14,7 @@ export function ActiveUserData({ user, apiMode, loadingColony, fetchedColony }: 
 
   const getColonyBaseName = () => {
     if (!fetchedColony) return null;
-    const isColombia = fetchedColony.pais.toLowerCase() === "colombia";
+    const isColombia = fetchedColony.pais?.toLowerCase() === "colombia";
     const parts = isColombia 
       ? [fetchedColony.ciudad, fetchedColony.departamento, fetchedColony.pais] 
       : [fetchedColony.pais];

@@ -52,7 +52,7 @@ export const useListColonies = (autoFetch = false, useMocks?: boolean): UseListC
     if (autoFetch) {
       void listColonies();
     }
-  }, [autoFetch, effectiveUseMocks]);
+  }, [autoFetch, effectiveUseMocks, listColonies]);
 
   return { listColonies, refetch: listColonies, colonies, loading, error };
 };

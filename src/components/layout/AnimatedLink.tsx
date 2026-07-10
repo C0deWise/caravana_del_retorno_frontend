@@ -7,6 +7,7 @@ interface AnimatedLinkProps {
   linkClassName?: string;
   textClassName?: string;
   underlineClassName?: string;
+  onClick?: () => void;
 }
 
 export default function AnimatedLink({
@@ -15,10 +16,12 @@ export default function AnimatedLink({
   linkClassName,
   textClassName,
   underlineClassName,
+  onClick,
 }: AnimatedLinkProps) {
   return (
     <Link
       href={href}
+      onClick={onClick}
       className={`group transition-colors inline-flex flex-col ${linkClassName ?? ""}`}
     >
       <span className={`transition-colors duration-300 ${textClassName ?? ""}`}>

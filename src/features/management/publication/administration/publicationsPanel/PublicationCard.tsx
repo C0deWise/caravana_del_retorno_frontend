@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { NewspaperIcon, EyeIcon } from "@heroicons/react/24/solid";
 import ListCard from "@/components/common/ListCard";
 import { PublicationData, PublicationMultimedia } from "@/types/publication.types";

@@ -72,7 +72,7 @@ export function GenerateReportModalForm({ retornoId, retornoAnio, onCancel }: Ge
             if (!blob) return;
             const url = URL.createObjectURL(blob);
             setPreviewUrl(url);
-        } catch (error) {
+        } catch {
             onCancel?.();
             
             let customMessage = `Aún no hay nadie registrado para el Retorno ${retornoAnio}.`;

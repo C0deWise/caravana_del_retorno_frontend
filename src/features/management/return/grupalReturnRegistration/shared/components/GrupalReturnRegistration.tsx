@@ -9,8 +9,7 @@ import { useGrupo } from "../../../shared/hooks/useGrupo.hook";
 import { useGrupalMembersList } from "../hooks/useGrupalMemberList.hook";
 import { useCancelGroup } from "../hooks/useCancelGroup.hook";
 import { useSentInvitations } from "../../features/sentInvitations/hooks/useSentInvitations.hook";
-import { useRemoveMember } from "../../features/invitateMembers/hooks/useRemoveMember.hook";
-import { useRemoveExternalPerson } from "../../features/externalPerson/hooks/useRemoveExternalPerson.hook";
+
 import { InviteMemberModal } from "../../features/invitateMembers/components/InviteMemberModal";
 import { ExternalPersonModal } from "../../features/externalPerson/components/ExternalPersonModal";
 import { SentInvitationsList } from "../../features/sentInvitations/components/SentInvitationsList";
@@ -37,8 +36,7 @@ function GrupalReturnRegistrationFeature() {
   const { members, isLoading: membersLoading, refetch: refetchMembers } = useGrupalMembersList(grupo?.gr_codigo);
   const { invitations, isLoading: invitationsLoading, error: invitationsError, hasPending, refetch: refetchInvitations } = useSentInvitations(grupo?.gr_codigo);
   const { cancelGroup, isLoading: cancelling, error: cancelError } = useCancelGroup();
-  const { removeMember, isLoading: removingMember } = useRemoveMember();
-  const { removeExternalPerson, isLoading: removingExternal } = useRemoveExternalPerson();
+
   const [existingRegistration, setExistingRegistration] = useState<RegistroGrupoRetorno | null>(null);
   const [activeReturnLoading, setActiveReturnLoading] = useState(true);
 
@@ -65,17 +63,6 @@ function GrupalReturnRegistrationFeature() {
   const isInitialLoading = activeReturnLoading || registrationLoading;
 
   const canEnroll = !hasPending && members.length >= 1 && !hasRegistration;
-
-  const handleRemoveInvitation = async (id: number, kind: "usuario" | "persona") => {
-    if (!grupo) return;
-    if (kind === "usuario") {
-      await removeMember({ usuario_id: id, grupo_id: grupo.gr_codigo });
-    } else {
-      await removeExternalPerson({ pe_codigo: id, gr_codigo: grupo.gr_codigo });
-    }
-    void refetchMembers();
-    void refetchInvitations();
-  };
 
   const handleCancelConfirm = async () => {
     if (!grupo) return;

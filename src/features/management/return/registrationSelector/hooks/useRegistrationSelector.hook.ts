@@ -23,7 +23,7 @@ export function useRegistrationSelector(): UseRegistrationSelectorReturn {
     const { user } = useAuth();
     const { grupo, isLoading, error, createGrupo, isCreating, createError } = useGrupo(user?.id);
 
-    const [activeReturn, setActiveReturn] = useState<Retorno | null>(null);
+    const [, setActiveReturn] = useState<Retorno | null>(null);
     const [hasIndividualRegistration, setHasIndividualRegistration] = useState(false);
     const [isCheckingIndividual, setIsCheckingIndividual] = useState(true);
     const [noColony, setNoColony] = useState(false);

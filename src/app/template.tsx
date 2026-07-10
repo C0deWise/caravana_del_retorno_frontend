@@ -107,7 +107,10 @@ export default function Template({ children }: { readonly children: React.ReactN
     abortControllerRef.current = new AbortController();
     startTimeRef.current = Date.now();
 
-    const requestIdleCallbackId = globalThis.requestIdleCallback(
+    const rIC = globalThis.requestIdleCallback || ((cb: () => void) => setTimeout(cb, 1));
+    const cIC = globalThis.cancelIdleCallback || ((id: ReturnType<typeof setTimeout> | number) => clearTimeout(id as number));
+
+    const requestIdleCallbackId = rIC(
       () => {
         checkResourcesLoaded();
       },
@@ -116,7 +119,7 @@ export default function Template({ children }: { readonly children: React.ReactN
 
     return () => {
       abortControllerRef.current?.abort();
-      globalThis.cancelIdleCallback(requestIdleCallbackId);
+      cIC(requestIdleCallbackId);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, [checkResourcesLoaded, isHydrating]);
@@ -125,17 +128,9 @@ export default function Template({ children }: { readonly children: React.ReactN
     <>
       {/* Spinner + fondo con gradiente - se desvanecen suavemente */}
       <div
+        className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 px-6"
         style={{
-          position: "fixed",
-          inset: 0,
-          zIndex: 50,
-          background:
-            "linear-gradient(135deg, #024059 0%, #013548 50%, #02314d 100%)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-          gap: "1rem",
+          background: "linear-gradient(135deg, #024059 0%, #013548 50%, #02314d 100%)",
           opacity: loading || isHydrating ? 1 : 0,
           filter: loading || isHydrating ? "blur(0px)" : "blur(8px)",
           transition: "opacity 0.8s ease-out, filter 0.8s ease-out",
@@ -144,13 +139,9 @@ export default function Template({ children }: { readonly children: React.ReactN
       >
         <Spinner size="xl" />
         <p
+          className="text-white text-base md:text-lg font-semibold tracking-wide text-center max-w-sm md:max-w-md animate-pulse"
           style={{
-            color: "white",
-            fontSize: "1.125rem",
-            fontWeight: 600,
-            letterSpacing: "0.025em",
             fontFamily: "var(--font-inter), sans-serif",
-            animation: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
             opacity: loading || isHydrating ? 1 : 0,
             transition: loading || isHydrating ? "opacity 0.6s ease-out 0.3s" : "none",
           }}

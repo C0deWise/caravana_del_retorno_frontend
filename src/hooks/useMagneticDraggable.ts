@@ -90,9 +90,10 @@ export function useMagneticDraggable(
 
     const corners = getCornerPositions();
     if (corners[corner]) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setPos(corners[corner]);
-      setIsReady(true);
+      setTimeout(() => {
+        setPos(corners[corner]);
+        setIsReady(true);
+      }, 0);
       posInitialized.current = true;
     }
   }, [corner, getCornerPositions]);

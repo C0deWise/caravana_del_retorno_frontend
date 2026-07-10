@@ -1,6 +1,6 @@
 import ListCard from "@/components/common/ListCard";
 import { EntradaInvitacion } from "../../../shared/types/grupalReturnRegistration";
-import { TrashIcon, UserIcon } from "@heroicons/react/24/outline";
+import { UserIcon } from "@heroicons/react/24/outline";
 import { RequestStatusTag } from "@/features/management/components/RequestStatusTag";
 
 interface SentInvitationCardProps {
@@ -14,7 +14,7 @@ export function SentInvitationCard({ invitation, index }: SentInvitationCardProp
         ? invitation.data.correo_usuario
         : `${invitation.data.pe_nombre} ${invitation.data.pe_apellido}`;
     const estado = isUsuario ? invitation.data.estado.toLowerCase() : "externo";
-    const removeId = isUsuario ? invitation.data.usuario_id : invitation.data.pe_codigo;
+
 
     return (
         <ListCard

@@ -49,10 +49,13 @@ export function AnimatedList<T>({
 
   useEffect(() => {
     if (enableScrollShadow) {
-      setCanScroll(false);
-      setIsScrolledBottom(true);
-      setIsScrolledTop(true);
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      const timer = setTimeout(() => {
+        setCanScroll(false);
+        setIsScrolledBottom(true);
+        setIsScrolledTop(true);
+        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [items.length, enableScrollShadow]);
 

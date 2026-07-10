@@ -1,13 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { registrationService } from "../services/userRegistry.service";
 import { ApiError } from "@/services/api.services";
 import type { RegistrationRequest } from "../types/registro.types";
-import { useAuth } from "@/auth/context/AuthContext";
-import { CODE_TO_ROLE, UserApi } from "@/types/user.types";
-import { authApi } from "@/services/auth.api";
+
 
 interface UseRegisterUserReturn {
   registerUser: (data: RegistrationRequest) => Promise<void>;
@@ -20,21 +16,24 @@ export const useRegisterUser = (): UseRegisterUserReturn => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const router = useRouter();
-  const { login } = useAuth();
 
   const registerUser = async (data: RegistrationRequest): Promise<void> => {
+    void data; // TODO: Implementar API
     setLoading(true);
     setError(null);
     setSuccess(false);
 
     try {
-      await registrationService.userRegistration(data);
-      const userData = await authApi.login(data.correo, data.contrasenia);
+      // API call simulada para testing
+      // await registrationService.userRegistration(data);
+      // const userData = await authApi.login(data.correo, data.contrasenia);
+      // login(userData);
 
-      login(userData);
+      // Simulamos la latencia de la red de 1.5 segundos
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
       setSuccess(true);
-      setTimeout(() => router.push("/gestion"), 1500);
+      // setTimeout(() => router.push("/gestion"), 5000);
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.status === 422) {

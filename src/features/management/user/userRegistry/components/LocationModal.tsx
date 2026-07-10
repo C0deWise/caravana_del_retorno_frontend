@@ -6,10 +6,15 @@ import {
   getCitiesByDepartmentName,
 } from "@/constants/countries";
 import type { City } from "@/constants/countries";
+import { useEffect } from "react";
 import CountrySelect from "@/components/forms/CountrySelect";
 import { SelectField } from "@/components/forms/SelectField";
+import { FrostedModal } from "@/components/feedback/FrostedModal";
+import { motion, AnimatePresence } from "framer-motion";
+import { MarqueeText } from "@/components/common/MarqueeText";
 
 interface LocationModalProps {
+  readonly isOpen: boolean;
   readonly onClose: () => void;
   readonly onSave: (location: LocationData) => void;
   readonly initialData?: LocationData;
@@ -33,6 +38,7 @@ const EMPTY_LOCATION_DATA: LocationData = {
 };
 
 export default function LocationModal({
+  isOpen,
   onClose,
   onSave,
   initialData,
@@ -46,6 +52,20 @@ export default function LocationModal({
     }
     return [];
   });
+
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => {
+        setLocationData(initialData ?? EMPTY_LOCATION_DATA);
+        if (initialData?.departamento) {
+          setCities(getCitiesByDepartmentName(initialData.departamento));
+        } else {
+          setCities([]);
+        }
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, initialData]);
 
   const departments = useMemo(() => {
     if (locationData.pais === "Colombia") {
@@ -90,13 +110,13 @@ export default function LocationModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-bg rounded-lg shadow-2xl w-full max-w-md p-6 mx-4">
-        <h2 className="text-2xl font-bold mb-6 text-primary">
-          Seleccione su lugar de residencia
-        </h2>
-
-        <div className="space-y-4">
+    <FrostedModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Seleccione su lugar de residencia"
+      maxWidth="max-w-md"
+    >
+      <div className="space-y-4">
           {/* País */}
           <CountrySelect
             value={locationData.pais}
@@ -105,74 +125,94 @@ export default function LocationModal({
             inputId="location-modal-country-select-input"
           />
 
-          {/* Departamento - Solo para Colombia */}
-          {locationData.pais === "Colombia" && (
-            <SelectField
-              label="Departamento"
-              instanceId="create-colony-department-select"
-              inputId="create-colony-department-select-input"
-              options={departmentOptions}
-              value={
-                departmentOptions.find(
-                  (opt) => opt.value === locationData.departamento,
-                ) || null
-              }
-              onChange={handleDepartamentoChange}
-              placeholder="Seleccione un departamento"
-              isSearchable
-              isClearable
-              openMenuOnFocus
-              noOptionsMessage={() => "No se encontraron departamentos"}
-            />
-          )}
+          {/* Campos adicionales para Colombia */}
+          <AnimatePresence>
+            {locationData.pais === "Colombia" && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="overflow-hidden"
+              >
+                <div className="space-y-4 pt-4">
+                  {/* Departamento */}
+                  <SelectField
+                    label="Departamento"
+                    instanceId="create-colony-department-select"
+                    inputId="create-colony-department-select-input"
+                    options={departmentOptions}
+                    value={
+                      departmentOptions.find(
+                        (opt) => opt.value === locationData.departamento,
+                      ) || null
+                    }
+                    onChange={handleDepartamentoChange}
+                    placeholder="Elegir departamento"
+                    isSearchable
+                    isClearable
+                    openMenuOnFocus
+                    noOptionsMessage={() => "No se encontraron departamentos"}
+                    formatOptionLabel={(option, { context }) => (
+                      context === 'value' ? (
+                        <div className="w-full overflow-hidden">
+                          <MarqueeText text={option.label} speed={20} className="w-full text-left" />
+                        </div>
+                      ) : (
+                        <span>{option.label}</span>
+                      )
+                    )}
+                  />
 
-          {/* Municipio - Solo para Colombia */}
-          {locationData.pais === "Colombia" && (
-            <SelectField
-              label="Municipio"
-              instanceId="create-colony-city-select"
-              inputId="create-colony-city-select-input"
-              options={cityOptions}
-              value={
-                cityOptions.find(
-                  (opt) => opt.value === locationData.municipio,
-                ) || null
-              }
-              onChange={handleMunicipioChange}
-              placeholder={
-                locationData.departamento
-                  ? "Seleccione un municipio"
-                  : "Seleccione primero un departamento"
-              }
-              isSearchable
-              isClearable
-              openMenuOnFocus
-              isDisabled={!locationData.departamento || cities.length === 0}
-              noOptionsMessage={() => "No se encontraron municipios"}
-            />
-          )}
+                  {/* Municipio */}
+                  <SelectField
+                    label="Municipio"
+                    instanceId="create-colony-city-select"
+                    inputId="create-colony-city-select-input"
+                    options={cityOptions}
+                    value={
+                      cityOptions.find(
+                        (opt) => opt.value === locationData.municipio,
+                      ) || null
+                    }
+                    onChange={handleMunicipioChange}
+                    placeholder={
+                      locationData.departamento
+                        ? "Elegir municipio"
+                        : "Primero elija departamento"
+                    }
+                    isSearchable
+                    isClearable
+                    openMenuOnFocus
+                    isDisabled={!locationData.departamento || cities.length === 0}
+                    noOptionsMessage={() => "No se encontraron municipios"}
+                    formatOptionLabel={(option, { context }) => (
+                      context === 'value' ? (
+                        <div className="w-full overflow-hidden">
+                          <MarqueeText text={option.label} speed={20} className="w-full text-left" />
+                        </div>
+                      ) : (
+                        <span>{option.label}</span>
+                      )
+                    )}
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Botones */}
-        <div className="mt-6 flex justify-end gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-6 py-2 border border-border rounded-lg
-                       text-text transition-colors hover:bg-surface-offset"
-          >
-            Cancelar
-          </button>
+        <div className="mt-8 flex justify-end">
           <button
             type="button"
             onClick={handleSave}
-            className="btn-primary px-6 py-2"
+            disabled={!locationData.pais || (locationData.pais === "Colombia" && (!locationData.departamento || !locationData.municipio))}
+            className="w-full py-3 px-4 rounded-xl bg-secondary text-white font-semibold hover:bg-secondary/90 hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:hover:shadow-none disabled:hover:translate-y-0 disabled:cursor-not-allowed"
           >
             Guardar
           </button>
         </div>
-      </div>
-    </div>
+    </FrostedModal>
   );
 }
-

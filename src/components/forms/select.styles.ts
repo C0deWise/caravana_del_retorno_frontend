@@ -9,17 +9,19 @@ export const getSelectStyles = <
   Option = SelectOption,
   IsMulti extends boolean = false,
   Group extends GroupBase<Option> = GroupBase<Option>
->(): StylesConfig<Option, IsMulti, Group> => ({
+>(hasError?: boolean): StylesConfig<Option, IsMulti, Group> => ({
   control: (base, state) => ({
     ...base,
     backgroundColor: "var(--color-bg)",
-    borderColor: state.isFocused
-      ? "var(--color-primary)"
-      : "var(--color-bg-border)",
+    borderColor: hasError 
+      ? "var(--color-accent-red)" // accent-red
+      : state.isFocused
+        ? "var(--color-primary)"
+        : "var(--color-bg-border)",
     borderRadius: "0.75rem",
-    padding: "0.2rem",
-    minHeight: "46px",
-    fontSize: "0.875rem",
+    padding: "0.2rem 0.5rem",
+    minHeight: "50px",
+    fontSize: "1rem",
     boxShadow: state.isFocused ? "0 0 0 2px rgba(2, 64, 89, 0.1)" : "none",
     transition: "all 0.2s ease",
     ":hover": {
@@ -41,6 +43,10 @@ export const getSelectStyles = <
     marginTop: "0.5rem",
     animation: "fade-in 0.2s ease-out, zoom-in 0.2s ease-out",
   }),
+  menuList: (base) => ({
+    ...base,
+    padding: 0,
+  }),
   option: (base, state) => {
     let backgroundColor = "transparent";
     if (state.isSelected) {
@@ -54,11 +60,11 @@ export const getSelectStyles = <
       backgroundColor,
       color: state.isSelected
         ? "var(--color-text-inverse)"
-        : "var(--color-text)",
+        : "#111827",
       padding: "0.625rem 1rem",
       borderRadius: "0.5rem",
       cursor: "pointer",
-      fontSize: "0.875rem",
+      fontSize: "1rem",
       fontWeight: state.isSelected ? "600" : "400",
       ":active": {
         backgroundColor: "rgba(2, 64, 89, 0.15)",
@@ -71,17 +77,17 @@ export const getSelectStyles = <
   },
   placeholder: (base) => ({
     ...base,
-    color: "var(--color-text-muted)",
-    fontSize: "0.875rem",
+    color: "rgba(156, 163, 175, 0.6)",
+    fontSize: "1rem",
   }),
   singleValue: (base) => ({
     ...base,
-    color: "var(--color-text)",
-    fontSize: "0.875rem",
+    color: "#111827",
+    fontSize: "1rem",
   }),
   input: (base) => ({
     ...base,
-    color: "var(--color-text)",
+    color: "#111827",
   }),
   menuPortal: (base) => ({
     ...base,

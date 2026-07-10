@@ -19,7 +19,7 @@ const DOCUMENT_RULES: Record <
 };
 
 const REQUIRED_FIELDS: Array<keyof RegistrationFormData> = [
-  "nombre", "apellido", "documento", "fecha_nacimiento",
+  "nombre", "apellido", "tipo_doc", "documento", "genero", "fecha_nacimiento",
   "celular", "correo", "confirmEmail", "contrasenia", "confirmPassword",
 ];
 

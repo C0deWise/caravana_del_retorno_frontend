@@ -13,10 +13,12 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "axios": "^1.14.0",
+    "date-fns": "^4.4.0",
     "framer-motion": "^12.38.0",
     "lucide-react": "^0.577.0",
     "next": "^16.2.0",
     "react": "19.2.3",
+    "react-datepicker": "^9.1.0",
     "react-dom": "19.2.3",
     "react-select": "^5.10.2"
   },
@@ -25,6 +27,7 @@
     "@types/axios": "^0.9.36",
     "@types/node": "^20",
     "@types/react": "^19",
+    "@types/react-datepicker": "^6.2.0",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",

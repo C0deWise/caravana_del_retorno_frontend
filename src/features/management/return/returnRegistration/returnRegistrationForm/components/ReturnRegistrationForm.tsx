@@ -44,12 +44,6 @@ function parkingOptionLabel(parking: ParkingOption | ""): string {
   return "No";
 }
 
-function parkingLabel(car: number, bike: number): string {
-  if (car === 1) return "Sí, para carro";
-  if (bike === 1) return "Sí, para moto";
-  return "No";
-}
-
 function NoUserView() {
   return (
     <div className="bg-white px-4 py-6 flex items-center justify-center">
@@ -134,8 +128,6 @@ function resolveFormGuard({
   activeReturnCode,
   activeReturnYear,
   alreadyRegistered,
-  submittedRecord,
-  onReset,
   onUnregistered,
 }: FormGuardProps): React.ReactNode {
   if (!user) return <NoUserView />;
@@ -415,7 +407,8 @@ function ReturnRegistrationFormContent() {
               ]}
               value={formData.accomodation !== "" ? { value: formData.accomodation, label: formData.accomodation === 1 ? "Sí" : "No" } : null}
               onChange={(option) => handleRadioChange("accomodation", option ? (option.value as ReturnRegistrationAnswer) : "")}
-              error={fieldErrors.accomodation}
+              hasError={!!fieldErrors.accomodation}
+              errorMessage={fieldErrors.accomodation}
             />
 
             <SelectField
@@ -426,7 +419,8 @@ function ReturnRegistrationFormContent() {
               ]}
               value={formData.transport !== "" ? { value: formData.transport, label: formData.transport === 1 ? "Sí" : "No" } : null}
               onChange={(option) => handleRadioChange("transport", option ? (option.value as ReturnRegistrationAnswer) : "")}
-              error={fieldErrors.transport}
+              hasError={!!fieldErrors.transport}
+              errorMessage={fieldErrors.transport}
             />
 
             <SelectField
@@ -442,7 +436,8 @@ function ReturnRegistrationFormContent() {
                   : null
               }
               onChange={(option) => handleParkingChange(option ? (option.value as ParkingOption) : "")}
-              error={fieldErrors.parking}
+              hasError={!!fieldErrors.parking}
+              errorMessage={fieldErrors.parking}
               isDisabled={formData.transport !== 1}
             />
           </div>

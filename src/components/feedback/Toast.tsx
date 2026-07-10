@@ -38,13 +38,6 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 const createToastId = (): string => crypto.randomUUID();
 
-const findExistingToast = (
-  toasts: Toast[],
-  message: string,
-  type: ToastType,
-): Toast | undefined =>
-  toasts.find((toast) => toast.message === message && toast.type === type);
-
 const createToast = (message: string, type: ToastType): Toast => ({
   id: createToastId(),
   message,

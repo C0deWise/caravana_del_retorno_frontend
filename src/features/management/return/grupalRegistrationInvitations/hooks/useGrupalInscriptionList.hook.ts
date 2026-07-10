@@ -47,7 +47,7 @@ export function useGrupalInscriptionList(): UseGrupalInscriptionListReturn {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     fetchInvitations();

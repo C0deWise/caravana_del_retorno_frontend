@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useId } from "react";
 import Select, { components, ClearIndicatorProps, DropdownIndicatorProps, IndicatorsContainerProps, Props as SelectProps, GroupBase } from "react-select";
 import { ChevronDownIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { getSelectStyles, SelectOption } from "./select.styles";
@@ -11,7 +11,9 @@ interface SelectFieldProps<
   Group extends GroupBase<Option> = GroupBase<Option>
 > extends Omit<SelectProps<Option, IsMulti, Group>, "styles"> {
   readonly label?: string;
-  readonly error?: string;
+  readonly hasError?: boolean;
+  readonly errorMessage?: string;
+  readonly errorClassName?: string;
 }
 
 const DropdownIndicator = <Option, IsMulti extends boolean, Group extends GroupBase<Option>>(
@@ -71,29 +73,33 @@ export function SelectField<
   Option = SelectOption,
   IsMulti extends boolean = false,
   Group extends GroupBase<Option> = GroupBase<Option>
->({ label, error, ...props }: Readonly<SelectFieldProps<Option, IsMulti, Group>>) {
+>({ label, hasError, errorMessage, errorClassName = "absolute -bottom-5 left-1", ...props }: Readonly<SelectFieldProps<Option, IsMulti, Group>>) {
   const [mounted, setMounted] = useState(false);
 
+  const instanceId = useId();
+
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMounted(true);
+    setTimeout(() => setMounted(true), 0);
   }, []);
 
   return (
-    <div className={`space-y-1.5 transition-opacity duration-300 ${props.isDisabled ? "opacity-40 pointer-events-none select-none" : ""}`}>
+    <div className={`relative transition-opacity duration-300 ${props.isDisabled ? "opacity-40 pointer-events-none select-none" : ""}`}>
       {label && (
         <label
           htmlFor={props.inputId || props.id}
-          className="block text-sm font-medium text-text"
+          className="block text-sm font-medium text-text mb-1.5"
         >
           {label}
         </label>
       )}
       <Select
-        styles={getSelectStyles<Option, IsMulti, Group>()}
+        instanceId={instanceId}
+        styles={getSelectStyles<Option, IsMulti, Group>(hasError || !!errorMessage)}
         placeholder="Selecciona..."
         noOptionsMessage={() => "Sin opciones"}
         menuPortalTarget={mounted ? document.body : null}
+        menuPosition="fixed"
+        maxMenuHeight={314}
         components={{
           DropdownIndicator,
           ClearIndicator,
@@ -101,7 +107,9 @@ export function SelectField<
         }}
         {...props}
       />
-      {error && <p className="text-xs text-danger mt-1">{error}</p>}
+      {(hasError || errorMessage) && errorMessage && (
+        <p className={`text-accent-red text-xs font-medium z-10 ${errorClassName}`}>{errorMessage}</p>
+      )}
     </div>
   );
 }

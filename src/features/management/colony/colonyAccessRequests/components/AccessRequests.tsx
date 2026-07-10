@@ -97,7 +97,7 @@ export default function AccessRequests() {
       setShowConfirmModal(false);
       setSelectedRequest(null);
       setPendingAction(null);
-    } catch (err) {
+    } catch {
       // El hook ya maneja el error internamente y lo coloca en el estado (acceptError / rejectError)
       setShowConfirmModal(false);
     }

@@ -46,7 +46,7 @@ export const useGetColony = (useMocks?: boolean): UseGetColonyReturn => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [effectiveUseMocks]);
 
   return { getColony, colony, loading, error };
 };
