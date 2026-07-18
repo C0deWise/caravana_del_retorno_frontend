@@ -6,23 +6,12 @@ import MainIcon from "@/components/common/MainIcon";
 import MainText from "@/components/common/MainText";
 import HeaderCurve from "@/components/layout/HeaderCurve";
 import Link from "next/link";
-import { ArrowLeftEndOnRectangleIcon } from "@heroicons/react/24/outline";
 import NotificationsDropdown from "@/features/notifications/components/NotificationsDropdown";
-
-const ROLE_LABEL: Record<string, string> = {
-  admin: "Administrador",
-  lider_colonia: "Líder de colonia",
-  usuario: "Usuario",
-};
+import UserMenuDropdown from "@/features/management/user/googleLink/GoogleLinkButton";
 
 export default function ManagementHeaderContent() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
-
-  const handleLogout = () => {
-    logout();
-    router.push("/inicio");
-  };
 
   return (
     <div className="flex items-center justify-between px-8 py-2 bg-primary relative">
@@ -36,27 +25,11 @@ export default function ManagementHeaderContent() {
         {user?.role === "usuario" ? "Panel de usuario" : "Panel de gestión"}
       </span>
 
-      {/* Info del usuario + logout */}
+      {/* Info del usuario + menú */}
       {user && (
-        <div className="flex items-center gap-8">
-          <div className="flex flex-col items-end justify-center h-full gap-1.5">
-            <span className="text-xl font-bold text-text-inverse leading-none drop-shadow-sm">
-              {user.nombre} {user.apellido}
-            </span>
-            <span className="text-xs font-black text-primary bg-white px-3 py-1 rounded-full leading-none shadow-sm uppercase tracking-wide">
-              {ROLE_LABEL[user.role] ?? user.role}
-            </span>
-          </div>
-
+        <div className="flex items-center gap-4">
           <NotificationsDropdown />
-
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent-red text-white font-black hover:brightness-110 transition-all shadow-sm active:scale-95 border-none"
-          >
-            <ArrowLeftEndOnRectangleIcon className="w-6 h-6 stroke-[2.5]" />
-            Cerrar sesión
-          </button>
+          <UserMenuDropdown />
         </div>
       )}
 

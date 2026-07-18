@@ -6,14 +6,14 @@ import { NavItemType } from "../types/navbar.types";
 import { homeNavItems } from "../config/HomeNavItems";
 import HomeNavLink from "./HomeNavLink";
 import LoginPanel from "../../login/components/LoginPanel";
+import UserMenuDropdown from "@/features/management/user/googleLink/GoogleLinkButton";
 import { useState } from "react";
 import { useAuth } from "@/auth/context/AuthContext";
-import { ArrowLeftEndOnRectangleIcon } from "@heroicons/react/24/outline";
 
 export default function HomeNavbar() {
   const pathName = usePathname();
   const [showLogin, setShowLogin] = useState(false);
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return (
     <nav
@@ -46,13 +46,7 @@ export default function HomeNavbar() {
                 >
                   Ir a gestión
                 </Link>
-                <button
-                  onClick={logout}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent-red text-white font-black hover:brightness-110 transition-all shadow-sm active:scale-95 border-none"
-                >
-                  <ArrowLeftEndOnRectangleIcon className="w-6 h-6 stroke-[2.5]" />
-                  Cerrar sesión
-                </button>
+                <UserMenuDropdown />
               </div>
             );
           }

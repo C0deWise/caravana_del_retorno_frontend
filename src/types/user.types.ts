@@ -71,6 +71,7 @@ export interface UserApi {
   pais: string;
   departamento: string | null;
   ciudad: string | null;
+  google_email?: string | null;
 }
 
 /**
