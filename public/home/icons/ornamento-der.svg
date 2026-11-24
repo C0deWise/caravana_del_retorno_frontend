@@ -1,0 +1,9 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="56" height="24" viewBox="0 0 56 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Ornamento">
+<g id="Vector">
+<path d="M2 12H54Z" fill="black"/>
+<path d="M2 12H54" stroke-width="2" stroke-linecap="round" stroke="#F28F38"/>
+</g>
+<path id="Vector_2" d="M14 12C14 6 20 4 22 4C22 9 18 12 14 12ZM26 12C26 6 32 4 34 4C34 9 30 12 26 12ZM38 12C38 6 44 4 46 4C46 9 42 12 38 12ZM14 12C14 18 20 20 22 20C22 15 18 12 14 12ZM26 12C26 18 32 20 34 20C34 15 30 12 26 12Z" fill="#F28F38"/>
+</g>
+</svg>
