@@ -1,76 +1,102 @@
 import FooterCurve from "@/ui/general/FooterCurve";
 import FlorenciaMap from "@/ui/social/FlorenciaMap";
 import VerticalSeparator from "@/ui/decorators/VerticalSeparator";
-import MainText from "@/ui/general/MainText";
+import InstitutionalStripe from "@/ui/decorators/InstitutionalStripe";
+import CroppedLogo, { LOGO_CROQUIS_ICON } from "@/ui/general/CroppedLogo";
 import SocialIcon from "@/ui/social/SocialIcon";
-import { PhotoIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
 
+/** Entidades que apoyan el proyecto ("Con el apoyo de"). Logos en `public/apoyo`. */
+const SUPPORTERS = [
+  { name: "CodeWise", logo: "/apoyo/logo-apoyo-codewise.svg" },
+  { name: "Universidad del Cauca", logo: "/apoyo/logo-apoyo-unicauca.svg" },
+];
+
+/** Redes sociales del footer. */
+const SOCIAL_LINKS = [
+  { label: "Facebook", href: "https://facebook.com", icon: "/social/facebook.svg" },
+  { label: "Instagram", href: "https://instagram.com", icon: "/social/instagram.svg" },
+];
+
+/**
+ * Contenido del footer público.
+ *
+ * Responsive (prototipo "Footer" desktop y mobile):
+ *  - Móvil / tablet (< `lg`): todo apilado — mapa, "¡Encuéntranos en el mapa!",
+ *    apoyos, franja institucional horizontal y fila con logo + redes.
+ *  - `lg` (≥1024px): tres columnas — mapa | texto + apoyos | franja vertical | logo + redes.
+ *  - Abajo, siempre, la barra de derechos reservados (en flujo normal, ya no
+ *    posicionada en absoluto, para que nunca se monte sobre el contenido).
+ */
 export default function HomeFooterContent() {
   return (
-    <div className="bg-primary md:h-90 relative">
+    <div className="relative bg-primary text-text-inverse">
       <FooterCurve />
-      <div className="w-full h-11/12 flex">
-        <div className="flex-none md:w-auto aspect-square md:pl-10 md:py-5">
+
+      <div className="flex flex-col gap-8 px-4 pb-8 pt-10 md:px-8 lg:flex-row lg:items-stretch lg:gap-10 lg:px-10 lg:pb-6 lg:pt-8">
+        {/* Mapa */}
+        <div className="aspect-[16/10] w-full overflow-hidden rounded-xl md:aspect-[21/9] lg:aspect-square lg:w-64 lg:shrink-0 xl:w-72">
           <FlorenciaMap />
         </div>
-        <div className="md:w-fit md:h-full justify-center">
-          <div className="flex flex-col md:pl-10 md:pr-10 md:h-full md:py-5 md:w-300">
-            <div className="flex w-fit items-center">
-              <span className="text-text-inverse font-semibold text-3xl md:text-2xl text-shadow-lg">
-                ¡Encuentranos en el mapa!
-              </span>
-            </div>
-            <span className="self-stretch h-1 rounded-full bg-bg flex-none mt-4"></span>
-            <div className="flex flex-col flex-1 min-h-0 mt-2 overflow-hidden">
-              <span className="text-text-inverse font-semibold text-xl text-shadow-lg md:pb-4 flex-none">
-                Con el apoyo de:
-              </span>
-              <div className="flex md:w-full flex-1 min-h-0 gap-4 md:gap-6 relative justify-between items-center">
-                <div className="flex-1 flex justify-center items-center min-w-0 h-full">
-                  <div className="bg-bg/15 rounded-xl aspect-square w-full max-h-full flex items-center justify-center">
-                    <PhotoIcon className="w-1/2 h-1/2 text-text-inverse" />
-                  </div>
-                </div>
-                <div className="flex-1 flex justify-center items-center min-w-0 h-full">
-                  <div className="bg-bg/15 rounded-xl aspect-square w-full max-h-full flex items-center justify-center">
-                    <PhotoIcon className="w-1/2 h-1/2 text-text-inverse" />
-                  </div>
-                </div>
-                <div className="flex-1 flex justify-center items-center min-w-0 h-full">
-                  <div className="bg-bg/15 rounded-xl aspect-square w-full max-h-full flex items-center justify-center">
-                    <PhotoIcon className="w-1/2 h-1/2 text-text-inverse" />
-                  </div>
-                </div>
-                <div className="flex-1 flex justify-center items-center min-w-0 h-full">
-                  <div className="bg-bg/15 rounded-xl aspect-square w-full max-h-full flex items-center justify-center">
-                    <PhotoIcon className="w-1/2 h-1/2 text-text-inverse" />
-                  </div>
-                </div>
-              </div>
-            </div>
+
+        {/* Texto + apoyos */}
+        <div className="flex min-w-0 flex-1 flex-col">
+          <p className="text-2xl font-semibold text-shadow-lg">¡Encuéntranos en el mapa!</p>
+          <span aria-hidden className="mt-4 h-1 w-full rounded-full bg-bg" />
+          <p className="mt-4 text-xl font-semibold text-shadow-lg">Con el apoyo de:</p>
+          <ul className="mt-4 flex flex-wrap gap-4 md:gap-6">
+            {SUPPORTERS.map((supporter) => (
+              <li
+                key={supporter.name}
+                className="flex size-24 items-center justify-center rounded-xl bg-bg p-3 md:size-28 xl:size-36"
+              >
+                <Image
+                  src={supporter.logo}
+                  alt={supporter.name}
+                  width={240}
+                  height={240}
+                  unoptimized
+                  className="size-full object-contain"
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Separador: horizontal en móvil, vertical en escritorio. */}
+        <InstitutionalStripe className="h-1.5 w-full lg:hidden" />
+        {/*
+          El SVG de la franja (viewBox 7×277) tomaría su alto de la proporción
+          (28px de ancho → 1108px de alto) y estiraría todo el footer; en
+          absoluto solo ocupa el alto que ya definen las otras columnas.
+        */}
+        <span aria-hidden className="relative hidden w-7 shrink-0 lg:block">
+          <span className="absolute inset-0 overflow-clip rounded-full">
+            <VerticalSeparator />
+          </span>
+        </span>
+
+        {/* Logo + redes */}
+        <div className="flex items-center justify-between gap-6 lg:w-56 lg:flex-col lg:justify-between xl:w-64">
+          <CroppedLogo logo={LOGO_CROQUIS_ICON} className="w-[170px] md:w-[200px] xl:w-[220px]" />
+          <div className="flex items-center gap-4 lg:flex-col lg:gap-6">
+            {SOCIAL_LINKS.map((social) => (
+              <SocialIcon
+                key={social.label}
+                href={social.href}
+                src={social.icon}
+                label={social.label}
+                size={56}
+              />
+            ))}
           </div>
         </div>
-        <span className="self-stretch w-7 rounded-full overflow-clip md:mr-6 md:mb-5 md:mt-2">
-          <VerticalSeparator />
-        </span>
-        <div className="flex flex-1 flex-col md:mr-7 md:pb-4 justify-between items-center">
-          <MainText size={220} />
-          <SocialIcon
-            href="https://facebook.com"
-            src="/social/facebook.svg"
-            label="Facebook"
-          />
-          <SocialIcon
-            href="https://instagram.com"
-            src="/social/instagram.svg"
-            label="Instagram"
-          />
-        </div>
       </div>
-      <div className="absolute bottom-2 left-0 right-0 text-center text-text-inverse text-sm font-light">
-        © {new Date().getFullYear()} All rights reserved | Caravana del retorno,
-        Florencia, Cauca
-      </div>
+
+      <p className="border-t border-text-inverse/10 bg-black/10 px-4 py-4 text-center text-sm font-light">
+        © {new Date().getFullYear()} Todos los derechos reservados | Caravana del Retorno, Florencia,
+        Cauca
+      </p>
     </div>
   );
 }
