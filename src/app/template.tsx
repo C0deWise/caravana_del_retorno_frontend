@@ -58,7 +58,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
         ? Promise.resolve()
         : Promise.all(images.map(waitForLoad));
 
-    promise.finally(() => {
+    void promise.finally(() => {
       clearTimers();
       setLoading(false);
     });

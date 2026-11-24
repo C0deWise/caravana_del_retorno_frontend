@@ -139,7 +139,12 @@ export default function HistoryLightbox({
 /** Renderiza el archivo en grande según su tipo. */
 function MediaViewer({ item }: { item: GalleryItem }) {
   if (item.kind === "video") {
-    return <video src={item.src} controls playsInline className="max-h-[70vh] w-full rounded-xl bg-black" />;
+    return (
+      <video src={item.src} controls playsInline className="max-h-[70vh] w-full rounded-xl bg-black">
+        {/* Las publicaciones aún no tienen subtítulos; la pista vacía deja lista la estructura accesible. */}
+        <track kind="captions" />
+      </video>
+    );
   }
   if (item.kind === "embed") {
     const src = embedUrl(item.src);
