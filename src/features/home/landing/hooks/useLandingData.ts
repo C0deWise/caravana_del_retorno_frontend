@@ -48,7 +48,7 @@ export const useLandingData = (): UseLandingDataReturn => {
       })
       .catch(() => ({ finishedReturns: null, publications: null }));
 
-    Promise.all([loadColonies, loadReturnsAndPublications]).then(
+    void Promise.all([loadColonies, loadReturnsAndPublications]).then(
       ([colonies, { finishedReturns, publications }]) => {
         if (cancelled) return;
         setData({ colonies, finishedReturns, publications });

@@ -52,7 +52,7 @@ export function useHistory(): UseHistoryReturn {
   useEffect(() => {
     let cancelled = false;
 
-    (async () => {
+    void (async () => {
       try {
         const returns = [...(await historyService.getReturns())].sort(
           (a, b) => b.anio - a.anio,
