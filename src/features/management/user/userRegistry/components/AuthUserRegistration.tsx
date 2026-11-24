@@ -350,7 +350,7 @@ export default function AuthUserRegistration() {
 
             {/* Columna Derecha - Datos de Inicio de Sesión */}
             <div>
-              <h2 className="section-title">Datos de inicio de sesion</h2>
+              <h2 className="section-title">Datos de inicio de sesión</h2>
 
               <div className="space-y-6">
                 {/* Correo Electrónico */}

@@ -22,7 +22,7 @@ export const menuConfig: MenuItem[] = [
         href: "/gestion/colonia/crear",
       },
       {
-        label: "Asignar lider de Colonia",
+        label: "Asignar líder de Colonia",
         href: "/gestion/colonia/asignar-lider",
       },
       {
