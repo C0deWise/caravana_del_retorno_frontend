@@ -1,0 +1,17 @@
+node_modules
+.next
+.git
+.gitignore
+.github
+.vscode
+.env
+.env.*
+env.encrypted
+encrypt.txt
+.sops.yaml
+README.md
+tsconfig.tsbuildinfo
+Dockerfile
+.dockerignore
+docker-compose*.yml
+*.log

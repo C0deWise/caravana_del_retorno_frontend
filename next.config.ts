@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  // Genera un servidor Node autocontenido en .next/standalone (lo usa el Dockerfile).
+  output: "standalone",
+};
 
 export default nextConfig;
