@@ -264,7 +264,7 @@ function AssignLeaderToColonyForm() {
   const error = searchError || assignError;
   const loading = assignLoading || searchLoading;
   const placeholder =
-    searchType === "documento" ? "Ej: 1234567890" : "Ej: Ana Pérez";
+    searchType === "documento" ? "Ej.: 1234567890" : "Ej.: Ana Pérez";
 
   return (
     <div
@@ -349,7 +349,7 @@ function AssignLeaderToColonyForm() {
                     if (filteredColonies.length > 0)
                       setIsColonyDropdownOpen(true);
                   }}
-                  placeholder="Ej: Colombia - Antioquia - Medellín"
+                  placeholder="Ej.: Colombia - Antioquia - Medellín"
                   className="flex-1 py-3 pr-4 text-base bg-transparent outline-none"
                   style={{ color: "var(--color-text)" }}
                   autoComplete="off"

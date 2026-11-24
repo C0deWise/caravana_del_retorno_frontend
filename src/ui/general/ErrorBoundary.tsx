@@ -24,7 +24,7 @@ export default class ErrorBoundary extends React.Component<Props> {
         this.props.fallback || (
           <div className="p-6 bg-red-50 border border-red-200 rounded-xl text-red-800">
             <h3 className="font-semibold mb-2">Error en esta sección</h3>
-            <p>Recarga la página o contacta soporte si persiste.</p>
+            <p>Recarga la página o contacta a soporte si persiste.</p>
           </div>
         )
       );

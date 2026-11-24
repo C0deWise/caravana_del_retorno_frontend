@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ReactNode } from "react";
+import { MouseEventHandler, ReactNode } from "react";
 
 interface AnimatedLinkProps {
   href: string;
@@ -7,6 +7,8 @@ interface AnimatedLinkProps {
   linkClassName?: string;
   textClassName?: string;
   underlineClassName?: string;
+  /** Opcional: permite al padre interceptar el clic (p. ej. scroll a una sección). */
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
 }
 
 export default function AnimatedLink({
@@ -15,10 +17,12 @@ export default function AnimatedLink({
   linkClassName,
   textClassName,
   underlineClassName,
+  onClick,
 }: AnimatedLinkProps) {
   return (
     <Link
       href={href}
+      onClick={onClick}
       className={`group transition-colors inline-flex flex-col ${linkClassName ?? ""}`}
     >
       <span className={`transition-colors duration-300 ${textClassName ?? ""}`}>

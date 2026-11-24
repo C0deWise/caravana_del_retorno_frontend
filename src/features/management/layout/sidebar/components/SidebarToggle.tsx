@@ -21,7 +21,7 @@ export default function SidebarToggle() {
           }
         `}
       >
-        Menu principal
+        Menú principal
       </span>
     </button>
   );

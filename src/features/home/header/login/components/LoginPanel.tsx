@@ -7,9 +7,20 @@ import { useRouter } from "next/navigation";
 
 interface LoginPanelProps {
   onClose: () => void;
+  /**
+   * Opcional: reemplaza la posición/tamaño del panel. Por defecto es el
+   * desplegable flotante del header de escritorio; el menú móvil lo usa en línea.
+   */
+  className?: string;
 }
 
-export default function LoginPanel({ onClose }: LoginPanelProps) {
+const DEFAULT_PANEL_CLASS =
+  "absolute top-full -right-9 z-50 mt-2 w-80 rounded-bl-xl";
+
+export default function LoginPanel({
+  onClose,
+  className = DEFAULT_PANEL_CLASS,
+}: LoginPanelProps) {
   const [documento, setDocumento] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -39,7 +50,7 @@ export default function LoginPanel({ onClose }: LoginPanelProps) {
   };
 
   return (
-    <div className="absolute top-full -right-9 z-50 mt-2 w-80 rounded-bl-xl bg-primary p-6 shadow-lg">
+    <div className={`${className} bg-primary p-6 shadow-lg`}>
       <h2 className="mb-4 text-xl font-semibold">Iniciar sesión</h2>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -55,7 +66,7 @@ export default function LoginPanel({ onClose }: LoginPanelProps) {
             setDocumento(e.target.value);
             setError("");
           }}
-          placeholder="Ej: 1085123456"
+          placeholder="Ej.: 1085123456"
           disabled={isLoading}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? "login-document-error" : undefined}

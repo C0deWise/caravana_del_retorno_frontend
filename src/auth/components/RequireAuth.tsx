@@ -30,7 +30,7 @@ export function RequireAuth({ children, roles }: RequireAuthProps) {
     return (
       <div className="w-full h-full flex items-center justify-center p-8">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-text mb-4">Acceso Denegado</h1>
+          <h1 className="text-2xl font-bold text-text mb-4">Acceso denegado</h1>
           <p className="text-text-muted">
             No tienes permiso para ver este contenido.
           </p>

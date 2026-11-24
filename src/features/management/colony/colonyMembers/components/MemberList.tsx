@@ -19,7 +19,7 @@ export function MemberList({ members, userRole }: MemberListProps) {
         <h3 className="text-xl font-bold text-text mb-2">
           No se encontraron miembros
         </h3>
-        <p className="text-text-muted">Esta colonia no tiene miembros aun.</p>
+        <p className="text-text-muted">Esta colonia no tiene miembros aún.</p>
       </div>
     );
   }

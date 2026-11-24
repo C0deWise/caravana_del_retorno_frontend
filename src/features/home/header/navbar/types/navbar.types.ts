@@ -1,7 +1,7 @@
 export const NavItemType = {
   LINK: "Link",
-  DROPDOWN: "Menu desplegable",
-  LOGIN: "Menu desplegable de inicio de sesión",
+  DROPDOWN: "Menú desplegable",
+  LOGIN: "Menú desplegable de inicio de sesión",
 } as const;
 
 export type NavType = (typeof NavItemType)[keyof typeof NavItemType];
