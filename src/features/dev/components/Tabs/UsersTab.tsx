@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useAuth } from "@/auth/context/AuthContext";
 import { useGetColony } from "@/features/management/colony/hooks/useGetColony";
 import { useDev } from "../../context/DevContext";
+import { UserData } from "@/types/user.types";
 import { ApiConnectionToggle } from "./Users/ApiConnectionToggle";
 import { ApiUserSearch } from "./Users/ApiUserSearch";
 import { ManualRoleSelector } from "./Users/ManualRoleSelector";
@@ -27,6 +28,29 @@ export function UsersTab() {
       getColony(user.codigo_colonia);
     }
   }, [user?.codigo_colonia, getColony]);
+
+  const displayUser: UserData | null =
+    user ??
+    (!apiMode && roleOverride !== undefined
+      ? {
+          id: mockUserId ?? 9999,
+          role: roleOverride,
+          codigo_colonia: mockColoniaId ?? null,
+          fecha_creacion: new Date().toISOString(),
+          tipo_doc: "CC",
+          documento: "0000000000",
+          celular: "0000000000",
+          correo: "mock@dev.com",
+          nombre: "Usuario",
+          apellido: "Mock",
+          genero: "otro",
+          fecha_nacimiento: "2000-01-01",
+          pais: "Colombia",
+          departamento: null,
+          ciudad: null,
+          codigo_retorno: null,
+        }
+      : null);
 
   return (
     <>
@@ -60,7 +84,7 @@ export function UsersTab() {
       />
 
       <ActiveUserData
-        user={user}
+        user={displayUser}
         apiMode={apiMode}
         loadingColony={loadingColony}
         fetchedColony={fetchedColony}

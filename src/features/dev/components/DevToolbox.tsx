@@ -29,49 +29,6 @@ export default function DevToolboxWrapper() {
 }
 
 function MockAuthSync() {
-  const { apiMode, roleOverride, mockColoniaId, mockUserId, isDev } = useDev();
-  const { user, login } = useAuth();
-
-  useEffect(() => {
-    if (!isDev || apiMode) return;
-    if (roleOverride === undefined) return;
-
-    const currentUserId = user?.id;
-    const currentUserRole = user?.role;
-    const currentColoniaId = user?.codigo_colonia ?? null;
-
-    const targetUserId = mockUserId ?? 9999;
-    const targetColoniaId = mockColoniaId ?? null;
-
-    if (
-      currentUserId !== targetUserId ||
-      currentUserRole !== roleOverride ||
-      currentColoniaId !== targetColoniaId
-    ) {
-      const mockUser: UserData = {
-        ...(user ?? ({} as UserData)),
-        id: targetUserId,
-        role: roleOverride,
-        codigo_colonia: targetColoniaId,
-        fecha_creacion: user?.fecha_creacion ?? new Date().toISOString(),
-        tipo_doc: user?.tipo_doc ?? "CC",
-        documento: user?.documento ?? "0000000000",
-        celular: user?.celular ?? "0000000000",
-        correo: user?.correo ?? "mock@dev.com",
-        nombre: user?.nombre ?? "Usuario",
-        apellido: user?.apellido ?? "Mock",
-        genero: user?.genero ?? "otro",
-        fecha_nacimiento: user?.fecha_nacimiento ?? "2000-01-01",
-        pais: user?.pais ?? "Colombia",
-        departamento: user?.departamento ?? null,
-        ciudad: user?.ciudad ?? null,
-        codigo_retorno: user?.codigo_retorno ?? null,
-      };
-      
-      login(mockUser);
-    }
-  }, [isDev, apiMode, roleOverride, mockColoniaId, mockUserId, user, login]);
-
   return null;
 }
 
@@ -94,18 +51,20 @@ function DevToolbox() {
 
     if (isDragging && !prevDraggingRef.current) {
       wasOpenRef.current = isOpen;
-      if (isOpen) {
-        timer = setTimeout(() => setIsOpen(false), 0);
-      }
+    } else if (isDragging && hasMoved.current && isOpen) {
+      timer = setTimeout(() => setIsOpen(false), 0);
     } else if (!isDragging && prevDraggingRef.current && wasOpenRef.current) {
-      timer = setTimeout(() => setIsOpen(true), 0);
+      if (hasMoved.current) {
+        timer = setTimeout(() => setIsOpen(true), 0);
+      }
+      wasOpenRef.current = false;
     }
     prevDraggingRef.current = isDragging;
 
     return () => {
       if (timer) clearTimeout(timer);
     };
-  }, [isDragging, isOpen]);
+  }, [isDragging, isOpen, hasMoved]);
 
   const handleButtonClick = () => {
     if (!hasMoved.current) {

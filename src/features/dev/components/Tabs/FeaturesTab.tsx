@@ -10,7 +10,7 @@ export function FeaturesTab() {
         <ToggleRight size={14} />
         <span>Feature Flags</span>
       </div>
-      
+
       {!apiMode && (
         <div className="text-[10px] text-amber-500/50 italic mb-2">
           Activa la conexión a la API para modificar individualmente los mocks.
@@ -22,6 +22,7 @@ export function FeaturesTab() {
           <div key={key} className={`flex items-center justify-between p-3 rounded-lg border border-zinc-800 bg-black/40 ${apiMode ? "" : "opacity-50"}`}>
             <span className="text-[10px] font-mono text-zinc-300">{key}</span>
             <button
+              type="button"
               onClick={() => setFeatureFlag(key as keyof typeof featureFlags, !value)}
               disabled={!apiMode}
               className={`relative inline-flex h-4 w-8 items-center rounded-full transition-colors ${

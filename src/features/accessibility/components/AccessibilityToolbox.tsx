@@ -43,11 +43,12 @@ export default function AccessibilityToolbox() {
     <>
       <div
         ref={ref}
+        className="touch-none"
         style={{ ...getButtonStyle(pos, isDragging), visibility: isReady ? "visible" : "hidden" }}
       >
         <button
           onClick={handleButtonClick}
-          className="w-12 h-12 rounded-full shadow-lg transition-all hover:scale-110 active:scale-95 flex items-center justify-center bg-secondary text-text-inverse"
+          className="touch-none w-12 h-12 rounded-full shadow-lg transition-all hover:scale-110 active:scale-95 flex items-center justify-center bg-secondary text-text-inverse"
           aria-label="Abrir panel de accesibilidad"
           aria-expanded={isOpen}
           aria-controls="accessibility-panel"

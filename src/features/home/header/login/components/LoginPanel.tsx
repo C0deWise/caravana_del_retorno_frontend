@@ -12,9 +12,10 @@ interface LoginPanelProps {
   readonly isVisible?: boolean;
   readonly isMobile?: boolean;
   readonly onClose: () => void;
+  readonly onNavigateToRegister?: () => void;
 }
 
-export default function LoginPanel({ isVisible = true, isMobile = false, onClose }: LoginPanelProps) {
+export default function LoginPanel({ isVisible = true, isMobile = false, onClose, onNavigateToRegister }: LoginPanelProps) {
   const [correo, setCorreo] = useState("");
   const [contrasenia, setContrasenia] = useState("");
   const router = useRouter();
@@ -144,6 +145,7 @@ export default function LoginPanel({ isVisible = true, isMobile = false, onClose
               type="button"
               onClick={() => {
                 onClose();
+                onNavigateToRegister?.();
                 router.push("/auth/registro");
               }}
               className="w-full cursor-pointer rounded-lg bg-secondary py-3 text-base font-bold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg active:scale-[0.98] border border-transparent hover:border-white/20"

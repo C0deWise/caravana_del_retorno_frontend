@@ -1,10 +1,19 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode, useMemo } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useMemo } from "react";
 import { UserRole } from "@/types/user.types";
 import { FEATURE_FLAGS } from "@/config/featureFlags";
 
-export const IS_DEV = process.env.NEXT_PUBLIC_DEV_TOOLS === "true";
+export const IS_DEV =
+  process.env.NEXT_PUBLIC_DEV_TOOLS === "true" || process.env.NODE_ENV === "development";
+
+export interface DevRegisterOptions {
+  blockRedirect: boolean;
+}
+
+const DEFAULT_REGISTER_OPTIONS: DevRegisterOptions = {
+  blockRedirect: false,
+};
 
 interface DevContextType {
   roleOverride: UserRole | undefined;
@@ -18,6 +27,8 @@ interface DevContextType {
   setApiMode: (mode: boolean) => void;
   featureFlags: typeof FEATURE_FLAGS;
   setFeatureFlag: (key: keyof typeof FEATURE_FLAGS, value: boolean) => void;
+  devRegisterOptions: DevRegisterOptions;
+  setDevRegisterOption: (key: keyof DevRegisterOptions, value: boolean) => void;
 }
 
 const DevContext = createContext<DevContextType | undefined>(undefined);
@@ -36,6 +47,31 @@ export function DevProvider({ children }: { readonly children: ReactNode }) {
     });
     return flags;
   });
+
+  const [devRegisterOptions, setDevRegisterOptions] = useState<DevRegisterOptions>(DEFAULT_REGISTER_OPTIONS);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("dev_register_options");
+      if (saved) {
+        setDevRegisterOptions({ ...DEFAULT_REGISTER_OPTIONS, ...JSON.parse(saved) });
+      }
+    } catch {
+      // ignore storage errors
+    }
+  }, []);
+
+  const setDevRegisterOption = (key: keyof DevRegisterOptions, value: boolean) => {
+    setDevRegisterOptions((prev) => {
+      const next = { ...prev, [key]: value };
+      try {
+        localStorage.setItem("dev_register_options", JSON.stringify(next));
+      } catch {
+        // ignore storage errors
+      }
+      return next;
+    });
+  };
 
   const setFeatureFlag = (key: keyof typeof FEATURE_FLAGS, value: boolean) => {
     setFeatureFlags(prev => ({ ...prev, [key]: value }));
@@ -65,8 +101,10 @@ export function DevProvider({ children }: { readonly children: ReactNode }) {
       setApiMode: handleSetApiMode,
       featureFlags,
       setFeatureFlag,
+      devRegisterOptions,
+      setDevRegisterOption,
     }),
-    [roleOverride, mockColoniaId, mockUserId, apiMode, featureFlags],
+    [roleOverride, mockColoniaId, mockUserId, apiMode, featureFlags, devRegisterOptions],
   );
 
   return <DevContext.Provider value={value}>{children}</DevContext.Provider>;
@@ -87,6 +125,8 @@ export function useDev() {
       setApiMode: () => { },
       featureFlags: FEATURE_FLAGS,
       setFeatureFlag: () => { },
+      devRegisterOptions: DEFAULT_REGISTER_OPTIONS,
+      setDevRegisterOption: () => { },
     };
   }
   return context;

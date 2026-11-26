@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import { ApiError } from "@/services/api.services";
+import { authApi } from "@/services/auth.api";
+import { useAuth } from "@/auth/context/AuthContext";
+import { useDev } from "@/features/dev/context/DevContext";
+import { registrationService } from "../services/userRegistry.service";
 import type { RegistrationRequest } from "../types/registro.types";
-
 
 interface UseRegisterUserReturn {
   registerUser: (data: RegistrationRequest) => Promise<void>;
@@ -16,24 +19,31 @@ export const useRegisterUser = (): UseRegisterUserReturn => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const { login } = useAuth();
+  const { apiMode } = useDev();
 
   const registerUser = async (data: RegistrationRequest): Promise<void> => {
-    void data; // TODO: Implementar API
     setLoading(true);
     setError(null);
     setSuccess(false);
 
     try {
-      // API call simulada para testing
-      // await registrationService.userRegistration(data);
-      // const userData = await authApi.login(data.correo, data.contrasenia);
-      // login(userData);
+      if (apiMode) {
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(
+            () => reject(new Error("No se pudo conectar con el servidor. Intenta de nuevo más tarde.")),
+            10000
+          )
+        );
 
-      // Simulamos la latencia de la red de 1.5 segundos
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+        await Promise.race([registrationService.userRegistration(data), timeoutPromise]);
+        const userData = await Promise.race([authApi.login(data.correo, data.contrasenia), timeoutPromise]);
+        login(userData);
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      }
 
       setSuccess(true);
-      // setTimeout(() => router.push("/gestion"), 5000);
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.status === 422) {

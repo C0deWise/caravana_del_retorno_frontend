@@ -9,7 +9,8 @@ interface ApiUserSearchProps {
 }
 
 export function ApiUserSearch({ apiMode, onLogin }: ApiUserSearchProps) {
-  const { realUsers, isLoadingUsers } = useDevUsers(apiMode);
+  const [fetchUsersEnabled, setFetchUsersEnabled] = useState(false);
+  const { realUsers, isLoadingUsers } = useDevUsers(apiMode && fetchUsersEnabled);
 
   const [userSearchQuery, setUserSearchQuery] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -26,7 +27,15 @@ export function ApiUserSearch({ apiMode, onLogin }: ApiUserSearchProps) {
         <Users size={14} />
         <span>Seleccionar Usuario Real</span>
       </div>
-      {isLoadingUsers ? (
+      {!fetchUsersEnabled ? (
+        <button
+          type="button"
+          onClick={() => setFetchUsersEnabled(true)}
+          className="w-full rounded-lg border border-zinc-800 bg-black/40 px-3 py-2 text-[10px] font-mono text-lime-400 hover:border-lime-500/50 hover:bg-zinc-900 transition-all cursor-pointer"
+        >
+          Buscar usuarios disponibles
+        </button>
+      ) : isLoadingUsers ? (
         <div className="text-xs text-zinc-500 italic">Cargando usuarios...</div>
       ) : (
         <div className="relative">

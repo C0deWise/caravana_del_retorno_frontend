@@ -22,6 +22,8 @@ export default function HomeNavbar({ isMobile = false, onClose }: HomeNavbarProp
   const loginRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (isMobile) return;
+
     function handleClickOutside(event: MouseEvent) {
       if (loginRef.current && !loginRef.current.contains(event.target as Node)) {
         setShowLogin(false);
@@ -33,7 +35,7 @@ export default function HomeNavbar({ isMobile = false, onClose }: HomeNavbarProp
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [showLogin]);
+  }, [showLogin, isMobile]);
 
   return (
     <nav
@@ -95,7 +97,12 @@ export default function HomeNavbar({ isMobile = false, onClose }: HomeNavbarProp
                   showLogin ? "w-full" : "w-0 group-hover:w-full"
                 }`} />
               </button>
-              <LoginPanel isVisible={showLogin} isMobile={isMobile} onClose={() => setShowLogin(false)} />
+              <LoginPanel
+                isVisible={showLogin}
+                isMobile={isMobile}
+                onClose={() => setShowLogin(false)}
+                onNavigateToRegister={onClose}
+              />
             </div>
           );
         }

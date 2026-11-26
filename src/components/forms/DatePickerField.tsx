@@ -102,6 +102,7 @@ export function DatePickerField({
           locale="es"
           portalId="datepicker-portal"
           wrapperClassName="w-full"
+          customInput={<input readOnly inputMode="none" />}
           onChangeRaw={(e) => e?.preventDefault()}
           renderCustomHeader={({
             date,

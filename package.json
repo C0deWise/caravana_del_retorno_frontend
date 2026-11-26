@@ -5,7 +5,7 @@
   "scripts": {
     "env:dec": "node scripts/decrypt.mjs",
     "env:enc": "node scripts/encrypt.mjs",
-    "dev": "npm run env:dec && next dev",
+    "dev": "npm run env:dec && next dev -H 0.0.0.0",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

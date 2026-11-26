@@ -27,7 +27,7 @@ export function DevButton({
         ...getButtonStyle(pos, isDragging),
         visibility: isReady ? "visible" : "hidden",
       }}
-      className="group"
+      className="group touch-none"
     >
       <button
         onClick={onClick}
