@@ -1,0 +1,10 @@
+Ajustar redireccion registro
+Ajustar login
+Abre teclado en datepicker
+deja escribir en genero
+Ajustar tipos CC, CE, PA.
+Traducir todos los paises al español
+Agregar select indicativo numero
+Numero celular '+300134567'
+No se ve bien Iphone 13 Pro
+Ajustar input de nombre solo letras
