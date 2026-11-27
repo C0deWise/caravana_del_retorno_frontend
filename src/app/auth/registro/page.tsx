@@ -5,7 +5,7 @@ export default function RegistroPage() {
   return (
     <div className="relative w-full min-h-[100dvh] md:min-h-[900px] flex flex-col justify-center overflow-hidden">
       <Image
-        src="/backgrounds/mesh.webp"
+        src="/backgrounds/mesh-registro.webp"
         alt="Fondo de registro"
         fill
         sizes="100vw"

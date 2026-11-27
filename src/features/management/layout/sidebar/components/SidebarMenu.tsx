@@ -31,7 +31,11 @@ export default function SidebarMenu() {
   });
 
   return (
-    <nav className="flex-1 p-4 overflow-hidden overflow-y-auto custom-scrollbar">
+    <nav
+      className={`flex-1 px-4 pb-4 overflow-hidden overflow-y-auto custom-scrollbar transition-[padding] duration-300 ${
+        isCollapsed ? "pt-1" : "pt-4"
+      }`}
+    >
       <div className="mb-4 pb-4 border-b border-bg-border/60">
         <SidebarMenuItem
           item={{ label: "Inicio del Panel", href: "/gestion", icon: "dashboard" }}

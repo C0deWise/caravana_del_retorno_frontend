@@ -7,6 +7,7 @@ import { useSidebarContext } from "./SidebarContext";
 import { MenuItem } from "@/features/management/layout/types/menu.types";
 import { useActivePath } from "../hooks/useActivePath";
 import { useRouter } from "next/navigation";
+import { MarqueeText } from "@/components/common/MarqueeText";
 
 interface MenuItemProps {
   item: MenuItem;
@@ -21,7 +22,7 @@ export default function SidebarMenuItem({
 }: MenuItemProps) {
   const router = useRouter();
   const { isActive } = useActivePath();
-  const { openMenus, toggleMenu } = useSidebarContext();
+  const { openMenus, toggleMenu, closeMobile } = useSidebarContext();
 
   const isOpen = openMenus[item.href];
   const isParent = !!item.subitems?.length;
@@ -40,15 +41,16 @@ export default function SidebarMenuItem({
       return;
     }
 
+    closeMobile();
     router.push(item.href);
   };
 
-  const baseStyles = `rounded-lg transition-all flex items-center w-full relative z-10 cursor-pointer py-1 group hover:bg-gray-100 hover:text-secondary hover:shadow-md`;
+  const baseStyles = `rounded-xl transition-all flex items-center w-full relative z-10 cursor-pointer py-1.5 group hover:bg-white/60 hover:text-secondary`;
   const activeStyles =
-    anyDescendantActive || (isActive(item.href) && isParent)
-      ? "bg-gray-100 shadow-md text-primary"
+    anyDescendantActive || isActive(item.href)
+      ? "bg-white/85 shadow-sm text-primary font-semibold"
       : isOpen && isParent
-        ? "bg-gray-100 shadow-md"
+        ? "bg-white/60 shadow-sm"
         : "";
 
   return (
@@ -67,15 +69,15 @@ export default function SidebarMenuItem({
               {iconMap[item.icon] && React.createElement(iconMap[item.icon], { className: "w-5 h-5 shrink-0" })}
             </span>
           )}
-          <span
-            className={`truncate font-medium text-lg transition-all relative z-20 ${
+          <div
+            className={`min-w-0 flex-1 font-medium text-lg transition-all relative z-20 ${
               isCollapsed && level === 0
                 ? "opacity-0 w-0 scale-x-50 -translate-x-2"
                 : "opacity-100"
             }`}
           >
-            {item.label}
-          </span>
+            <MarqueeText text={item.label} />
+          </div>
         </div>
 
         {/* Chevron */}

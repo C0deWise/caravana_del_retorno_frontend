@@ -56,6 +56,16 @@
 body {
   background: var(--color-bg);
   font-family: var(--font-sans);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+input,
+textarea,
+[contenteditable="true"] {
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 /* Custom Scrollbar */
